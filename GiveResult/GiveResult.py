@@ -1,0 +1,2 @@
+def giveResult(string):
+    return
