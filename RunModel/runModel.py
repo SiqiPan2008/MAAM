@@ -113,6 +113,7 @@ def trainModel(device, model, dataloaders, criterion, optimizer, scheduler, file
                     "best_acc": bestAcc,
                     "optimizer": optimizer.state_dict()
                 }
+                torch.save(state, os.path.join("../TrainedModel", filename))
             if phase == "test":
                 testAccHistory.append(epochAcc)
                 testLosses.append(epochLoss)
@@ -131,7 +132,7 @@ def trainModel(device, model, dataloaders, criterion, optimizer, scheduler, file
     model.load_state_dict(bestModelWts)
     return model, testAccHistory, trainAccHistory, testLosses, trainLosses, LRs
 
-def runModel():
+def runModel(device, featureExtract, modelName, filename):
     dataDir = "../data"
     trainDir = dataDir + "/train"
     testDir = dataDir + "/test"
@@ -142,16 +143,8 @@ def runModel():
     datasetSizes = {x: len(imageDatasets[x]) for x in ["train", "test"]}
     classNames = imageDatasets["train"].classes
     
-    modelName = "resnet"
-    featureExtract = True
-    useGpu = torch.cuda.is_available()
-    print("CUDA available." if useGpu else "CUDA not available.")
-    device = torch.device("cuda:0" if useGpu else "cpu") # get to know how to use both GPUs
-    print(device)
-    
     modelFt, inputSize = initializeModel(modelName, 128, featureExtract) # what does FT stand for?
     modelFt = modelFt.to(device)
-    filename = "checkpoint.pth"
     
     paramsToUpdate = modelFt.parameters()
     print("Params to learn:")
