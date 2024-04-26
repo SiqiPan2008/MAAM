@@ -1,10 +1,10 @@
-from TrainModel import TrainModel
+from RunModel import runModel
 from GiveResult import GiveResult
 
 def main():
     string = input("Filename (empty for training): ")
     if string == "":
-        TrainModel.trainModel() # call trainModel()
+        runModel.runModel() # call trainModel()
     else:
         GiveResult.giveResult(string) # with file open: give results
     
