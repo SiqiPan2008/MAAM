@@ -16,6 +16,16 @@ import json
 from PIL import Image
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 
+def resizeLongEdge(imagePath, longEdgeSize = 224):
+    img = Image.open(imagePath)
+    width, height = img.size
+    if width > height:
+        newSize = (longEdgeSize, int(height * longEdgeSize / width))
+    else:
+        newSize = (int(longEdgeSize * width / height), height)
+    img = img.resize(newSize, Image.ANTIALIAS)
+    return img
+
 def setParameterRequiresGrad(model, featureExtract):
     if featureExtract:
         for param in model.parameters():
@@ -92,19 +102,41 @@ def trainModel(device, model, dataloaders, criterion, optimizer, scheduler, file
             epochLoss = runningLoss / datasetLen
             epochAcc = runningCorrects / datasetLen
             timeElapsed = time.time() - startTime
-            print(f"time elapsed {timeElapsed // 60 :.0f}m {timeElapsed % 60 :.2f}")
+            print(f"time elapsed {timeElapsed // 60 :.0f}m {timeElapsed % 60 :.2f}s")
             print(f"{phase} loss: {epochLoss :.4f}, acc: {epochAcc :.4f}")
             
-                        
+            if phase == "test" and epochAcc > bestAcc:
+                bestAcc = epochAcc
+                bestModelWts = copy.deepcopy(model.state_dict())
+                state = {
+                    "state_dict": model.state_dict(),
+                    "best_acc": bestAcc,
+                    "optimizer": optimizer.state_dict()
+                }
+            if phase == "test":
+                testAccHistory.append(epochAcc)
+                testLosses.append(epochLoss)
+                scheduler.step(epochLoss)
+            elif phase == "train":
+                trainAccHistory.append(epochAcc)
+                trainLosses.append(epochLoss)
         
-    
+        print(f"optimizer learning rate: {optimizer.param_groups[0]["lr"] :.7f}")
+        LRs.append(optimizer.param_group[0]["lr"])
+        print()
+        
+    timeElapsed = time.time() - startTime
+    print(f"training complete in {timeElapsed // 60 :.0f}m {timeElapsed % 60 :.2f}s")
+    print(f"best test acc: {bestAcc :.4f}")
+    model.load_state_dict(bestModelWts)
+    return model, testAccHistory, trainAccHistory, testLosses, trainLosses, LRs
 
 def runModel():
     dataDir = "../data"
     trainDir = dataDir + "/train"
     testDir = dataDir + "/test"
     batchSize = 16
-    dataTransforms = transforms.Compose([transforms.CenterCrop(224), transforms.ToTensor()])
+    dataTransforms = transforms.Compose([transforms.Lambda(resizeLongEdge), transforms.ToTensor()])
     imageDatasets = {x: datasets.ImageFolder(os.path.join(dataDir, x), dataTransforms) for x in ["train", "test"]}
     dataloaders = {x: torch.utils.data.DataLoader(imageDatasets[x], batchSize = batchSize, shuffle = True) for x in ["train", "test"]}
     datasetSizes = {x: len(imageDatasets[x]) for x in ["train", "test"]}
@@ -135,4 +167,5 @@ def runModel():
     scheduler = optim.lr_scheduler.StepLR(optimizerFt, step_size = 7, gamma = 0.1)
     criterion = nn.NLLLoss() # what is NLL?
     
-    return
+    modelFt, testAccHistory, trainAccHistory, testLosses, trainLosses, LRs = trainModel(device, modelFt, dataloaders, criterion, optimizerFt, scheduler, filename)
+    
