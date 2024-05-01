@@ -33,7 +33,7 @@ def imgShow(img, ax = None, title = None):
     return ax
 
 def giveResult(imgName, numClasses, device, useGpu, featureExtract, modelName, filename):
-    imgPath = os.path.join("../NewImage", imgName)
+    imgPath = os.path.join("./NewImage", imgName)
     modelFt, inputSize = runModel.initializeModel(modelName, numClasses, featureExtract)
     modelFt = modelFt.to(device)
     trainedModel = torch.load(filename)

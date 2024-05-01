@@ -16,15 +16,19 @@ import json
 from PIL import Image
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 
-def resizeLongEdge(imagePath, longEdgeSize = 224):
-    img = Image.open(imagePath)
+def resizeLongEdge(img, longEdgeSize = 224):
     width, height = img.size
     if width > height:
         newSize = (longEdgeSize, int(height * longEdgeSize / width))
+        loc = (0, int((224 - newSize[1]) / 2))
     else:
-        newSize = (int(longEdgeSize * width / height), height)
-    img = img.resize(newSize, Image.ANTIALIAS)
-    return img
+        newSize = (int(longEdgeSize * width / height), longEdgeSize)
+        width, _ = img.size
+        loc = (int((224 - newSize[0]) / 2), 0)
+    img = img.resize(newSize)
+    blackBackground = Image.new('RGB', (224, 224), 'black')  
+    blackBackground.paste(img, loc)
+    return blackBackground
 
 def setParameterRequiresGrad(model, featureExtract):
     if featureExtract:
@@ -96,7 +100,7 @@ def trainModel(device, model, dataloaders, criterion, optimizer, scheduler, file
                         loss.backward
                         optimizer.step()
                 runningLoss += loss.item() * inputs.size(0) # what does 0 mean
-                runningCorrects += torch.sum(preds = labels.data)
+                runningCorrects += torch.sum(preds == labels.data)
             
             datasetLen = len(dataloaders[phase].dataset)
             epochLoss = runningLoss / datasetLen
@@ -113,7 +117,7 @@ def trainModel(device, model, dataloaders, criterion, optimizer, scheduler, file
                     "best_acc": bestAcc,
                     "optimizer": optimizer.state_dict()
                 }
-                torch.save(state, os.path.join("../TrainedModel", filename))
+                torch.save(state, os.path.join("./TrainedModel", filename))
             if phase == "test":
                 testAccHistory.append(epochAcc)
                 testLosses.append(epochLoss)
@@ -122,8 +126,8 @@ def trainModel(device, model, dataloaders, criterion, optimizer, scheduler, file
                 trainAccHistory.append(epochAcc)
                 trainLosses.append(epochLoss)
         
-        print(f"optimizer learning rate: {optimizer.param_groups[0]["lr"] :.7f}")
-        LRs.append(optimizer.param_group[0]["lr"])
+        print(f"optimizer learning rate: {optimizer.param_groups[0]['lr'] :.7f}")
+        LRs.append(optimizer.param_groups[0]["lr"])
         print()
         
     timeElapsed = time.time() - startTime
@@ -133,13 +137,13 @@ def trainModel(device, model, dataloaders, criterion, optimizer, scheduler, file
     return model, testAccHistory, trainAccHistory, testLosses, trainLosses, LRs
 
 def runModel(device, featureExtract, modelName, filename):
-    dataDir = "../data"
+    dataDir = "./data"
     trainDir = dataDir + "/train"
     testDir = dataDir + "/test"
     batchSize = 16
     dataTransforms = transforms.Compose([transforms.Lambda(resizeLongEdge), transforms.ToTensor()])
     imageDatasets = {x: datasets.ImageFolder(os.path.join(dataDir, x), dataTransforms) for x in ["train", "test"]}
-    dataloaders = {x: torch.utils.data.DataLoader(imageDatasets[x], batchSize = batchSize, shuffle = True) for x in ["train", "test"]}
+    dataloaders = {x: torch.utils.data.DataLoader(imageDatasets[x], batch_size = batchSize, shuffle = True) for x in ["train", "test"]}
     datasetSizes = {x: len(imageDatasets[x]) for x in ["train", "test"]}
     classNames = imageDatasets["train"].classes
     
