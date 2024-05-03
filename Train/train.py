@@ -136,7 +136,7 @@ def trainModel(device, model, dataloaders, criterion, optimizer, scheduler, file
             print(f"time elapsed {timeElapsed // 60 :.0f}m {timeElapsed % 60 :.2f}s")
             print(f"{phase} loss: {epochLoss :.4f}, acc: {epochAcc :.4f}")
             
-            if phase == "valid" and epochAcc > bestAcc:
+            if phase == "valid" and epochAcc >= bestAcc:
                 bestAcc = epochAcc
                 bestModelWts = copy.deepcopy(model.state_dict())
                 state = {
@@ -145,6 +145,8 @@ def trainModel(device, model, dataloaders, criterion, optimizer, scheduler, file
                     "optimizer": optimizer.state_dict()
                 }
                 torch.save(state, os.path.join(".\\TrainedModel", filename))
+                print(f"Data successfully written into {filename}.pth")
+                
             if phase == "valid":
                 validAccHistory.append(epochAcc)
                 validLosses.append(epochLoss)
@@ -204,6 +206,6 @@ def train(device, featureExtract, modelName, batchSize, numEpochs, LR, usePretra
         writer.writerow(["Trained from ResNet152" if wtsName == "" else f"Trained from {wtsName}", f"batchSize = {batchSize}", f"LR = {LRs[0]}", f"epochNum = {len(trainLosses)}"])
         for i in range(len(trainLosses)):  
             writer.writerow([i + 1, validAccHistory[i].item(), trainAccHistory[i].item(), validLosses[i], trainLosses[i], LRs[i]])
-    print(f"Data successfully written into {filename}.pth")
+    print(f"Data successfully written into {filename}.csv")
     
     curve(validAccHistory, trainAccHistory, validLosses, trainLosses, filename + ".pdf")

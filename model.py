@@ -13,7 +13,7 @@ def main():
     print(device)
     
     if string == "":
-        train.train(device, featureExtract, modelName, 5, 3, 1e-3, True, "OCT-normal-drusen-demo", "O 2024-05-03 19-20-38", "O")
+        train.train(device, featureExtract, modelName, 16, 25, 1e-3, True, "Fundus-normal-DR-selected", "", "F")
     else:
         numClasses = 2 # CHANGE NUM OF CLASSES!
         classify.classify(string, numClasses, device, useGpu, featureExtract, modelName, string + ".pth")
