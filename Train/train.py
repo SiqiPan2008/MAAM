@@ -14,6 +14,8 @@ import sys
 import copy
 import json
 from PIL import Image
+import csv
+from datetime import datetime
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 
 def resizeLongEdge(img, longEdgeSize = 224):
@@ -26,7 +28,7 @@ def resizeLongEdge(img, longEdgeSize = 224):
         width, _ = img.size
         loc = (int((224 - newSize[0]) / 2), 0)
     img = img.resize(newSize)
-    blackBackground = Image.new('RGB', (224, 224), 'black')  
+    blackBackground = Image.new("RGB", (224, 224), "black")  
     blackBackground.paste(img, loc)
     return blackBackground
 
@@ -40,8 +42,8 @@ def initializeModel (modelName, numClasses, featureExtract, usePretrained = True
     inputSize = 0
     
     if modelName == "resnet":
-        modelFt = models.resnet152(weights = models.ResNet152_Weights.DEFAULT)
-        setParameterRequiresGrad(modelFt, featureExtract)
+        modelFt = models.resnet152(weights = models.ResNet152_Weights.DEFAULT if usePretrained else None)
+        setParameterRequiresGrad(modelFt, featureExtract if usePretrained else False)
         numFtrs = modelFt.fc.in_features
         modelFt.fc = nn.Sequential(nn.Linear(numFtrs, numClasses), nn.LogSoftmax(dim = 1))
         inputSize = 224
@@ -51,7 +53,32 @@ def initializeModel (modelName, numClasses, featureExtract, usePretrained = True
     
     return modelFt, inputSize
 
-def trainModel(device, model, dataloaders, criterion, optimizer, scheduler, filename, numEpochs = 25, isInception = False):
+def curve(validAccHistory, trainAccHistory, validLosses, trainLosses, filename):
+    x = range(1, len(trainLosses) + 1)
+    
+    vAH = [validAccHistory[i].item() for i in range(len(x))]
+    tAH = [trainAccHistory[i].item() for i in range(len(x))]
+    plt.subplot(2, 1, 1)
+    plt.plot(x, vAH, label = "validAcc")
+    plt.plot(x, tAH, label = "trainAcc")
+    plt.title("Accuracy Curve")  
+    plt.xlabel("Epoch")  
+    plt.ylabel("Accuracy")  
+    plt.legend()  
+      
+    plt.subplot(2, 1, 2)
+    plt.plot(x, validLosses, label = "validLoss")
+    plt.plot(x, trainLosses, label = "trainLoss")
+    plt.title("Loss Curve")  
+    plt.xlabel("Epoch")  
+    plt.ylabel("Loss")  
+    plt.legend() 
+    
+    plt.tight_layout()
+    plt.savefig(os.path.join(".\\Log", filename), format="pdf")
+    plt.show()
+
+def trainModel(device, model, dataloaders, criterion, optimizer, scheduler, filename, dbName, numEpochs = 25, isInception = False):
     startTime = time.time()
     bestAcc = 0
     model.to(device)
@@ -136,8 +163,8 @@ def trainModel(device, model, dataloaders, criterion, optimizer, scheduler, file
     model.load_state_dict(bestModelWts)
     return model, validAccHistory, trainAccHistory, validLosses, trainLosses, LRs
 
-def train(device, featureExtract, modelName, filename):
-    dataDir = "./Data"
+def train(device, featureExtract, modelName, batchSize, numEpochs, LR, usePretrained, dbName, wtsName, modelType):
+    dataDir = "./Data/" + dbName
     trainDir = dataDir + "/train"
     validDir = dataDir + "/valid"
     batchSize = 4
@@ -147,9 +174,12 @@ def train(device, featureExtract, modelName, filename):
     datasetSizes = {x: len(imageDatasets[x]) for x in ["train", "valid"]}
     classNames = imageDatasets["train"].classes
     
-    modelFt, inputSize = initializeModel(modelName, 128, featureExtract) # what does FT stand for?
-    modelFt = modelFt.to(device)
     
+    modelFt, inputSize = initializeModel(modelName, 128, featureExtract, usePretrained = usePretrained) # what does FT stand for?
+    modelFt = modelFt.to(device)
+    if wtsName != "":
+        trainedModel = torch.load(os.path.join(".\\TrainedModel", wtsName + ".pth"))
+        modelFt.load_state_dict(trainedModel['state_dict'])  
     paramsToUpdate = modelFt.parameters()
     print("Params to learn:")
     if featureExtract:
@@ -160,9 +190,20 @@ def train(device, featureExtract, modelName, filename):
                 paramsToUpdate.append(param)
             print("\t", name)
             
-    optimizerFt = optim.Adam(paramsToUpdate, lr = 1e-3)
+    optimizerFt = optim.Adam(paramsToUpdate, lr = LR)
     scheduler = optim.lr_scheduler.StepLR(optimizerFt, step_size = 7, gamma = 0.1)
     criterion = nn.NLLLoss() # what is NLL?
     
-    modelFt, validAccHistory, trainAccHistory, validLosses, trainLosses, LRs = trainModel(device, modelFt, dataloaders, criterion, optimizerFt, scheduler, filename)
+    now = datetime.now()
+    filename = now.strftime(modelType + " %Y-%m-%d %H-%M-%S")
     
+    modelFt, validAccHistory, trainAccHistory, validLosses, trainLosses, LRs = trainModel(device, modelFt, dataloaders, criterion, optimizerFt, scheduler, filename + ".pth", dbName, numEpochs = numEpochs)
+  
+    with open(os.path.join(".\\Log", filename + ".csv"), "w", newline="") as file:  
+        writer = csv.writer(file)  
+        writer.writerow(["Trained from ResNet152" if wtsName == "" else f"Trained from {wtsName}", f"batchSize = {batchSize}", f"LR = {LRs[0]}", f"epochNum = {len(trainLosses)}"])
+        for i in range(len(trainLosses)):  
+            writer.writerow([i + 1, validAccHistory[i].item(), trainAccHistory[i].item(), validLosses[i], trainLosses[i], LRs[i]])
+    print(f"Data successfully written into {filename}.pth")
+    
+    curve(validAccHistory, trainAccHistory, validLosses, trainLosses, filename + ".pdf")
