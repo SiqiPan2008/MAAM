@@ -40,7 +40,7 @@ def initializeModel (modelName, numClasses, featureExtract, usePretrained = True
     inputSize = 0
     
     if modelName == "resnet":
-        modelFt = models.resnet152(pretrained = usePretrained)
+        modelFt = models.resnet152(weights = models.ResNet152_Weights.DEFAULT)
         setParameterRequiresGrad(modelFt, featureExtract)
         numFtrs = modelFt.fc.in_features
         modelFt.fc = nn.Sequential(nn.Linear(numFtrs, numClasses), nn.LogSoftmax(dim = 1))
@@ -55,9 +55,9 @@ def trainModel(device, model, dataloaders, criterion, optimizer, scheduler, file
     startTime = time.time()
     bestAcc = 0
     model.to(device)
-    testAccHistory = []
+    validAccHistory = []
     trainAccHistory = []
-    testLosses = []
+    validLosses = []
     trainLosses = []
     LRs = [optimizer.param_groups[0]["lr"]]
     
@@ -67,7 +67,7 @@ def trainModel(device, model, dataloaders, criterion, optimizer, scheduler, file
         print(f"Epoch {epoch + 1}/{numEpochs}")
         print("-" * 10)
         
-        for phase in ["train", "test"]:
+        for phase in ["train", "valid"]:
             if phase == "train":
                 model.train() #看下定义
             else:
@@ -97,7 +97,7 @@ def trainModel(device, model, dataloaders, criterion, optimizer, scheduler, file
                     preds = torch.max(outputs, 1)[1] # what does this function mean?
                     if phase == "train":
                         loss.to(device)
-                        loss.backward
+                        loss.backward()
                         optimizer.step()
                 runningLoss += loss.item() * inputs.size(0) # what does 0 mean
                 runningCorrects += torch.sum(preds == labels.data)
@@ -109,7 +109,7 @@ def trainModel(device, model, dataloaders, criterion, optimizer, scheduler, file
             print(f"time elapsed {timeElapsed // 60 :.0f}m {timeElapsed % 60 :.2f}s")
             print(f"{phase} loss: {epochLoss :.4f}, acc: {epochAcc :.4f}")
             
-            if phase == "test" and epochAcc > bestAcc:
+            if phase == "valid" and epochAcc > bestAcc:
                 bestAcc = epochAcc
                 bestModelWts = copy.deepcopy(model.state_dict())
                 state = {
@@ -117,11 +117,11 @@ def trainModel(device, model, dataloaders, criterion, optimizer, scheduler, file
                     "best_acc": bestAcc,
                     "optimizer": optimizer.state_dict()
                 }
-                torch.save(state, os.path.join("./TrainedModel", filename))
-            if phase == "test":
-                testAccHistory.append(epochAcc)
-                testLosses.append(epochLoss)
-                scheduler.step(epochLoss)
+                torch.save(state, os.path.join(".\\TrainedModel", filename))
+            if phase == "valid":
+                validAccHistory.append(epochAcc)
+                validLosses.append(epochLoss)
+                # scheduler.step(epochLoss)
             elif phase == "train":
                 trainAccHistory.append(epochAcc)
                 trainLosses.append(epochLoss)
@@ -132,19 +132,19 @@ def trainModel(device, model, dataloaders, criterion, optimizer, scheduler, file
         
     timeElapsed = time.time() - startTime
     print(f"training complete in {timeElapsed // 60 :.0f}m {timeElapsed % 60 :.2f}s")
-    print(f"best test acc: {bestAcc :.4f}")
+    print(f"best valid acc: {bestAcc :.4f}")
     model.load_state_dict(bestModelWts)
-    return model, testAccHistory, trainAccHistory, testLosses, trainLosses, LRs
+    return model, validAccHistory, trainAccHistory, validLosses, trainLosses, LRs
 
-def runModel(device, featureExtract, modelName, filename):
-    dataDir = "./data"
+def train(device, featureExtract, modelName, filename):
+    dataDir = "./Data"
     trainDir = dataDir + "/train"
-    testDir = dataDir + "/test"
-    batchSize = 16
+    validDir = dataDir + "/valid"
+    batchSize = 4
     dataTransforms = transforms.Compose([transforms.Lambda(resizeLongEdge), transforms.ToTensor()])
-    imageDatasets = {x: datasets.ImageFolder(os.path.join(dataDir, x), dataTransforms) for x in ["train", "test"]}
-    dataloaders = {x: torch.utils.data.DataLoader(imageDatasets[x], batch_size = batchSize, shuffle = True) for x in ["train", "test"]}
-    datasetSizes = {x: len(imageDatasets[x]) for x in ["train", "test"]}
+    imageDatasets = {x: datasets.ImageFolder(os.path.join(dataDir, x), dataTransforms) for x in ["train", "valid"]}
+    dataloaders = {x: torch.utils.data.DataLoader(imageDatasets[x], batch_size = batchSize, shuffle = True) for x in ["train", "valid"]}
+    datasetSizes = {x: len(imageDatasets[x]) for x in ["train", "valid"]}
     classNames = imageDatasets["train"].classes
     
     modelFt, inputSize = initializeModel(modelName, 128, featureExtract) # what does FT stand for?
@@ -160,9 +160,9 @@ def runModel(device, featureExtract, modelName, filename):
                 paramsToUpdate.append(param)
             print("\t", name)
             
-    optimizerFt = optim.Adam(paramsToUpdate, lr = 1e-2)
+    optimizerFt = optim.Adam(paramsToUpdate, lr = 1e-3)
     scheduler = optim.lr_scheduler.StepLR(optimizerFt, step_size = 7, gamma = 0.1)
     criterion = nn.NLLLoss() # what is NLL?
     
-    modelFt, testAccHistory, trainAccHistory, testLosses, trainLosses, LRs = trainModel(device, modelFt, dataloaders, criterion, optimizerFt, scheduler, filename)
+    modelFt, validAccHistory, trainAccHistory, validLosses, trainLosses, LRs = trainModel(device, modelFt, dataloaders, criterion, optimizerFt, scheduler, filename)
     

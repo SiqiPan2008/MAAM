@@ -14,12 +14,12 @@ import sys
 import copy
 import json
 from PIL import Image
-from RunModel import runModel
+from Train import train
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 
 def processImg(imgPath):
     img = Image.open(imgPath)
-    img = runModel.resizeLongEdge(imgPath)
+    img = train.resizeLongEdge(imgPath)
     toTensor = transforms.ToTensor()
     img = toTensor(img)
     return img
@@ -32,7 +32,7 @@ def imgShow(img, ax = None, title = None):
     ax.set_title(title)
     return ax
 
-def giveResult(imgName, numClasses, device, useGpu, featureExtract, modelName, filename):
+def classify(imgName, numClasses, device, useGpu, featureExtract, modelName, filename):
     imgPath = os.path.join("./NewImage", imgName)
     modelFt, inputSize = runModel.initializeModel(modelName, numClasses, featureExtract)
     modelFt = modelFt.to(device)

@@ -1,5 +1,5 @@
-from RunModel import runModel
-from GiveResult import GiveResult
+from Classify import classify
+from Train import train
 import torch
 
 def main():
@@ -8,16 +8,17 @@ def main():
     modelName = "resnet"
     featureExtract = True
     useGpu = torch.cuda.is_available()
-    print("CUDA available." if useGpu else "CUDA not available.")
+    print("CUDA available." if useGpu else
+          "CUDA not available.")
     device = torch.device("cuda:0" if useGpu else "cpu") # get to know how to use both GPUs
     print(device)
     fileName = "trainedModel.pth"
     
     if string == "":
-        runModel.runModel(device, featureExtract, modelName, fileName)
+        train.train(device, featureExtract, modelName, fileName)
     else:
         numClasses = 2 # CHANGE NUM OF CLASSES!
-        GiveResult.giveResult(string, numClasses, device, useGpu, featureExtract, modelName, fileName)
+        classify.classify(string, numClasses, device, useGpu, featureExtract, modelName, fileName)
     
     
 
