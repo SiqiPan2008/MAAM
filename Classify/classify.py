@@ -34,9 +34,9 @@ def imgShow(img, ax = None, title = None):
 
 def classify(imgName, numClasses, device, useGpu, featureExtract, modelName, filename):
     imgPath = os.path.join("./NewImage", imgName)
-    modelFt, inputSize = runModel.initializeModel(modelName, numClasses, featureExtract)
+    modelFt, inputSize = train.initializeModel(modelName, numClasses, featureExtract)
     modelFt = modelFt.to(device)
-    trainedModel = torch.load(filename)
+    trainedModel = torch.load(filename + ".pth")
     bestAcc = trainedModel["best_acc"]
     modelFt.load_state_dict(trainedModel["state_dict"])
     img = processImg(imgPath)
