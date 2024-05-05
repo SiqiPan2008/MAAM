@@ -166,11 +166,10 @@ def trainModel(device, model, dataloaders, criterion, optimizer, scheduler, file
     
     return model, validAccHistory, trainAccHistory, validLosses, trainLosses, LRs, timeElapsed
 
-def train(device, featureExtract, modelName, batchSize, numEpochs, LR, usePretrained, dbName, wtsName, modelType):
+def train(device, featureExtract, modelName, numClasses, batchSize, numEpochs, LR, usePretrained, dbName, wtsName, modelType):
     dataDir = "./Data/" + dbName
     trainDir = dataDir + "/train"
     validDir = dataDir + "/valid"
-    batchSize = 4
     dataTransforms = transforms.Compose([transforms.Lambda(resizeLongEdge), transforms.ToTensor()])
     imageDatasets = {x: datasets.ImageFolder(os.path.join(dataDir, x), dataTransforms) for x in ["train", "valid"]}
     dataloaders = {x: torch.utils.data.DataLoader(imageDatasets[x], batch_size = batchSize, shuffle = True) for x in ["train", "valid"]}
@@ -178,7 +177,7 @@ def train(device, featureExtract, modelName, batchSize, numEpochs, LR, usePretra
     classNames = imageDatasets["train"].classes
     
     
-    modelFt, inputSize = initializeModel(modelName, 128, featureExtract, usePretrained = usePretrained) # what does FT stand for?
+    modelFt, inputSize = initializeModel(modelName, numClasses, featureExtract, usePretrained = usePretrained) # what does FT stand for?
     modelFt = modelFt.to(device)
     if wtsName != "":
         trainedModel = torch.load(os.path.join(".\\TrainedModel", wtsName + ".pth"))

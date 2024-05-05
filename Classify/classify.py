@@ -19,7 +19,7 @@ os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 
 def processImg(imgPath):
     img = Image.open(imgPath)
-    img = train.resizeLongEdge(imgPath)
+    img = train.resizeLongEdge(img)
     toTensor = transforms.ToTensor()
     img = toTensor(img)
     return img
@@ -30,17 +30,15 @@ def imgShow(img, ax = None, title = None):
     img = np.array(img).transpose((1, 2, 0))
     ax.imshow(img)
     ax.set_title(title)
-    return ax
+    plt.show()
 
-def classify(imgName, numClasses, device, useGpu, featureExtract, modelName, filename):
-    imgPath = os.path.join("./NewImage", imgName)
-    modelFt, inputSize = train.initializeModel(modelName, numClasses, featureExtract)
+def classify(imgPath, numClasses, device, useGpu, featureExtract, modelName, wtsName):
+    modelFt, _ = train.initializeModel(modelName, numClasses, featureExtract)
     modelFt = modelFt.to(device)
-    trainedModel = torch.load(filename + ".pth")
-    bestAcc = trainedModel["best_acc"]
+    trainedModel = torch.load(os.path.join(".\\TrainedModel", wtsName + ".pth"))
     modelFt.load_state_dict(trainedModel["state_dict"])
     img = processImg(imgPath)
     imgShow(img)
     output = modelFt(img.cuda() if useGpu else img)
-    print(output.shape)
+    print(output)
     

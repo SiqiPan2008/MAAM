@@ -3,7 +3,7 @@ from Train import train
 import torch
 
 def main():
-    string = ""
+    string = "" # "./Data/Fundus-normal-DR-selected/train/DR/16_left.jpeg"
     modelName = "resnet"
     featureExtract = True
     useGpu = torch.cuda.is_available()
@@ -11,12 +11,12 @@ def main():
           "CUDA not available.")
     device = torch.device("cuda:0" if useGpu else "cpu") # get to know how to use both GPUs
     print(device)
-    
+
+    numClasses = 2 # CHANGE NUM OF CLASSES!
     if string == "":
-        train.train(device, featureExtract, modelName, 16, 15, 1e-3, True, "Fundus-normal-DR-selected", "F 2024-05-04 07-50-36", "F")
+        train.train(device, featureExtract, modelName, numClasses, 2, 10, 1e-3, True, "Fundus-normal-DR-demo", "", "F")
     else:
-        numClasses = 2 # CHANGE NUM OF CLASSES!
-        classify.classify(string, numClasses, device, useGpu, featureExtract, modelName, string)
+        classify.classify(string, numClasses, device, useGpu, featureExtract, modelName, "F 2024-05-05 18-09-32")
 
 if __name__ == "__main__":
     main()
