@@ -76,9 +76,9 @@ def curve(validAccHistory, trainAccHistory, validLosses, trainLosses, filename):
     
     plt.tight_layout()
     plt.savefig(os.path.join(".\\Log", filename), format="pdf")
-    plt.show()
+    # plt.show()
 
-def trainModel(device, model, dataloaders, criterion, optimizer, scheduler, filename, dbName, numEpochs = 25, isInception = False):
+def trainModel(device, model, dataloaders, criterion, optimizer, scheduler, filename, dbName, numEpochs = 25, isInception = False, crossValid = 1):
     startTime = time.time()
     bestAcc = 0
     model.to(device)
@@ -166,15 +166,16 @@ def trainModel(device, model, dataloaders, criterion, optimizer, scheduler, file
     
     return model, validAccHistory, trainAccHistory, validLosses, trainLosses, LRs, timeElapsed
 
-def train(device, featureExtract, modelName, numClasses, batchSize, numEpochs, LR, usePretrained, dbName, wtsName, modelType):
-    dataDir = "./Data/" + dbName
-    trainDir = dataDir + "/train"
-    validDir = dataDir + "/valid"
-    dataTransforms = transforms.Compose([transforms.Lambda(resizeLongEdge), transforms.ToTensor()])
-    imageDatasets = {x: datasets.ImageFolder(os.path.join(dataDir, x), dataTransforms) for x in ["train", "valid"]}
-    dataloaders = {x: torch.utils.data.DataLoader(imageDatasets[x], batch_size = batchSize, shuffle = True) for x in ["train", "valid"]}
-    datasetSizes = {x: len(imageDatasets[x]) for x in ["train", "valid"]}
-    classNames = imageDatasets["train"].classes
+def train(device, featureExtract, modelName, numClasses, batchSize, numEpochs, LR, usePretrained, dbName, wtsName, modelType, crossValid = 1):
+    if not crossValid:
+        dataDir = "./Data/" + dbName
+        trainDir = dataDir + "/train"
+        validDir = dataDir + "/valid"
+        dataTransforms = transforms.Compose([transforms.Lambda(resizeLongEdge), transforms.ToTensor()])
+        imageDatasets = {x: datasets.ImageFolder(os.path.join(dataDir, x), dataTransforms) for x in ["train", "valid"]}
+        dataloaders = {x: torch.utils.data.DataLoader(imageDatasets[x], batch_size = batchSize, shuffle = True) for x in ["train", "valid"]}
+        datasetSizes = {x: len(imageDatasets[x]) for x in ["train", "valid"]}
+        classNames = imageDatasets["train"].classes
     
     
     modelFt, inputSize = initializeModel(modelName, numClasses, featureExtract, usePretrained = usePretrained) # what does FT stand for?
@@ -199,7 +200,7 @@ def train(device, featureExtract, modelName, numClasses, batchSize, numEpochs, L
     now = datetime.now()
     filename = now.strftime(modelType + " %Y-%m-%d %H-%M-%S")
     
-    modelFt, validAccHistory, trainAccHistory, validLosses, trainLosses, LRs, timeElapsed = trainModel(device, modelFt, dataloaders, criterion, optimizerFt, scheduler, filename + ".pth", dbName, numEpochs = numEpochs)
+    modelFt, validAccHistory, trainAccHistory, validLosses, trainLosses, LRs, timeElapsed = trainModel(device, modelFt, dataloaders, criterion, optimizerFt, scheduler, filename + ".pth", dbName, numEpochs = numEpochs, crossValid = crossValid)
   
     with open(os.path.join(".\\Log", filename + ".csv"), "w", newline="") as file:  
         writer = csv.writer(file)  

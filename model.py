@@ -14,9 +14,13 @@ def main():
 
     numClasses = 2 # CHANGE NUM OF CLASSES!
     if string == "":
-        train.train(device, featureExtract, modelName, numClasses, 2, 10, 1e-3, True, "Fundus-normal-DR-demo", "", "F")
+        train.train(device, featureExtract, modelName, numClasses, 16, 100, 1e-3, True, "OCT-normal-drusen-large", "", "O", crossValid = 1)
     else:
         classify.classify(string, numClasses, device, useGpu, featureExtract, modelName, "F 2024-05-05 18-09-32")
 
 if __name__ == "__main__":
     main()
+    
+# divide into 5 parts, do cross-validation
+# 多分类
+# GAN, GradCAM, Django
