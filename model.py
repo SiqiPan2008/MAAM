@@ -12,9 +12,9 @@ def main():
     device = torch.device("cuda:0" if useGpu else "cpu") # get to know how to use both GPUs
     print(device)
 
-    numClasses = 2 # CHANGE NUM OF CLASSES!
+    numClasses = 4 # CHANGE NUM OF CLASSES!
     if string == "":
-        train.train(device, featureExtract, modelName, numClasses, 16, 100, 1e-3, True, "OCT-normal-drusen-large", "", "O", crossValid = 1)
+        train.train(device, featureExtract, modelName, numClasses, 16, 5, 1e-3, True, "OCT-normal-drusen-demo/train", "", "O", crossValid = 5)
     else:
         classify.classify(string, numClasses, device, useGpu, featureExtract, modelName, "F 2024-05-05 18-09-32")
 
