@@ -4,7 +4,7 @@ from Generate import generate
 import torch
 
 def main():
-    task = 1
+    task = 0
     modelName = "resnet"
     featureExtract = True
     useGpu = torch.cuda.is_available()
@@ -15,8 +15,18 @@ def main():
 
     numClasses = 4 # CHANGE NUM OF CLASSES!
     if task == 0:
-        
-        generate()
+        batchSize = 1
+        numEpochs = 5
+        LR = 1e-5
+        numWorkers = 4
+        lambdaIdentity = 0.0
+        lambdaCycle = 10
+        normFolderName = ""
+        abnormFolderName = ""
+        wtsName = ""
+        abnormName = "ERM"
+        dataType = "O"
+        generate(device, batchSize, numEpochs, LR, numWorkers, lambdaIdentity, lambdaCycle, normFolderName, abnormFolderName, wtsName, abnormName, dataType)
     elif task == 1:
         dataset = "OCT-normal-drusen-demo/train"
         batchSize = 16
