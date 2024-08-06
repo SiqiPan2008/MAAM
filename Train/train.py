@@ -101,8 +101,8 @@ def genCrossValidDataloader(fullDataset, segIndices, validIndex, batchSize):
     for i in range(len(segIndices)):
         if i != validIndex:
             trainIndices += segIndices[i]
-    datasets = {"train": Subset(fullDataset, trainIndices),
-        "valid": Subset(fullDataset, validIndices)}
+    datasets = {"train": [], #Subset(fullDataset, trainIndices),
+        "valid": []} #Subset(fullDataset, validIndices)}
     return {x: torch.utils.data.Dataloader(datasets[x], batch_size = batchSize, shuffle = True) for x in ["train", "valid"]}
 
 def trainModelWithCrossValid(device, model, segIndices, imageDataset, criterion, optimizer, scheduler, filename, dbName, crossValid, batchSize, numEpochs, isInception = False):

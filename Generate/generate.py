@@ -2,14 +2,17 @@ import torch
 import torch.nn as nn
 from PIL import Image
 import os
+import torch.utils
 from torch.utils.data import Dataset
 import numpy as np
+import torch.utils.data
 from Train import train
 from torchvision import transforms
 from datetime import datetime
 import sys
 import random
 import torch.optim as optim
+from tqdm import tqdm
 from torchvision.utils import save_image
 
 class ConvBlock(nn.Module):
@@ -163,13 +166,21 @@ def seedAll(seed = 47):
     torch.backends.cudnn.benchmark = False
 '''
 
+
+
+
+
+
 def trainCycleGAN(gNorm, gAbnorm, dNorm, dAbnorm, loader, dOptimizer, gOptimizer, l1, mse, dScaler, gScaler, device, lambdaIdentity, lambdaCycle, foldername):
     normReals = 0
     normFakes = 0
     ####### why no abnormReals and abnormFakes?
+    loop = tqdm(loader, leave = True)
     
-    index = 0
-    for (norm, abnorm) in enumerate(loader):
+    for x in enumerate(loop):
+        print(x)
+    
+    for index, (norm, abnorm) in enumerate(loop):
         norm = norm.to(device)
         abnorm = abnorm.to(device)
         
@@ -229,8 +240,11 @@ def trainCycleGAN(gNorm, gAbnorm, dNorm, dAbnorm, loader, dOptimizer, gOptimizer
         gScaler.update()
         
         save_image(fakeAbnorm, f"GeneratedImg/{foldername}/{index}.png")
-        index += 1
         
+
+
+
+
 
 
 def generate(device, batchSize, numEpochs, lr, numWorkers, lambdaIdentity, lambdaCycle, normFoldername, abnormFoldername, wtsName, abnormName, dataType):
@@ -256,7 +270,7 @@ def generate(device, batchSize, numEpochs, lr, numWorkers, lambdaIdentity, lambd
     dNorm = Discriminator(inChannels = 3).to(device)
     dAbnorm = Discriminator(inChannels = 3).to(device)
     gNorm = Generator(imgChannels = 3, numResiduals = 9).to(device)
-    gAbnorm = Generator(inChannels = 3, numResiduals = 9).to(device)
+    gAbnorm = Generator(imgChannels = 3, numResiduals = 9).to(device)
     dOptimizer = optim.Adam(
         list(dNorm.parameters()) + list(dAbnorm.parameters()), 
         lr = lr,
@@ -280,7 +294,7 @@ def generate(device, batchSize, numEpochs, lr, numWorkers, lambdaIdentity, lambd
         loadCheckpoint(gAbnorm, device, gAbnormCheckpoint, gOptimizer, lr)
     
     trainData = NormAbnormDataset(f"Data/{normFoldername}", f"Data/{abnormFoldername}", transform = transforms)
-    trainLoader = torch.utils.data.Dataloader(trainData, batch_size = batchSize, shuffle = True, num_workers = numWorkers, pin_memory = True)
+    trainLoader = torch.utils.data.DataLoader(trainData, batch_size = batchSize, shuffle = True, num_workers = numWorkers, pin_memory = True)
     gScaler = torch.cuda.amp.GradScaler()
     dScaler = torch.cuda.amp.GradScaler()
     ####### where is validData used?
