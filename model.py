@@ -1,9 +1,10 @@
 from Classify import classify
 from Train import train
+from Generate import generate
 import torch
 
 def main():
-    string = "" # "./Data/Fundus-normal-DR-selected/train/DR/16_left.jpeg"
+    task = 1
     modelName = "resnet"
     featureExtract = True
     useGpu = torch.cuda.is_available()
@@ -13,10 +14,20 @@ def main():
     print(device)
 
     numClasses = 4 # CHANGE NUM OF CLASSES!
-    if string == "":
-        train.train(device, featureExtract, modelName, numClasses, 16, 5, 1e-3, True, "OCT-normal-drusen-demo/train", "", "O", crossValid = 5)
-    else:
-        classify.classify(string, numClasses, device, useGpu, featureExtract, modelName, "F 2024-05-05 18-09-32")
+    if task == 0:
+        
+        generate()
+    elif task == 1:
+        dataset = "OCT-normal-drusen-demo/train"
+        batchSize = 16
+        epochs = 5
+        LR = 1e-3
+        imgType = "O"
+        train.train(device, featureExtract, modelName, numClasses, batchSize, epochs, LR, True, dataset, "", imgType, crossValid = 5)
+    elif task == 2:
+        string = "./Data/Fundus-normal-DR-selected/train/DR/16_left.jpeg"
+        wts = "F 2024-05-05 18-09-32"
+        classify.classify(string, numClasses, device, useGpu, featureExtract, modelName, wts)
 
 if __name__ == "__main__":
     main()
