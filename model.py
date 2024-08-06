@@ -21,12 +21,12 @@ def main():
         numWorkers = 4
         lambdaIdentity = 0.0
         lambdaCycle = 10
-        normFolderName = ""
-        abnormFolderName = ""
+        normFolderName = "OCT-normal-ERM-fewshot/normal"
+        abnormFolderName = "OCT-normal-ERM-fewshot/ERM"
         wtsName = ""
         abnormName = "ERM"
         dataType = "O"
-        generate(device, batchSize, numEpochs, LR, numWorkers, lambdaIdentity, lambdaCycle, normFolderName, abnormFolderName, wtsName, abnormName, dataType)
+        generate.generate(device, batchSize, numEpochs, LR, numWorkers, lambdaIdentity, lambdaCycle, normFolderName, abnormFolderName, wtsName, abnormName, dataType)
     elif task == 1:
         dataset = "OCT-normal-drusen-demo/train"
         batchSize = 16

@@ -2,14 +2,13 @@ import torch
 import torch.nn as nn
 from PIL import Image
 import os
-from torch.utils.data import Dataloader, Dataset
+from torch.utils.data import Dataset
 import numpy as np
 from Train import train
 from torchvision import transforms
 from datetime import datetime
 import sys
 import random
-from tqdm import tqdm
 import torch.optim as optim
 from torchvision.utils import save_image
 
@@ -134,8 +133,8 @@ class NormAbnormDataset(Dataset):
         normImg = np.array(Image.open(normPath).convert("RGB"))
         abnormImg = np.array(Image.open(abnormPath).convert("RGB"))
         if self.transform:
-            augmentations = self.transform(image = abnormImg, image0 = normImg)
-            normImg, abnormImg = augmentations["image0"], augmentations["image"]
+            normImg = self.transform(normImg)
+            abnormImg = self.transform(abnormImg)
         return abnormImg, normImg
 
 def saveCheckpoint(model, optimizer, filename):
@@ -164,9 +163,75 @@ def seedAll(seed = 47):
     torch.backends.cudnn.benchmark = False
 '''
 
-def trainCycleGAN(gNorm, gAbnorm, dNorm, dAbnorm, loader, dOptimizer, gOptimizer, l1, mse, dScaler, gScaler):
+def trainCycleGAN(gNorm, gAbnorm, dNorm, dAbnorm, loader, dOptimizer, gOptimizer, l1, mse, dScaler, gScaler, device, lambdaIdentity, lambdaCycle, foldername):
     normReals = 0
     normFakes = 0
+    ####### why no abnormReals and abnormFakes?
+    
+    index = 0
+    for (norm, abnorm) in enumerate(loader):
+        norm = norm.to(device)
+        abnorm = abnorm.to(device)
+        
+        with torch.cuda.amp.autocast():
+            fakeNorm = gNorm(abnorm)
+            dNormReal = dNorm(norm)
+            dNormFake = dNorm(fakeNorm.detach())
+            ####### what is detach()
+            normReals += dNormReal.mean().item()
+            normFakes += dNormFake.mean().item()
+            dNormRealLoss = mse(dNormReal, torch.ones_like(dNormReal))
+            dNormFakeLoss = mse(dNormFake, torch.zeros_like(dNormFake))
+            dNormLoss = dNormRealLoss + dNormFakeLoss
+            
+            fakeAbnorm = gAbnorm(norm)
+            dAbnormReal = dAbnorm(abnorm)
+            dAbnormFake = dAbnorm(fakeAbnorm.detach())
+            dAbnormRealLoss = mse(dAbnormReal, torch.ones_like(dAbnormReal))
+            dAbnormFakeLoss = mse(dAbnormFake, torch.zeros_like(dAbnormFake))
+            dAbnormLoss = dAbnormRealLoss + dAbnormFakeLoss
+            
+            dLoss = (dNormLoss + dAbnormLoss) / 2
+        
+        dOptimizer.zero_grad()
+        dScaler.scale(dLoss).backward()
+        dScaler.step(dOptimizer)
+        dScaler.update()
+        
+        with torch.cuda.amp.autocast():
+            # adversarial losses
+            dNormFake = dNorm(fakeNorm)
+            dAbnormFake = dAbnorm(fakeAbnorm)
+            gNormLoss = mse(dNormFake, torch.ones_like(dNormFake))
+            gAbnormLoss = mse(dAbnormFake, torch.ones_like(dAbnormFake))
+            
+            # cycle losses
+            cycleNorm = gNorm(fakeAbnorm)
+            cycleAbnorm = gAbnorm(fakeNorm)
+            cycleNormLoss = l1(norm, cycleNorm)
+            cycleAbnormLoss = l1(abnorm, cycleAbnorm)
+            
+            # identity losses
+            # identityNorm = gNorm(norm)
+            # identityAbnorm = gAbnorm(abnorm)
+            # identityNormLoss = l1(norm, identityNorm)
+            # identityAbnormLoss = l1(abnorm, identityAbnorm)
+            
+            gLoss = (
+                (gNormLoss + gAbnormLoss)
+                + lambdaCycle * (cycleNormLoss + cycleAbnormLoss)
+                # + lambdaIdentity * (identityNormLoss + identityAbnormLoss)
+            )
+            
+        gOptimizer.zero_grad()
+        gScaler.scale(gLoss).backward()
+        gScaler.step(gOptimizer)
+        gScaler.update()
+        
+        save_image(fakeAbnorm, f"GeneratedImg/{foldername}/{index}.png")
+        index += 1
+        
+
 
 def generate(device, batchSize, numEpochs, lr, numWorkers, lambdaIdentity, lambdaCycle, normFoldername, abnormFoldername, wtsName, abnormName, dataType):
     # wtsName: name of folder of weights, e.g. "GAN O MH 2024-08-06 12-50-24"
@@ -175,7 +240,7 @@ def generate(device, batchSize, numEpochs, lr, numWorkers, lambdaIdentity, lambd
     now = datetime.now()
     timeStr = now.strftime("%Y-%m-%d %H-%M-%S")
     foldername = f"GAN {dataType} {abnormName} {timeStr}"
-    log = f"TrainedModel/{foldername}.csv"
+    log = f"Log/{foldername}.csv"
     gNormCheckpoint = f"TrainedModel/{foldername}/{foldername} G Norm.pth"
     gAbnormCheckpoint = f"TrainedModel/{foldername}/{foldername} G Abnorm.pth"
     dNormCheckpoint = f"TrainedModel/{foldername}/{foldername} D Norm.pth"
@@ -185,13 +250,12 @@ def generate(device, batchSize, numEpochs, lr, numWorkers, lambdaIdentity, lambd
         [
         transforms.Lambda(lambda img: train.resizeLongEdge(img, longEdgeSize = 256)),
         transforms.ToTensor()
-        ],
-        additional_targets = {"image0": "image"}
+        ]
     )
     
     dNorm = Discriminator(inChannels = 3).to(device)
     dAbnorm = Discriminator(inChannels = 3).to(device)
-    gNorm = Generator(inChannels = 3, numResiduals = 9).to(device)
+    gNorm = Generator(imgChannels = 3, numResiduals = 9).to(device)
     gAbnorm = Generator(inChannels = 3, numResiduals = 9).to(device)
     dOptimizer = optim.Adam(
         list(dNorm.parameters()) + list(dAbnorm.parameters()), 
@@ -215,15 +279,14 @@ def generate(device, batchSize, numEpochs, lr, numWorkers, lambdaIdentity, lambd
         loadCheckpoint(gNorm, device, gNormCheckpoint, gOptimizer, lr)
         loadCheckpoint(gAbnorm, device, gAbnormCheckpoint, gOptimizer, lr)
     
-    trainData = NormAbnormDataset(f"Data/{normFoldername}/train", f"Data/{abnormFoldername}/train", transform = transforms)
-    validData = NormAbnormDataset(f"Data/{normFoldername}/valid", f"Data/{abnormFoldername}/valid", transform = transforms)
-    trainLoader = Dataloader(trainData, batch_size = batchSize, shuffle = True, num_workers = numWorkers, pin_memory = True)
-    validLoader = Dataloader(validData, batch_size = batchSize, shuffle = False, pin_memory = True)
+    trainData = NormAbnormDataset(f"Data/{normFoldername}", f"Data/{abnormFoldername}", transform = transforms)
+    trainLoader = torch.utils.data.Dataloader(trainData, batch_size = batchSize, shuffle = True, num_workers = numWorkers, pin_memory = True)
     gScaler = torch.cuda.amp.GradScaler()
     dScaler = torch.cuda.amp.GradScaler()
+    ####### where is validData used?
     
     for epoch in range(numEpochs):
-        trainCycleGAN(gNorm, gAbnorm, dNorm, dAbnorm, trainLoader, dOptimizer, gOptimizer, L1, mse, dScaler, gScaler)
+        trainCycleGAN(gNorm, gAbnorm, dNorm, dAbnorm, trainLoader, dOptimizer, gOptimizer, L1, mse, dScaler, gScaler, device, lambdaIdentity, lambdaCycle, foldername)
     
     saveCheckpoint(gNorm, gOptimizer, filename = gNormCheckpoint)
     saveCheckpoint(gAbnorm, gOptimizer, filename = gAbnormCheckpoint)

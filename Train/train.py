@@ -6,7 +6,6 @@ from torch import nn
 import torch.optim as optim
 import torchvision
 from torchvision import transforms, models, datasets
-from torch.utils.data import Subset, Dataloader
 import imageio
 import time
 import warnings
