@@ -20,7 +20,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-    
-# divide into 5 parts, do cross-validation
-# 多分类
-# GAN, GradCAM, Django
