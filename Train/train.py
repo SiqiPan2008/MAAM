@@ -28,7 +28,7 @@ def resizeLongEdge(img, longEdgeSize = 224):
         width, _ = img.size
         loc = (int((224 - newSize[0]) / 2), 0)
     img = img.resize(newSize)
-    blackBackground = Image.new("RGB", (224, 224), "black")  
+    blackBackground = Image.new("RGB", (224, 224), "black")
     blackBackground.paste(img, loc)
     return blackBackground
 
