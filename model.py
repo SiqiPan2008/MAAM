@@ -1,10 +1,11 @@
 from Classify import classify
+from Classify import gradcam
 from Train import train
 from Generate import generate
 import torch
 
 def main():
-    task = 0
+    task = 3
     modelName = "resnet"
     featureExtract = True
     useGpu = torch.cuda.is_available()
@@ -13,7 +14,7 @@ def main():
     device = torch.device("cuda:0" if useGpu else "cpu") # get to know how to use both GPUs
     print(device)
 
-    numClasses = 4 # CHANGE NUM OF CLASSES!
+    numClasses = 2 # CHANGE NUM OF CLASSES!
     if task == 0:
         batchSize = 1
         numEpochs = 5
@@ -28,16 +29,20 @@ def main():
         dataType = "O"
         generate.generate(device, batchSize, numEpochs, LR, numWorkers, lambdaIdentity, lambdaCycle, normFolderName, abnormFolderName, wtsName, abnormName, dataType)
     elif task == 1:
-        dataset = "OCT-normal-drusen-demo/train"
+        dataset = "Fundus-normal-DR-demo"
         batchSize = 16
         epochs = 5
         LR = 1e-3
-        imgType = "O"
+        imgType = "F"
         train.train(device, featureExtract, modelName, numClasses, batchSize, epochs, LR, True, dataset, "", imgType, crossValid = 5)
     elif task == 2:
         string = "./Data/Fundus-normal-DR-selected/train/DR/16_left.jpeg"
-        wts = "F 2024-05-05 18-09-32"
+        wts = "F 2024-08-07 16-48-56"
         classify.classify(string, numClasses, device, useGpu, featureExtract, modelName, wts)
+    elif task == 3:
+        string = "./Data/OCT-normal-drusen-large/train/drusen/DRUSEN-303435-2.jpeg"
+        wts = "O 2024-05-09 22-42-15"
+        gradcam.highlight(string, numClasses, device, useGpu, featureExtract, modelName, wts)
 
 if __name__ == "__main__":
     main()

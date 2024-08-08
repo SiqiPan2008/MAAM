@@ -17,9 +17,10 @@ from PIL import Image
 from Train import train
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 
-def processImg(imgPath):
+def processImg(imgPath, customResize = 224):
     img = Image.open(imgPath)
-    img = train.resizeLongEdge(img)
+    if customResize != 0:
+        img = train.resizeLongEdge(img, longEdgeSize = customResize)
     toTensor = transforms.ToTensor()
     img = toTensor(img)
     return img
@@ -39,6 +40,6 @@ def classify(imgPath, numClasses, device, useGpu, featureExtract, modelName, wts
     modelFt.load_state_dict(trainedModel["state_dict"])
     img = processImg(imgPath)
     imgShow(img)
+    img = img.unsqueeze(0)
     output = modelFt(img.cuda() if useGpu else img)
     print(output)
-    
