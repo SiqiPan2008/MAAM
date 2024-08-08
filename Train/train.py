@@ -22,13 +22,13 @@ def resizeLongEdge(img, longEdgeSize = 224):
     width, height = img.size
     if width > height:
         newSize = (longEdgeSize, int(height * longEdgeSize / width))
-        loc = (0, int((longEdgeSize - newSize[1]) / 2))
+        loc = (0, int((224 - newSize[1]) / 2))
     else:
         newSize = (int(longEdgeSize * width / height), longEdgeSize)
         width, _ = img.size
-        loc = (int((longEdgeSize - newSize[0]) / 2), 0)
+        loc = (int((224 - newSize[0]) / 2), 0)
     img = img.resize(newSize)
-    blackBackground = Image.new("RGB", (longEdgeSize, longEdgeSize), "black")  
+    blackBackground = Image.new("RGB", (224, 224), "black")
     blackBackground.paste(img, loc)
     return blackBackground
 
@@ -45,7 +45,7 @@ def initializeModel (modelName, numClasses, featureExtract, usePretrained = True
         modelFt = models.resnet152(weights = models.ResNet152_Weights.DEFAULT if usePretrained else None)
         setParameterRequiresGrad(modelFt, featureExtract if usePretrained else False)
         numFtrs = modelFt.fc.in_features
-        modelFt.fc = nn.Sequential(nn.Linear(numFtrs, numClasses), nn.Softmax(dim = 1))
+        modelFt.fc = nn.Sequential(nn.Linear(numFtrs, numClasses), nn.LogSoftmax(dim = 1))
         inputSize = 224
     else:
         print("Invalid model name.")
@@ -103,7 +103,7 @@ def genCrossValidDataloader(fullDataset, segIndices, validIndex, batchSize):
             trainIndices += segIndices[i]
     datasets = {"train": [], #Subset(fullDataset, trainIndices),
         "valid": []} #Subset(fullDataset, validIndices)}
-    return {x: torch.utils.data.DataLoader(datasets[x], batch_size = batchSize, shuffle = True) for x in ["train", "valid"]}
+    return {x: torch.utils.data.Dataloader(datasets[x], batch_size = batchSize, shuffle = True) for x in ["train", "valid"]}
 
 def trainModelWithCrossValid(device, model, segIndices, imageDataset, criterion, optimizer, scheduler, filename, dbName, crossValid, batchSize, numEpochs, isInception = False):
     startTime = time.time()
@@ -287,11 +287,11 @@ def train(device, featureExtract, modelName, numClasses, batchSize, numEpochs, L
     #dataloaders = {}
     #if crossValid == 0:
     dataTransforms = transforms.Compose([transforms.Lambda(resizeLongEdge), transforms.ToTensor()])
-    imageDatasets = {x: datasets.ImageFolder(os.path.join(dataDir, x), dataTransforms) for x in ["train", "valid"]}
-    dataloaders = {x: torch.utils.data.DataLoader(imageDatasets[x], batch_size = batchSize, shuffle = True) for x in ["train", "valid"]}
+    #imageDatasets = {x: datasets.ImageFolder(os.path.join(dataDir, x), dataTransforms) for x in ["train", "valid"]}
+    #dataloaders = {x: torch.utils.data.DataLoader(imageDatasets[x], batch_size = batchSize, shuffle = True) for x in ["train", "valid"]}
     #elif crossValid == 1:
-    #imageDataset = datasets.ImageFolder(dataDir, dataTransforms)
-    #segIndices = divideDataset(imageDataset, crossValid)
+    imageDataset = datasets.ImageFolder(dataDir, dataTransforms)
+    segIndices = divideDataset(imageDataset, crossValid)
     
     modelFt, inputSize = initializeModel(modelName, numClasses, featureExtract, usePretrained = usePretrained) # what does FT stand for?
     modelFt = modelFt.to(device)
@@ -315,8 +315,8 @@ def train(device, featureExtract, modelName, numClasses, batchSize, numEpochs, L
     now = datetime.now()
     filename = now.strftime(modelType + " %Y-%m-%d %H-%M-%S")
     
-    modelFt, validAccHistory, trainAccHistory, validLosses, trainLosses, LRs, timeElapsed = trainModel(device, modelFt, dataloaders, criterion, optimizerFt, scheduler, filename + ".pth", dbName, crossValid, numEpochs = numEpochs)
-    #modelFt, validAccHistory, trainAccHistory, validLosses, trainLosses, LRs, timeElapsed = trainModelWithCrossValid(device, modelFt, segIndices, imageDataset, criterion, optimizerFt, scheduler, filename + ".pth", dbName, crossValid, batchSize, numEpochs)
+    #modelFt, validAccHistory, trainAccHistory, validLosses, trainLosses, LRs, timeElapsed = trainModel(device, modelFt, dataloaders, criterion, optimizerFt, scheduler, filename + ".pth", dbName, crossValid, numEpochs = numEpochs)
+    modelFt, validAccHistory, trainAccHistory, validLosses, trainLosses, LRs, timeElapsed = trainModelWithCrossValid(device, modelFt, segIndices, imageDataset, criterion, optimizerFt, scheduler, filename + ".pth", dbName, crossValid, batchSize, numEpochs)
     with open(os.path.join(".\\Log", filename + ".csv"), "w", newline="") as file:  
         writer = csv.writer(file)  
         writer.writerow(["Trained from ResNet152" if wtsName == "" else f"Trained from {wtsName}", f"Data: {dbName}", f"batchSize = {batchSize}", f"LR = {LRs[0]}", f"epochNum = {len(trainLosses)}", f"timeElapsed = {timeElapsed // 60 :.0f}m {timeElapsed % 60: .2f}s"])
