@@ -22,13 +22,13 @@ def resizeLongEdge(img, longEdgeSize = 224):
     width, height = img.size
     if width > height:
         newSize = (longEdgeSize, int(height * longEdgeSize / width))
-        loc = (0, int((224 - newSize[1]) / 2))
+        loc = (0, int((longEdgeSize - newSize[1]) / 2))
     else:
         newSize = (int(longEdgeSize * width / height), longEdgeSize)
         width, _ = img.size
-        loc = (int((224 - newSize[0]) / 2), 0)
+        loc = (int((longEdgeSize - newSize[0]) / 2), 0)
     img = img.resize(newSize)
-    blackBackground = Image.new("RGB", (224, 224), "black")
+    blackBackground = Image.new("RGB", (longEdgeSize, longEdgeSize), "black")
     blackBackground.paste(img, loc)
     return blackBackground
 
