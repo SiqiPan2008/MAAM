@@ -7,6 +7,8 @@ import os
 import matplotlib.pyplot as plt
 from matplotlib.colors import LinearSegmentedColormap
 
+# from https://blog.csdn.net/sjhKevin/article/details/121747933
+
 class CamExtractor():
     def __init__(self, model):
         self.model = model
