@@ -1,0 +1,53 @@
+"OF " = "OCT and Fundus/"
+"F " = "Fundus/"
+
+###################################################################
+
+Glaucomatous disc change
+	OF trghs22fpg-4
+	OF Mendeley
+	F HRF
+	
+Normal
+	OF trghs22fpg-4
+	F E-ophtha (from both EX and MA)
+	F Kaggle1000
+	F HRF
+	
+Hard Exudates
+	F STARE
+	F E-ophtha
+
+Soft Exudates/Cotton Wool Patch
+	F STARE
+
+Hemorrhage
+	STARE
+
+drusen
+	F STARE
+
+ERM
+	F STARE
+
+Vascular Abnormity
+	F Kaggle1000
+
+MH
+	F Google Image
+
++ Microaneurysms
+	F E-ophtha
+	F STARE
+	
++ RP
+	F Kaggle1000
+	
+- Retinal nerve fiber layer defect
+	nihil
+
+- Choroidal Lesion
+	nihil
+
+- Fluid Accumulation
+	nihil
