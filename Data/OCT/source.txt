@@ -1,0 +1,52 @@
+"OF " = "OCT and Fundus/"
+"O " = "OCT/"
+
+###################################################################
+
+CNV
+	O Normal Disease Database
+
+CSC
+	O Few-shot
+	O OpenICPSR
+	CYCLE_GAN
+
+DME
+	O Normal Disease Database
+
+drusen
+	O Normal Disease Database
+
+ERM
+	O Google Image
+	CYCLE_GAN
+
+intraretinal fluid
+	O Normal Disease Database (CNV)
+	CYCLE_GAN
+
+Mactel
+	O Few-shot
+	CYCLE_GAN
+
+MH
+	O Few-shot
+	CYCLE_GAN
+
+Normal
+	O Normal Disease Database
+
+Retinal Detachment
+	O Google Image
+
+RP
+	O Few-shot
+	CYCLE_GAN
+
+Stargardt
+	O Few-shot
+	CYCLE_GAN
+
+subretinal fluid
+	O Normal Disease Database (CNV)
+	CYCLE_GAN

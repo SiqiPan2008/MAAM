@@ -105,7 +105,7 @@ def genCrossValidDataloader(fullDataset, segIndices, validIndex, batchSize):
         "valid": []} #Subset(fullDataset, validIndices)}
     return {x: torch.utils.data.Dataloader(datasets[x], batch_size = batchSize, shuffle = True) for x in ["train", "valid"]}
 
-def trainModelWithCrossValid(device, model, segIndices, imageDataset, criterion, optimizer, scheduler, filename, dbName, crossValid, batchSize, numEpochs, isInception = False):
+def trainModel(device, model, criterion, optimizer, scheduler, filename, dbName, crossValid, batchSize, numEpochs, isInception = False):
     startTime = time.time()
     bestAcc = 0
     model.to(device)
@@ -117,99 +117,29 @@ def trainModelWithCrossValid(device, model, segIndices, imageDataset, criterion,
     
     bestModelWts = copy.deepcopy(model.state_dict())
     
-    for epoch in range(numEpochs):
-        print(f"Epoch {epoch + 1}/{numEpochs}")
-        print("-" * 10)
-        
-        dataloaders = genCrossValidDataloader(imageDataset, segIndices, random.randint(0, len(segIndices) - 1), batchSize)
-        for phase in ["train", "valid"]:
-            if phase == "train":
-                model.train() #看下定义
-            else:
-                model.eval() #看下定义
-            
-            runningLoss = 0.0
-            runningCorrects = 0
-            
-            for inputs, labels in dataloaders:
-                inputs = inputs.to(device)
-                labels = labels.to(device)
-                
-                optimizer.zero_grad()
-                with torch.set_grad_enabled(phase == "train"):
-                    if isInception and phase == "train":
-                        outputs,auxOutputs = model(inputs)
-                        outputs.to(device)
-                        auxOutputs.to(device)
-                        criterion.to(device)
-                        loss1 = criterion(outputs, labels)
-                        loss2 = criterion(auxOutputs, labels)
-                        loss = loss1 + 0.4 * loss2
-                    else:
-                        outputs = model(inputs)
-                        loss = criterion(outputs, labels)
-                        
-                    preds = torch.max(outputs, 1)[1] # what does this function mean?
-                    if phase == "train":
-                        loss.to(device)
-                        loss.backward()
-                        optimizer.step()
-                runningLoss += loss.item() * inputs.size(0) # what does 0 mean
-                runningCorrects += torch.sum(preds == labels.data)
-            
-            datasetLen = len(dataloaders[phase].dataset)
-            epochLoss = runningLoss / datasetLen
-            epochAcc = runningCorrects / datasetLen
-            timeElapsed = time.time() - startTime
-            print(f"time elapsed {timeElapsed // 60 :.0f}m {timeElapsed % 60 :.2f}s")
-            print(f"{phase} loss: {epochLoss :.4f}, acc: {epochAcc :.4f}")
-            
-            if phase == "valid" and epochAcc >= bestAcc:
-                bestAcc = epochAcc
-                bestModelWts = copy.deepcopy(model.state_dict())
-                state = {
-                    "state_dict": model.state_dict(),
-                    "best_acc": bestAcc,
-                    "optimizer": optimizer.state_dict()
-                }
-                torch.save(state, os.path.join(".\\TrainedModel", filename))
-                print(f"Data successfully written into {filename}")
-                
-            if phase == "valid":
-                validAccHistory.append(epochAcc)
-                validLosses.append(epochLoss)
-                # scheduler.step(epochLoss)
-            elif phase == "train":
-                trainAccHistory.append(epochAcc)
-                trainLosses.append(epochLoss)
-        
-        print(f"optimizer learning rate: {optimizer.param_groups[0]['lr'] :.7f}")
-        LRs.append(optimizer.param_groups[0]["lr"])
-        print()
-        
-    timeElapsed = time.time() - startTime
-    print(f"training complete in {timeElapsed // 60 :.0f}m {timeElapsed % 60 :.2f}s")
-    print(f"best valid acc: {bestAcc :.4f}")
-    model.load_state_dict(bestModelWts)
+    dataDir = "./Data/" + dbName
+    dataTransforms = transforms.Compose([transforms.Lambda(resizeLongEdge), transforms.ToTensor()])
+    if crossValid:
+        imageDataset = datasets.ImageFolder(dataDir, dataTransforms)
+    else:
+        imageDatasets = {x: datasets.ImageFolder(os.path.join(dataDir, x), dataTransforms) for x in ["train", "valid"]}
+        dataloaders = {x: torch.utils.data.DataLoader(imageDatasets[x], batch_size = batchSize, shuffle = True) for x in ["train", "valid"]}
     
-    return model, validAccHistory, trainAccHistory, validLosses, trainLosses, LRs, timeElapsed
-
-def trainModel(device, model, dataloaders, criterion, optimizer, scheduler, filename, dbName, crossValid, numEpochs, isInception = False):
-    startTime = time.time()
-    bestAcc = 0
-    model.to(device)
-    validAccHistory = []
-    trainAccHistory = []
-    validLosses = []
-    trainLosses = []
-    LRs = [optimizer.param_groups[0]["lr"]]
-    
-    bestModelWts = copy.deepcopy(model.state_dict())
     
     for epoch in range(numEpochs):
         print(f"Epoch {epoch + 1}/{numEpochs}")
         print("-" * 10)
         
+        if crossValid:
+            datasetSize = len(imageDataset)
+            trainSize = int(0.8 * datasetSize)
+            validSize = datasetSize - trainSize
+            trainDataset, validDataset = torch.utils.data.random_split(imageDataset, [trainSize, validSize])
+            dataloaders = {
+                "train": torch.utils.data.DataLoader(trainDataset, batch_size = batchSize, shuffle=True),
+                "valid": torch.utils.data.DataLoader(validDataset, batch_size = batchSize, shuffle=True)
+            }
+    
         for phase in ["train", "valid"]:
             if phase == "train":
                 model.train() #看下定义
@@ -282,17 +212,7 @@ def trainModel(device, model, dataloaders, criterion, optimizer, scheduler, file
     
     return model, validAccHistory, trainAccHistory, validLosses, trainLosses, LRs, timeElapsed
 
-def train(device, featureExtract, modelName, numClasses, batchSize, numEpochs, LR, usePretrained, dbName, wtsName, modelType, crossValid):
-    dataDir = "./Data/" + dbName
-    #dataloaders = {}
-    #if crossValid == 0:
-    dataTransforms = transforms.Compose([transforms.Lambda(resizeLongEdge), transforms.ToTensor()])
-    #imageDatasets = {x: datasets.ImageFolder(os.path.join(dataDir, x), dataTransforms) for x in ["train", "valid"]}
-    #dataloaders = {x: torch.utils.data.DataLoader(imageDatasets[x], batch_size = batchSize, shuffle = True) for x in ["train", "valid"]}
-    #elif crossValid == 1:
-    imageDataset = datasets.ImageFolder(dataDir, dataTransforms)
-    segIndices = divideDataset(imageDataset, crossValid)
-    
+def train(device, featureExtract, modelName, numClasses, batchSize, numEpochs, LR, usePretrained, dbName, wtsName, modelType, crossValid = True):
     modelFt, inputSize = initializeModel(modelName, numClasses, featureExtract, usePretrained = usePretrained) # what does FT stand for?
     modelFt = modelFt.to(device)
     if wtsName != "":
@@ -314,9 +234,8 @@ def train(device, featureExtract, modelName, numClasses, batchSize, numEpochs, L
     
     now = datetime.now()
     filename = now.strftime(modelType + " %Y-%m-%d %H-%M-%S")
-    
-    #modelFt, validAccHistory, trainAccHistory, validLosses, trainLosses, LRs, timeElapsed = trainModel(device, modelFt, dataloaders, criterion, optimizerFt, scheduler, filename + ".pth", dbName, crossValid, numEpochs = numEpochs)
-    modelFt, validAccHistory, trainAccHistory, validLosses, trainLosses, LRs, timeElapsed = trainModelWithCrossValid(device, modelFt, segIndices, imageDataset, criterion, optimizerFt, scheduler, filename + ".pth", dbName, crossValid, batchSize, numEpochs)
+
+    modelFt, validAccHistory, trainAccHistory, validLosses, trainLosses, LRs, timeElapsed = trainModel(device, modelFt, criterion, optimizerFt, scheduler, filename + ".pth", dbName, crossValid, batchSize, numEpochs)
     with open(os.path.join(".\\Log", filename + ".csv"), "w", newline="") as file:  
         writer = csv.writer(file)  
         writer.writerow(["Trained from ResNet152" if wtsName == "" else f"Trained from {wtsName}", f"Data: {dbName}", f"batchSize = {batchSize}", f"LR = {LRs[0]}", f"epochNum = {len(trainLosses)}", f"timeElapsed = {timeElapsed // 60 :.0f}m {timeElapsed % 60: .2f}s"])
