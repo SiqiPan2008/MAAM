@@ -36,27 +36,41 @@ class SimpleNet(nn.Module):
         x = self.softmax(x)
         return x
 
-def getRandImageOutput(dbName, abnormityType, abnormity, oModel, fModel):
-    pass
-
-def getOutputAndLabel(diseaseName, oAbnormityNum, fAbnormityNum, grade, dbName):
-    criteria = getCriteria()
-    if oAbnormityNum == 0 or fAbnormityNum == 0:
-        abnormityType = "Fundus" if oAbnormityNum == 0 else "OCT"
-        diseaseAbnormities = criteria[diseaseName][abnormityType]
-        allAbnormityNum = criteria["All"][abnormityType]
-        selCorrectAbnormities = random.sample(diseaseAbnormities, grade)
-        incorrectAbnormities = [abnormity for abnormity in allAbnormityNum if (abnormity not in diseaseAbnormities)]
-        selIncorrectAbnormities = random.sample(incorrectAbnormities, fAbnormityNum - grade)
-        selAbnormities = selCorrectAbnormities + selIncorrectAbnormities
-        output = torch.empty([fAbnormityNum, allAbnormityNum])
-        for abnormity in selAbnormities:
-            output[abnormity] = getRandImageOutput(dbName, abnormityType, abnormity, oModel, fModel)
-        output = torch.max(output, dim=0)[0]
-        output = output.unsqueeze(0)
-    else:
-        pass
+def getRandImageOutput(device, dbName, abnormity, oModel, fModel):
+    abnormityType, abnormityName = abnormity[0], abnormity[1]
+    foldername = f"{dbName}/{abnormityType}/{abnormityName}"
+    files = os.listdir(foldername)
+    randomImg = random.choice(files)
+    imgPath = os.path.join(foldername, randomImg)
+    img = classify.processImg(imgPath)
+    img = img.unsqueeze(0)
+    output = oModel(img.to(device)) if abnormityType == "OCT" else fModel(img.to(device))
     return output
+
+def getOutputAndLabel(device, diseaseName, oAbnormityNum, fAbnormityNum, grade, dbName, oModel, fModel):
+    criteria = getCriteria()
+   
+    diseaseAbnormities = [(("Fundus", abnormity) for abnormity in criteria[diseaseName]["Fundus"])
+                            + (("OCT", abnormity) for abnormity in criteria[diseaseName]["OCT"])]
+    selCorrectAbnormities = random.sample(diseaseAbnormities, grade)
+    correctFs = sum((abnormity[0] == "Fundus") for abnormity in diseaseAbnormities)
+    correctOs = sum((abnormity[0] == "OCT") for abnormity in diseaseAbnormities)
+    
+    allFAbnormity = [("Fundus", abnormity) for abnormity in criteria["All"]["Fundus"]]
+    allOAbnormity = [("OCT", abnormity) for abnormity in criteria["All"]["OCT"]]
+    incorrectFAbnormities = [abnormity for abnormity in allFAbnormity if (abnormity not in diseaseAbnormities)]
+    incorrectOAbnormities = [abnormity for abnormity in allOAbnormity if (abnormity not in diseaseAbnormities)]
+    selIncorrectFAbnormities = random.sample(incorrectFAbnormities, fAbnormityNum - correctFs)
+    selIncorrectOAbnormities = random.sample(incorrectOAbnormities, oAbnormityNum - correctOs)
+    
+    selAbnormities = selCorrectAbnormities + selIncorrectFAbnormities + selIncorrectOAbnormities
+    
+    outputs = torch.empty([fAbnormityNum, len(allFAbnormity) + len(allOAbnormity)])
+    for i in range(len(selAbnormities)):
+        outputs[i] = getRandImageOutput(device, dbName, selAbnormities[i], oModel, fModel)
+    outputs = torch.max(outputs, dim=0)
+    outputs = outputs.unsqueeze(0)
+    return outputs
             
         
 
@@ -84,39 +98,82 @@ def trainModel(device, diseaseName, dModel, oModel, fModel, criterion, optimizer
     gradeTrainSize = int(0.8 * gradeSize)
     gradeValidSize = gradeSize - gradeTrainSize
     trainData = torch.empty(gradeLevels * gradeTrainSize, numClasses)
-    trainLabel = torch.empty(gradeLevels * gradeValidSize, 1)
+    trainLabel = torch.empty(gradeLevels * gradeValidSize)
     validData = torch.empty(gradeLevels * gradeTrainSize, numClasses)
-    validLabel = torch.empty(gradeLevels * gradeValidSize, 1)
+    validLabel = torch.empty(gradeLevels * gradeValidSize)
     
     model = SimpleNet(numClasses, gradeLevels)
     
+    trainAcc = []
+    validAcc = []
+    trainLosses = []
+    validLosses = []
     for epoch in range(numEpochs):
         for grade in range(gradeLevels):
             for i in range(gradeTrainSize):
-                output = getOutputAndLabel(diseaseName, oAbnormityNum, fAbnormityNum, grade, dbName)
+                output = getOutputAndLabel(device, diseaseName, oAbnormityNum, fAbnormityNum, grade, dbName, oModel, fModel)
                 trainData[grade * gradeTrainSize + i] = output
                 trainLabel[grade * gradeTrainSize + i] = grade
         for grade in range(gradeLevels):
             for i in range(gradeValidSize):
-                output = getOutputAndLabel(diseaseName, oAbnormityNum, fAbnormityNum, grade, dbName)
+                output = getOutputAndLabel(device, diseaseName, oAbnormityNum, fAbnormityNum, grade, dbName, oModel, fModel)
                 validData[grade * gradeValidSize + i] = output
                 validLabel[grade * gradeValidSize + i] = grade
+        trainDataset = torch.utils.data.TensorDataset(trainData, validData)
+        validDataset = torch.utils.data.TensorDataset(trainData, validData)
+        trainLoader = torch.utils.data.DataLoader(trainDataset, batch_size = batchSize, shuffle = False)
+        validLoader = torch.utils.data.DataLoader(validDataset, batch_size = batchSize, shuffle = False)
         
         print(f"Epoch {epoch + 1}/{numEpochs}")
         print("-" * 10)
+
+        model.train()  # 设为训练模式
+        runningLoss = 0.0
+        corrects = 0
+        total = 0
+        for inputs, labels in trainLoader:
+            optimizer.zero_grad()
+            outputs = model(inputs)
+            loss = criterion(outputs, labels)
+            loss.backward()
+            optimizer.step()
+            runningLoss += loss.item() * inputs.size(0)
+            
+            _, predicted = torch.max(outputs, 1)
+            total += labels.size(0)
+            corrects += (predicted == labels).sum().item()
+        acc = corrects / total
+        trainAcc.append(acc)
         
-        outputs = model(input_data)
-        loss = criterion(outputs, target_data)
-
-        optimizer.zero_grad()
-        loss.backward()
-        optimizer.step()
-        scheduler.step()
-
-        if (epoch + 1) % 10 == 0:
-            print(f'Epoch [{epoch + 1}/100], Loss: {loss.item():.4f}')
-    
-    timeElapsed = time.time() - startTime
+        loss = runningLoss / len(trainLoader.dataset)
+        trainLosses.append(loss)
+        timeElapsed = time.time() - startTime
+        print(f"time elapsed {timeElapsed // 60 :.0f}m {timeElapsed % 60 :.2f}s")
+        print(f"train loss: {loss :.4f}, acc: {acc :.4f}")
+        
+        model.eval()
+        corrects = 0
+        total = 0
+        valRunningLoss = 0.0
+        with torch.no_grad():
+            for inputs, labels in validLoader:
+                outputs = model(inputs)
+                loss = criterion(outputs, labels)
+                valRunningLoss += loss.item() * inputs.size(0)
+                _, predicted = torch.max(outputs, 1)
+                total += labels.size(0)
+                corrects += (predicted == labels).sum().item()
+        loss = valRunningLoss / len(validLoader.dataset)
+        acc = corrects / total
+        validAcc.append(acc)
+        validLosses.append(loss)
+        timeElapsed = time.time() - startTime
+        print(f"time elapsed {timeElapsed // 60 :.0f}m {timeElapsed % 60 :.2f}s")
+        print(f"train loss: {loss :.4f}, acc: {acc :.4f}")
+        
+    # record LR
+    # save model
+    # record best acc
     
     return model, accHistory, losses, LRs, timeElapsed
     
@@ -247,7 +304,7 @@ def train(device, featureExtract, modelName, oWts, fWts, oNumClasses, fNumClasse
 
     dModel = SimpleNet(oNumClasses, fNumClasses, dNumClasses)
     criterion = nn.CrossEntropyLoss()
-    optimizer = optim.SGD(dModel.parameters(), lr = LR)
+    optimizer = optim.Adam(dModel.parameters(), lr = LR)
     scheduler = optim.lr_scheduler.StepLR(optimizer, step_size = 7, gamma = 0.1)
     
     criteria = getCriteria()

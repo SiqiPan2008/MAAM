@@ -41,7 +41,7 @@ RP 31
 
 Stargardt 23
 	O Few-shot
-	CYCLE_GAN generate 3000 select ????
+	CYCLE_GAN generate 3000 select 2582
 
 subretinal fluid 1083
 	O Normal Disease Database (CNV)
