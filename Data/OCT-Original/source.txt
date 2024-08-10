@@ -3,13 +3,13 @@
 
 ###################################################################
 
-CNV ????
+CNV 2984
 	O Normal Disease Database
 
 CSC 134
 	O Few-shot
 	O OpenICPSR
-	CYCLE_GAN generate 3000 select 1811
+	CYCLE_GAN generate 3000 select 1730
 
 DME ????
 	O Normal Disease Database
@@ -21,8 +21,8 @@ ERM 19
 	O Google Image
 	CYCLE_GAN generate 3000 select ????
 
-intraretinal fluid ????
-	O Normal Disease Database (CNV
+intraretinal fluid 1097
+	O Normal Disease Database (CNV)
 
 Mactel 29
 	O Few-shot
@@ -30,7 +30,7 @@ Mactel 29
 
 MH 130
 	O Few-shot
-	CYCLE_GAN generate 3000 select ????
+	CYCLE_GAN generate 3000 select 1811
 
 Normal ????
 	O Normal Disease Database
@@ -43,5 +43,5 @@ Stargardt 23
 	O Few-shot
 	CYCLE_GAN generate 3000 select ????
 
-subretinal fluid ????
+subretinal fluid 1083
 	O Normal Disease Database (CNV)

@@ -36,22 +36,72 @@ class SimpleNet(nn.Module):
         x = self.softmax(x)
         return x
 
+def getRandImageOutput(dbName, abnormityType, abnormity, oModel, fModel):
+    pass
+
+def getOutputAndLabel(diseaseName, oAbnormityNum, fAbnormityNum, grade, dbName):
+    criteria = getCriteria()
+    if oAbnormityNum == 0 or fAbnormityNum == 0:
+        abnormityType = "Fundus" if oAbnormityNum == 0 else "OCT"
+        diseaseAbnormities = criteria[diseaseName][abnormityType]
+        allAbnormityNum = criteria["All"][abnormityType]
+        selCorrectAbnormities = random.sample(diseaseAbnormities, grade)
+        incorrectAbnormities = [abnormity for abnormity in allAbnormityNum if (abnormity not in diseaseAbnormities)]
+        selIncorrectAbnormities = random.sample(incorrectAbnormities, fAbnormityNum - grade)
+        selAbnormities = selCorrectAbnormities + selIncorrectAbnormities
+        output = torch.empty([fAbnormityNum, allAbnormityNum])
+        for abnormity in selAbnormities:
+            output[abnormity] = getRandImageOutput(dbName, abnormityType, abnormity, oModel, fModel)
+        output = torch.max(output, dim=0)[0]
+        output = output.unsqueeze(0)
+    else:
+        pass
+    return output
+            
+        
 
 
 
 
 
-
-def trainModel(device, dModel, oModel, fModel, dNumClasses, oNumClasses, fNumClasses, criterion, optimizer, scheduler, filename, dbName, batchSize, numEpochs, classSetSize):
+def trainModel(device, diseaseName, dModel, oModel, fModel, criterion, optimizer, scheduler, filename, dbName, batchSize, numEpochs, gradeSize):
+    criteria = getCriteria()
+    dNumClasses = len(criteria) - 1
+    oNumClasses = len(criteria["All"]["OCT"])
+    fNumClasses = len(criteria["All"]["Fundus"])
     
     accHistory = []
     losses = []
     LRs = [optimizer.param_groups[0]["lr"]]
     startTime = time.time()
     
-    torch.empty(1000, 22)
+    oAbnormityNum = len(criteria[diseaseName]["OCT"])
+    fAbnormityNum = len(criteria[diseaseName]["Fundus"])
+    numClasses = oNumClasses * (oAbnormityNum == 0) + fNumClasses * (fAbnormityNum == 0)
+    abnormityNum = oAbnormityNum + fAbnormityNum
+    gradeLevels = abnormityNum + 1
+    
+    gradeTrainSize = int(0.8 * gradeSize)
+    gradeValidSize = gradeSize - gradeTrainSize
+    trainData = torch.empty(gradeLevels * gradeTrainSize, numClasses)
+    trainLabel = torch.empty(gradeLevels * gradeValidSize, 1)
+    validData = torch.empty(gradeLevels * gradeTrainSize, numClasses)
+    validLabel = torch.empty(gradeLevels * gradeValidSize, 1)
+    
+    model = SimpleNet(numClasses, gradeLevels)
     
     for epoch in range(numEpochs):
+        for grade in range(gradeLevels):
+            for i in range(gradeTrainSize):
+                output = getOutputAndLabel(diseaseName, oAbnormityNum, fAbnormityNum, grade, dbName)
+                trainData[grade * gradeTrainSize + i] = output
+                trainLabel[grade * gradeTrainSize + i] = grade
+        for grade in range(gradeLevels):
+            for i in range(gradeValidSize):
+                output = getOutputAndLabel(diseaseName, oAbnormityNum, fAbnormityNum, grade, dbName)
+                validData[grade * gradeValidSize + i] = output
+                validLabel[grade * gradeValidSize + i] = grade
+        
         print(f"Epoch {epoch + 1}/{numEpochs}")
         print("-" * 10)
         
@@ -181,7 +231,7 @@ def trainModel(device, dModel, oModel, fModel, dNumClasses, oNumClasses, fNumCla
 
 
 
-def train(device, featureExtract, modelName, oWts, fWts, oNumClasses, fNumClasses, dNumClasses, batchSize, classSetSize, numEpochs, LR, dbName, wtsName):
+def train(device, featureExtract, modelName, oWts, fWts, oNumClasses, fNumClasses, dNumClasses, batchSize, gradeSize, numEpochs, LR, dbName, wtsName):
     oModel, _ = trainClassify.initializeModel(modelName, oNumClasses, featureExtract)
     oModel = oModel.to(device)
     oTrainedModel = torch.load(os.path.join(".\\TrainedModel", oWts + ".pth"))
@@ -200,11 +250,13 @@ def train(device, featureExtract, modelName, oWts, fWts, oNumClasses, fNumClasse
     optimizer = optim.SGD(dModel.parameters(), lr = LR)
     scheduler = optim.lr_scheduler.StepLR(optimizer, step_size = 7, gamma = 0.1)
     
-    dModel, accHistory, losses, LRs, timeElapsed = trainModel(device, dModel, oModel, fModel, dNumClasses, oNumClasses, fNumClasses, criterion, optimizer, scheduler, filename, dbName, batchSize, numEpochs, classSetSize)
+    criteria = getCriteria()
+    for diseaseName in criteria:
+        dModel, accHistory, losses, LRs, timeElapsed = trainModel(device, diseaseName, dModel, oModel, fModel, dNumClasses, oNumClasses, fNumClasses, criterion, optimizer, scheduler, filename, dbName, batchSize, numEpochs, gradeSize)
     
     with open(os.path.join(".\\Log", filename + ".csv"), "w", newline="") as file:  
         writer = csv.writer(file)  
-        writer.writerow(["Trained from scratch" if wtsName == "" else f"Trained from {wtsName}", f"batchSize = {batchSize}", f"datasetSize = {datasetSize}", f"LR = {LRs[0]}", f"epochNum = {len(trainLosses)}", f"timeElapsed = {timeElapsed // 60 :.0f}m {timeElapsed % 60: .2f}s"])
+        writer.writerow(["Trained from scratch" if wtsName == "" else f"Trained from {wtsName}", f"batchSize = {batchSize}", f"gradeSize = {gradeSize}", f"LR = {LRs[0]}", f"epochNum = {len(numEpochs)}", f"timeElapsed = {timeElapsed // 60 :.0f}m {timeElapsed % 60: .2f}s"])
         for i in range(len(losses)):  
             writer.writerow([i + 1, accHistory[i].item(), losses[i], LRs[i]])
     print(f"Data successfully written into {filename}.csv")

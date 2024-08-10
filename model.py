@@ -14,7 +14,7 @@ def main():
     device = torch.device("cuda:0" if useGpu else "cpu") # get to know how to use both GPUs
     print(device)
 
-    task = 1 # TASK!!!
+    task = 2 # TASK!!!
     numClasses = 2 # CHANGE NUM OF CLASSES!
     if task == 0:
         # UNUSED
@@ -49,13 +49,13 @@ def main():
         oModelName = "./Data/Fundus-normal-DR-selected/train/DR/16_left.jpeg"
         fModelName = "O 2024-05-09 22-42-15"
         oNumClasses = 11
-        fNumClasses = 10
-        dNumClasses = 13
+        fNumClasses = 9
+        dNumClasses = 12
         wts = ""
-        classSetSize = 3000
+        gradeSize = 3000
         batchsize = 16
         dbName = ""
-        trainDiagnose.train(device, featureExtract, modelName, oModelName, fModelName, oNumClasses, dNumClasses, fNumClasses, batchsize, classSetSize, numEpochs, LR, wts)
+        trainDiagnose.train(device, featureExtract, modelName, oModelName, fModelName, oNumClasses, dNumClasses, fNumClasses, batchsize, gradeSize, numEpochs, LR, wts)
 
 if __name__ == "__main__":
     main()
