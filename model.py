@@ -1,12 +1,13 @@
 from Classify import classify
 from Classify import gradcam
-from Train import train
+from TrainClassify import trainClassify
+from TrainDiagnose import trainDiagnose
 from Generate import generate
 import torch
 
 def main():
     modelName = "resnet"
-    featureExtract = True
+    featureExtract = True # True -> freeze conv layers; False -> train all layers
     useGpu = torch.cuda.is_available()
     print("CUDA available." if useGpu else
           "CUDA not available.")
@@ -16,6 +17,7 @@ def main():
     task = 1 # TASK!!!
     numClasses = 2 # CHANGE NUM OF CLASSES!
     if task == 0:
+        # UNUSED
         batchSize = 1
         numEpochs = 5
         LR = 1e-5
@@ -34,15 +36,26 @@ def main():
         epochs = 5
         LR = 1e-3
         imgType = "F"
-        train.train(device, featureExtract, modelName, numClasses, batchSize, epochs, LR, True, dataset, "", imgType, crossValid = True)
+        trainClassify.train(device, featureExtract, modelName, numClasses, batchSize, epochs, LR, True, dataset, "", imgType, crossValid = True)
     elif task == 2:
         string = "./Data/Fundus-normal-DR-selected/train/DR/16_left.jpeg"
         wts = "F 2024-08-07 16-48-56"
-        classify.classify(string, numClasses, device, useGpu, featureExtract, modelName, wts)
+        classify.classify(string, numClasses, device, featureExtract, modelName, wts)
     elif task == 3:
         string = "./Data/OCT-normal-drusen-large/train/drusen/DRUSEN-303435-2.jpeg"
         wts = "O 2024-05-09 22-42-15"
-        gradcam.highlight(string, numClasses, device, useGpu, featureExtract, modelName, wts)
+        gradcam.highlight(string, numClasses, device, featureExtract, modelName, wts)
+    elif task == 4:
+        oModelName = "./Data/Fundus-normal-DR-selected/train/DR/16_left.jpeg"
+        fModelName = "O 2024-05-09 22-42-15"
+        oNumClasses = 11
+        fNumClasses = 10
+        dNumClasses = 13
+        wts = ""
+        classSetSize = 3000
+        batchsize = 16
+        dbName = ""
+        trainDiagnose.train(device, featureExtract, modelName, oModelName, fModelName, oNumClasses, dNumClasses, fNumClasses, batchsize, classSetSize, numEpochs, LR, wts)
 
 if __name__ == "__main__":
     main()

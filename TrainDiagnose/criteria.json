@@ -1,0 +1,50 @@
+{
+    "CSC": {
+        "OCT": ["CSC", "SubretinalFluid"],
+        "Fundus": []
+    },
+    "Stargardt": {
+        "OCT": ["Stargardt"], 
+        "Fundus": []
+    },
+    "Mactel": {
+        "OCT": ["Mactel"], 
+        "Fundus": []
+    },
+    "ERM": {
+        "OCT": ["ERM"], 
+        "Fundus": ["ERM"]
+    },
+    "MH": {
+        "OCT": ["MH"], 
+        "Fundus": ["MH"]
+    },
+    "DryAMD": {
+        "OCT": ["Drusen"], 
+        "Fundus": ["Drusen"]
+    },
+    "CRVO": {
+        "OCT": [], 
+        "Fundus": ["Hemorrhage", "VascularAbnormity"]
+    },
+    "RP": {
+        "OCT": ["RP"], 
+        "Fundus": ["RP"]
+    },
+    "MildDR": {
+        "OCT": [], 
+        "Fundus": ["Hemorrhage", "HardExudate", "Microaneurysm"]
+    },
+    "BRVO": {
+        "OCT": [], 
+        "Fundus": ["Hemorrhage", "VascularAbnormity", "CottonWoolPatch"]
+    },
+    "WetAMD": {
+        "OCT": ["CNV", "IntraretinalFluid", "SubretinalFluid"], 
+        "Fundus": ["Hemorrhage"]
+    },
+    "ReferableDR": {
+        "OCT": ["DME"], 
+        "Fundus": ["Hemorrhage", "VascularAbnormity", "Microaneurysm", "CottonWoolPatch"]
+    }
+}

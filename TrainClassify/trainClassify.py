@@ -78,33 +78,6 @@ def curve(validAccHistory, trainAccHistory, validLosses, trainLosses, filename):
     plt.savefig(os.path.join(".\\Log", filename), format="pdf")
     # plt.show()
 
-def divideDataset(fullDataset, crossValidSegs):  
-    indices = list(range(len(fullDataset)))  
-    random.shuffle(indices)  
-    
-    dataLen = len(fullDataset)
-    segSize = int(dataLen // crossValidSegs)
-    segSeps = list(range(0, dataLen, segSize))
-    segSeps[crossValidSegs] = dataLen
-    segIndices = [indices[segSeps[i] : segSeps[i + 1]] for i in range(crossValidSegs)]
-    return segIndices
-      
-    # 使用 Subset 创建训练和验证集  
-    train_dataset = Subset(full_dataset, train_indices)  
-    val_dataset = Subset(full_dataset, val_indices)  
-      
-    return train_dataset, val_dataset 
-
-def genCrossValidDataloader(fullDataset, segIndices, validIndex, batchSize):
-    trainIndices = []
-    validIndices = segIndices[validIndex]
-    for i in range(len(segIndices)):
-        if i != validIndex:
-            trainIndices += segIndices[i]
-    datasets = {"train": [], #Subset(fullDataset, trainIndices),
-        "valid": []} #Subset(fullDataset, validIndices)}
-    return {x: torch.utils.data.Dataloader(datasets[x], batch_size = batchSize, shuffle = True) for x in ["train", "valid"]}
-
 def trainModel(device, model, criterion, optimizer, scheduler, filename, dbName, crossValid, batchSize, numEpochs, isInception = False):
     startTime = time.time()
     bestAcc = 0
@@ -196,7 +169,7 @@ def trainModel(device, model, criterion, optimizer, scheduler, filename, dbName,
             if phase == "valid":
                 validAccHistory.append(epochAcc)
                 validLosses.append(epochLoss)
-                # scheduler.step(epochLoss)
+                scheduler.step(epochLoss)
             elif phase == "train":
                 trainAccHistory.append(epochAcc)
                 trainLosses.append(epochLoss)

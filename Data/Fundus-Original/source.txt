@@ -3,44 +3,44 @@
 
 ###################################################################
 
-Glaucomatous disc change
+Glaucomatous disc change 69
 	OF trghs22fpg-4
 	OF Mendeley
 	F HRF
 	
-Normal
+Normal 169
 	OF trghs22fpg-4
 	F E-ophtha (from both EX and MA)
 	F Kaggle1000
 	F HRF
 	
-Hard Exudates
+Hard Exudates 112
 	F STARE
 	F E-ophtha
 
-Soft Exudates/Cotton Wool Patch
+Soft Exudates/Cotton Wool Patch 53
 	F STARE
 
-Hemorrhage
+Hemorrhage 287
 	STARE
 
-drusen
+drusen 63
 	F STARE
 
-ERM
+ERM 8
 	F STARE
 
-Vascular Abnormity
+Vascular Abnormity 66
 	F Kaggle1000
 
-MH
+MH 25
 	F Google Image
 
-+ Microaneurysms
++ Microaneurysms 180
 	F E-ophtha
 	F STARE
 	
-+ RP
++ RP 22
 	F Kaggle1000
 	
 - Retinal nerve fiber layer defect

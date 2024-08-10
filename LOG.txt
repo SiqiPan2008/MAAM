@@ -1,0 +1,4 @@
+Update abnormity->disease criteria graph (according to the .json file)
+	Add subretinal to CNV
+	delete retinal detachment
+	delete glaucoma

@@ -1,7 +1,7 @@
 import torch
 import numpy as np
 from PIL import Image
-from Train import train
+from TrainClassify import trainClassify
 from Classify import classify
 import os
 import matplotlib.pyplot as plt
@@ -162,8 +162,8 @@ def camShow(img, cam, title = ""):
     plt.show()
     
 
-def highlight(imgPath, numClasses, device, useGpu, featureExtract, modelName, wtsName):
-    modelFt, _ = train.initializeModel(modelName, numClasses, featureExtract)
+def highlight(imgPath, numClasses, device, featureExtract, modelName, wtsName):
+    modelFt, _ = trainClassify.initializeModel(modelName, numClasses, featureExtract)
     modelFt = modelFt.to(device)
     trainedModel = torch.load(os.path.join(".\\TrainedModel", wtsName + ".pth"))
     modelFt.load_state_dict(trainedModel["state_dict"])

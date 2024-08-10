@@ -1,3 +1,5 @@
+# UNUSED
+
 import torch
 import torch.nn as nn
 from PIL import Image
@@ -6,7 +8,7 @@ import torch.utils
 from torch.utils.data import Dataset
 import numpy as np
 import torch.utils.data
-from Train import train
+from TrainClassify import trainClassify
 from torchvision import transforms
 from datetime import datetime
 import sys
@@ -262,7 +264,7 @@ def generate(device, batchSize, numEpochs, lr, numWorkers, lambdaIdentity, lambd
     
     dataTransforms = transforms.Compose(
         [
-        transforms.Lambda(lambda img: train.resizeLongEdge(img, longEdgeSize = 256)),
+        transforms.Lambda(lambda img: trainClassify.resizeLongEdge(img, longEdgeSize = 256)),
         transforms.ToTensor()
         ]
     )
