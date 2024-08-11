@@ -42,7 +42,7 @@ def getRandImageOutput(device, dbName, abnormity, oModel, fModel):
     files = os.listdir(foldername)
     randomImg = random.choice(files)
     imgPath = os.path.join(foldername, randomImg)
-    img = classify.processImg(imgPath)
+    img = classify.processImgFromPath(imgPath)
     img = img.unsqueeze(0)
     output = oModel(img.to(device)) if abnormityType == "OCT" else fModel(img.to(device))
     return output
@@ -208,9 +208,9 @@ def train(device, diseaseName, featureExtract, modelName, oWts, fWts, batchSize,
     fModel.load_state_dict(fTrainedModel["state_dict"])
     
     now = datetime.now()
-    filename = now.strftime("D" + " %Y-%m-%d %H-%M-%S" + "/D " + diseaseName + " %Y-%m-%d %H-%M-%S")
+    filename = now.strftime("D " + diseaseName + " %Y-%m-%d %H-%M-%S")
     
-    dModel, validAccHistory, trainAccHistory, trainLosses, validLosses, LRs, timeElapsed = trainModel(device, diseaseName, oModel, fModel, wtsName, filename + ".pth", dbName, batchSize, LR, numEpochs, gradeSize)
+    dModel, validAccHistory, trainAccHistory, trainLosses, validLosses, LRs, timeElapsed = trainModel(device, diseaseName, oModel, fModel, wtsName, "./TrainedModel/D %Y-%m-%d %H-%M-%S/" + filename + ".pth", dbName, batchSize, LR, numEpochs, gradeSize)
     
     with open(os.path.join(".\\Log", filename + ".csv"), "w", newline="") as file:  
         writer = csv.writer(file)  

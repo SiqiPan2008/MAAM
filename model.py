@@ -1,9 +1,11 @@
 from Classify import classify
 from Classify import gradcam
 from TrainClassify import trainClassify
+from Diagnose import diagnose
 from TrainDiagnose import trainDiagnose
 from Generate import generate
 import torch
+from PIL import Image
 
 def main():
     modelName = "resnet"
@@ -40,7 +42,8 @@ def main():
     elif task == 2: # classify single image with OCT or Fundus
         string = "./Data/Fundus-normal-DR-selected/train/DR/16_left.jpeg"
         wts = "F 2024-08-07 16-48-56"
-        classify.classify(string, numClasses, device, featureExtract, modelName, wts)
+        img = Image.open(string)
+        classify.classify(img, numClasses, device, featureExtract, modelName, wts)
     elif task == 3: # gradCAM single image with OCT or Fundus
         string = "./Data/OCT-normal-drusen-large/train/drusen/DRUSEN-303435-2.jpeg"
         wts = "O 2024-05-09 22-42-15"
@@ -54,17 +57,24 @@ def main():
         dbName = ""
         diseaseName = "CSC"
         trainDiagnose.train(device, diseaseName, featureExtract, modelName, oModelName, fModelName, batchsize, gradeSize, numEpochs, LR, wts)
-    elif task == 5:
-        ModelName = "./Data/Fundus-normal-DR-selected/train/DR/16_left.jpeg"
+    elif task == 5: # train all diseases
         fModelName = "O 2024-05-09 22-42-15"
         gradeSize = 3000
         batchsize = 16
-        dbName = ""
+        dbName = "./Data"
         criteria = trainDiagnose.getCriteria()
         for disease in criteria.keys():
             wts = ""
-            trainDiagnose.train(device, disease, featureExtract, modelName, oModelName, fModelName, batchsize, gradeSize, numEpochs, LR, wts)
-        
+            trainDiagnose.train(device, disease, featureExtract, modelName, oModelName, fModelName, batchsize, gradeSize, numEpochs, LR, dbName, wts)
+    elif task == 6: # diagnose from images
+        oImgPaths = []
+        oImgs = [Image.open(imgPath) for imgPath in oImgPaths]
+        fImgPaths = []
+        fImgs = [Image.open(imgPath) for imgPath in fImgPaths]
+        dWtsTime = "2024-01-01 00-00-00"
+        oWts = "O 2024-05-09 22-42-15"
+        fWts = "F 2024-08-07-16-48-56"
+        diagnose.diagnose(oImgs, fImgs, diseaseName, device, modelName, dWtsTime, oWts, fWts)
     
 
 if __name__ == "__main__":
