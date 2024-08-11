@@ -16,7 +16,7 @@ def main():
 
     task = 2 # TASK!!!
     numClasses = 2 # CHANGE NUM OF CLASSES!
-    if task == 0:
+    if task == 0: # GAN
         # UNUSED
         batchSize = 1
         numEpochs = 5
@@ -30,32 +30,42 @@ def main():
         abnormName = "ERM"
         dataType = "O"
         generate.generate(device, batchSize, numEpochs, LR, numWorkers, lambdaIdentity, lambdaCycle, normFolderName, abnormFolderName, wtsName, abnormName, dataType)
-    elif task == 1:
+    elif task == 1: # train single OCT or Fundus
         dataset = "Fundus-normal-DR-demo/train"
         batchSize = 16
         epochs = 5
         LR = 1e-3
         imgType = "F"
         trainClassify.train(device, featureExtract, modelName, numClasses, batchSize, epochs, LR, True, dataset, "", imgType, crossValid = True)
-    elif task == 2:
+    elif task == 2: # classify single image with OCT or Fundus
         string = "./Data/Fundus-normal-DR-selected/train/DR/16_left.jpeg"
         wts = "F 2024-08-07 16-48-56"
         classify.classify(string, numClasses, device, featureExtract, modelName, wts)
-    elif task == 3:
+    elif task == 3: # gradCAM single image with OCT or Fundus
         string = "./Data/OCT-normal-drusen-large/train/drusen/DRUSEN-303435-2.jpeg"
         wts = "O 2024-05-09 22-42-15"
         gradcam.highlight(string, numClasses, device, featureExtract, modelName, wts)
-    elif task == 4:
+    elif task == 4: # train single disease
         oModelName = "./Data/Fundus-normal-DR-selected/train/DR/16_left.jpeg"
         fModelName = "O 2024-05-09 22-42-15"
-        oNumClasses = 11
-        fNumClasses = 9
-        dNumClasses = 12
         wts = ""
         gradeSize = 3000
         batchsize = 16
         dbName = ""
-        trainDiagnose.train(device, featureExtract, modelName, oModelName, fModelName, oNumClasses, dNumClasses, fNumClasses, batchsize, gradeSize, numEpochs, LR, wts)
+        diseaseName = "CSC"
+        trainDiagnose.train(device, diseaseName, featureExtract, modelName, oModelName, fModelName, batchsize, gradeSize, numEpochs, LR, wts)
+    elif task == 5:
+        ModelName = "./Data/Fundus-normal-DR-selected/train/DR/16_left.jpeg"
+        fModelName = "O 2024-05-09 22-42-15"
+        gradeSize = 3000
+        batchsize = 16
+        dbName = ""
+        criteria = trainDiagnose.getCriteria()
+        for disease in criteria.keys():
+            wts = ""
+            trainDiagnose.train(device, disease, featureExtract, modelName, oModelName, fModelName, batchsize, gradeSize, numEpochs, LR, wts)
+        
+    
 
 if __name__ == "__main__":
     main()

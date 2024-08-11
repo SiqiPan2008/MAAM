@@ -65,29 +65,18 @@ def getOutputAndLabel(device, diseaseName, oAbnormityNum, fAbnormityNum, grade, 
     
     selAbnormities = selCorrectAbnormities + selIncorrectFAbnormities + selIncorrectOAbnormities
     
-    outputs = torch.empty([fAbnormityNum, len(allFAbnormity) + len(allOAbnormity)])
+    oOutputs = torch.empty([fAbnormityNum, len(allFAbnormity) + len(allOAbnormity)])
     for i in range(len(selAbnormities)):
         outputs[i] = getRandImageOutput(device, dbName, selAbnormities[i], oModel, fModel)
     outputs = torch.max(outputs, dim=0)
     outputs = outputs.unsqueeze(0)
     return outputs
             
-        
-
-
-
-
-
-def trainModel(device, diseaseName, dModel, oModel, fModel, criterion, optimizer, scheduler, filename, dbName, batchSize, numEpochs, gradeSize):
+def trainModel(device, diseaseName, oModel, fModel, wtsName, filename, dbName, batchSize, LR, numEpochs, gradeSize):
     criteria = getCriteria()
     dNumClasses = len(criteria) - 1
     oNumClasses = len(criteria["All"]["OCT"])
     fNumClasses = len(criteria["All"]["Fundus"])
-    
-    accHistory = []
-    losses = []
-    LRs = [optimizer.param_groups[0]["lr"]]
-    startTime = time.time()
     
     oAbnormityNum = len(criteria[diseaseName]["OCT"])
     fAbnormityNum = len(criteria[diseaseName]["Fundus"])
@@ -102,10 +91,22 @@ def trainModel(device, diseaseName, dModel, oModel, fModel, criterion, optimizer
     validData = torch.empty(gradeLevels * gradeTrainSize, numClasses)
     validLabel = torch.empty(gradeLevels * gradeValidSize)
     
-    model = SimpleNet(numClasses, gradeLevels)
+    dModel = SimpleNet(abnormityNum, dNumClasses)
+    if wtsName:
+        dModel.load_state_dict("wtsName")
+    criterion = nn.CrossEntropyLoss()
+    optimizer = optim.Adam(dModel.parameters(), lr = LR)
+    scheduler = optim.lr_scheduler.StepLR(optimizer, step_size = 7, gamma = 0.1)
     
-    trainAcc = []
-    validAcc = []
+    startTime = time.time()
+    bestAcc = 0.0
+    bestModelWts = copy.deepcopy(dModel.state_dict())
+    LRs = [optimizer.param_groups[0]["lr"]]
+    accHistory = []
+    losses = []
+    
+    trainAccHistory = []
+    validAccHistory = []
     trainLosses = []
     validLosses = []
     for epoch in range(numEpochs):
@@ -127,168 +128,75 @@ def trainModel(device, diseaseName, dModel, oModel, fModel, criterion, optimizer
         print(f"Epoch {epoch + 1}/{numEpochs}")
         print("-" * 10)
 
-        model.train()  # 设为训练模式
+        dModel.train()
         runningLoss = 0.0
         corrects = 0
-        total = 0
+        total = len(trainLoader.dataset)
         for inputs, labels in trainLoader:
             optimizer.zero_grad()
-            outputs = model(inputs)
+            outputs = dModel(inputs)
             loss = criterion(outputs, labels)
             loss.backward()
             optimizer.step()
             runningLoss += loss.item() * inputs.size(0)
             
             _, predicted = torch.max(outputs, 1)
-            total += labels.size(0)
             corrects += (predicted == labels).sum().item()
         acc = corrects / total
-        trainAcc.append(acc)
-        
-        loss = runningLoss / len(trainLoader.dataset)
+        trainAccHistory.append(acc)
+        loss = runningLoss / total
         trainLosses.append(loss)
         timeElapsed = time.time() - startTime
-        print(f"time elapsed {timeElapsed // 60 :.0f}m {timeElapsed % 60 :.2f}s")
-        print(f"train loss: {loss :.4f}, acc: {acc :.4f}")
+        print(f"Time elapsed {timeElapsed // 60 :.0f}m {timeElapsed % 60 :.2f}s")
+        print(f"Train loss: {loss :.4f}, acc: {acc :.4f}")
         
-        model.eval()
+        dModel.eval()
         corrects = 0
-        total = 0
+        total = len(validLoader.dataset)
         valRunningLoss = 0.0
         with torch.no_grad():
             for inputs, labels in validLoader:
-                outputs = model(inputs)
+                outputs = dModel(inputs)
                 loss = criterion(outputs, labels)
                 valRunningLoss += loss.item() * inputs.size(0)
                 _, predicted = torch.max(outputs, 1)
-                total += labels.size(0)
                 corrects += (predicted == labels).sum().item()
-        loss = valRunningLoss / len(validLoader.dataset)
         acc = corrects / total
-        validAcc.append(acc)
+        validAccHistory.append(acc)
+        loss = valRunningLoss / total
         validLosses.append(loss)
         timeElapsed = time.time() - startTime
-        print(f"time elapsed {timeElapsed // 60 :.0f}m {timeElapsed % 60 :.2f}s")
-        print(f"train loss: {loss :.4f}, acc: {acc :.4f}")
+        print(f"Time elapsed {timeElapsed // 60 :.0f}m {timeElapsed % 60 :.2f}s")
+        print(f"Valid loss: {loss :.4f}, acc: {acc :.4f}")
         
-    # record LR
-    # save model
-    # record best acc
-    
-    return model, accHistory, losses, LRs, timeElapsed
-    
-    startTime = time.time()
-    bestAcc = 0
-    model.to(device)
-    validAccHistory = []
-    trainAccHistory = []
-    validLosses = []
-    trainLosses = []
-    LRs = [optimizer.param_groups[0]["lr"]]
-    
-    bestModelWts = copy.deepcopy(model.state_dict())
-    
-    dataDir = "./Data/" + dbName
-    dataTransforms = transforms.Compose([transforms.Lambda(classify.resizeLongEdge), transforms.ToTensor()])
-    if crossValid:
-        imageDataset = datasets.ImageFolder(dataDir, dataTransforms)
-    else:
-        imageDatasets = {x: datasets.ImageFolder(os.path.join(dataDir, x), dataTransforms) for x in ["train", "valid"]}
-        dataloaders = {x: torch.utils.data.DataLoader(imageDatasets[x], batch_size = batchSize, shuffle = True) for x in ["train", "valid"]}
-    
-    
-    for epoch in range(numEpochs):
-        print(f"Epoch {epoch + 1}/{numEpochs}")
-        print("-" * 10)
-        
-        if crossValid:
-            datasetSize = len(imageDataset)
-            trainSize = int(0.8 * datasetSize)
-            validSize = datasetSize - trainSize
-            trainDataset, validDataset = torch.utils.data.random_split(imageDataset, [trainSize, validSize])
-            dataloaders = {
-                "train": torch.utils.data.DataLoader(trainDataset, batch_size = batchSize, shuffle=True),
-                "valid": torch.utils.data.DataLoader(validDataset, batch_size = batchSize, shuffle=True)
+        if acc >= bestAcc:
+            bestAcc = acc
+            bestModelWts = copy.deepcopy(dModel.state_dict())
+            state = {
+                "state_dict": dModel.state_dict(),
+                "best_acc": bestAcc,
+                "optimizer": optimizer.state_dict()
             }
-    
-        for phase in ["train", "valid"]:
-            if phase == "train":
-                model.train() #看下定义
-            else:
-                model.eval() #看下定义
-            
-            runningLoss = 0.0
-            runningCorrects = 0
-            
-            for inputs, labels in dataloaders[phase]:
-                inputs = inputs.to(device)
-                labels = labels.to(device)
-                
-                optimizer.zero_grad()
-                with torch.set_grad_enabled(phase == "train"):
-                    if isInception and phase == "train":
-                        outputs,auxOutputs = model(inputs)
-                        outputs.to(device)
-                        auxOutputs.to(device)
-                        criterion.to(device)
-                        loss1 = criterion(outputs, labels)
-                        loss2 = criterion(auxOutputs, labels)
-                        loss = loss1 + 0.4 * loss2
-                    else:
-                        outputs = model(inputs)
-                        loss = criterion(outputs, labels)
-                        
-                    preds = torch.max(outputs, 1)[1] # what does this function mean?
-                    if phase == "train":
-                        loss.to(device)
-                        loss.backward()
-                        optimizer.step()
-                runningLoss += loss.item() * inputs.size(0) # what does 0 mean
-                runningCorrects += torch.sum(preds == labels.data)
-            
-            datasetLen = len(dataloaders[phase].dataset)
-            epochLoss = runningLoss / datasetLen
-            epochAcc = runningCorrects / datasetLen
-            timeElapsed = time.time() - startTime
-            print(f"time elapsed {timeElapsed // 60 :.0f}m {timeElapsed % 60 :.2f}s")
-            print(f"{phase} loss: {epochLoss :.4f}, acc: {epochAcc :.4f}")
-            
-            if phase == "valid" and epochAcc >= bestAcc:
-                bestAcc = epochAcc
-                bestModelWts = copy.deepcopy(model.state_dict())
-                state = {
-                    "state_dict": model.state_dict(),
-                    "best_acc": bestAcc,
-                    "optimizer": optimizer.state_dict()
-                }
-                torch.save(state, os.path.join(".\\TrainedModel", filename))
-                print(f"Data successfully written into {filename}")
-                
-            if phase == "valid":
-                validAccHistory.append(epochAcc)
-                validLosses.append(epochLoss)
-                # scheduler.step(epochLoss)
-            elif phase == "train":
-                trainAccHistory.append(epochAcc)
-                trainLosses.append(epochLoss)
+            torch.save(state, os.path.join(".\\TrainedModel", filename))
+            print(f"Data successfully written into {filename}")
         
-        print(f"optimizer learning rate: {optimizer.param_groups[0]['lr'] :.7f}")
+        scheduler.step()
         LRs.append(optimizer.param_groups[0]["lr"])
+        print(f"optimizer learning rate: {LRs[-1]:.7f}")
         print()
-        
+    
     timeElapsed = time.time() - startTime
     print(f"training complete in {timeElapsed // 60 :.0f}m {timeElapsed % 60 :.2f}s")
     print(f"best valid acc: {bestAcc :.4f}")
-    model.load_state_dict(bestModelWts)
+    dModel.load_state_dict(bestModelWts)
     
-    return model, validAccHistory, trainAccHistory, validLosses, trainLosses, LRs, timeElapsed
+    return dModel, trainAccHistory, validAccHistory, trainLosses, validLosses, LRs, timeElapsed
 
-
-
-
-
-
-def train(device, featureExtract, modelName, oWts, fWts, oNumClasses, fNumClasses, dNumClasses, batchSize, gradeSize, numEpochs, LR, dbName, wtsName):
+def train(device, diseaseName, featureExtract, modelName, oWts, fWts, batchSize, gradeSize, numEpochs, LR, dbName, wtsName):
+    criteria = getCriteria()
+    oNumClasses = len(criteria["All"]["OCT"])
+    fNumClasses = len(criteria["All"]["Fundus"])
+    
     oModel, _ = trainClassify.initializeModel(modelName, oNumClasses, featureExtract)
     oModel = oModel.to(device)
     oTrainedModel = torch.load(os.path.join(".\\TrainedModel", oWts + ".pth"))
@@ -300,22 +208,15 @@ def train(device, featureExtract, modelName, oWts, fWts, oNumClasses, fNumClasse
     fModel.load_state_dict(fTrainedModel["state_dict"])
     
     now = datetime.now()
-    filename = now.strftime("D" + " %Y-%m-%d %H-%M-%S")
-
-    dModel = SimpleNet(oNumClasses, fNumClasses, dNumClasses)
-    criterion = nn.CrossEntropyLoss()
-    optimizer = optim.Adam(dModel.parameters(), lr = LR)
-    scheduler = optim.lr_scheduler.StepLR(optimizer, step_size = 7, gamma = 0.1)
+    filename = now.strftime("D" + " %Y-%m-%d %H-%M-%S" + "/D " + diseaseName + " %Y-%m-%d %H-%M-%S")
     
-    criteria = getCriteria()
-    for diseaseName in criteria:
-        dModel, accHistory, losses, LRs, timeElapsed = trainModel(device, diseaseName, dModel, oModel, fModel, dNumClasses, oNumClasses, fNumClasses, criterion, optimizer, scheduler, filename, dbName, batchSize, numEpochs, gradeSize)
+    dModel, validAccHistory, trainAccHistory, trainLosses, validLosses, LRs, timeElapsed = trainModel(device, diseaseName, oModel, fModel, wtsName, filename + ".pth", dbName, batchSize, LR, numEpochs, gradeSize)
     
     with open(os.path.join(".\\Log", filename + ".csv"), "w", newline="") as file:  
         writer = csv.writer(file)  
-        writer.writerow(["Trained from scratch" if wtsName == "" else f"Trained from {wtsName}", f"batchSize = {batchSize}", f"gradeSize = {gradeSize}", f"LR = {LRs[0]}", f"epochNum = {len(numEpochs)}", f"timeElapsed = {timeElapsed // 60 :.0f}m {timeElapsed % 60: .2f}s"])
-        for i in range(len(losses)):  
-            writer.writerow([i + 1, accHistory[i].item(), losses[i], LRs[i]])
+        writer.writerow(["Trained from scratch" if wtsName == "" else f"Trained from {wtsName}", f"Data: {dbName}", f"batchSize = {batchSize}", f"LR = {LRs[0]}", f"epochNum = {len(trainLosses)}", f"gradeSize = {gradeSize}", f"timeElapsed = {timeElapsed // 60 :.0f}m {timeElapsed % 60: .2f}s"])
+        for i in range(len(trainLosses)):  
+            writer.writerow([i + 1, validAccHistory[i].item(), trainAccHistory[i].item(), validLosses[i], trainLosses[i], LRs[i]])
     print(f"Data successfully written into {filename}.csv")
     
-    trainClassify.curve(accHistory, losses, filename + ".pdf")
+    trainClassify.curve(validAccHistory, trainAccHistory, validLosses, trainLosses, filename + ".pdf")
