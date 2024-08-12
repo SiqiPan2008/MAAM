@@ -1,8 +1,8 @@
 import os
 from PIL import Image
 
-source_folder = './OCT-Original/Drusen_sel'
-target_folder = './OCT-Original/Drusen'
+source_folder = 'ODADS/Data/Data/Original/OCT/Drusen'
+target_folder = 'ODADS/Data/Data/Transformed/OCT/Drusen'
 
 os.makedirs(target_folder, exist_ok=True)
 

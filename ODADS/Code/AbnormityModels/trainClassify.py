@@ -13,7 +13,7 @@ os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 
 
 
-def trainModel(device, model, criterion, optimizer, scheduler, filename, dbName, crossValid, batchSize, numEpochs, isInception = False):
+def trainModel(device, model, criterion, optimizer, scheduler, filename, dataDir, crossValid, batchSize, numEpochs, isInception = False):
     startTime = time.time()
     bestAcc = 0
     model.to(device)
@@ -25,7 +25,6 @@ def trainModel(device, model, criterion, optimizer, scheduler, filename, dbName,
     
     bestModelWts = copy.deepcopy(model.state_dict())
     
-    dataDir = "./Data/" + dbName
     dataTransforms = transforms.Compose([transforms.Lambda(utils.resizeLongEdge), transforms.ToTensor()])
     if crossValid:
         imageDataset = datasets.ImageFolder(dataDir, dataTransforms)
@@ -98,8 +97,8 @@ def trainModel(device, model, criterion, optimizer, scheduler, filename, dbName,
                     "best_acc": bestAcc,
                     "optimizer": optimizer.state_dict()
                 }
-                torch.save(state, os.path.join(".\\TrainedModel", filename))
-                print(f"Data successfully written into {filename}")
+                torch.save(state, f"ODADS/Data/Weights/{filename}/{filename}.pth")
+                print(f"Data successfully written into {filename}.pth")
                 
             if phase == "valid":
                 validAccHistory.append(epochAcc)
@@ -121,34 +120,34 @@ def trainModel(device, model, criterion, optimizer, scheduler, filename, dbName,
     return model, validAccHistory, trainAccHistory, validLosses, trainLosses, LRs, timeElapsed
 
 def train(device, featureExtract, modelName, numClasses, batchSize, numEpochs, LR, usePretrained, dbName, wtsName, modelType, crossValid = True):
-    modelFt, inputSize = abnormityModel.initializeAbnormityModel(modelName, numClasses, featureExtract, usePretrained = usePretrained) # what does FT stand for?
-    modelFt = modelFt.to(device)
+    model, _ = abnormityModel.initializeAbnormityModel(modelName, numClasses, featureExtract, usePretrained = usePretrained)
+    model = model.to(device)
     if wtsName != "":
-        trainedModel = torch.load(os.path.join(".\\TrainedModel", wtsName + ".pth"))
-        modelFt.load_state_dict(trainedModel['state_dict'])  
-    paramsToUpdate = modelFt.parameters()
+        trainedModel = torch.load(f"ODADS/Data/Weights/{wtsName}/{wtsName}.pth")
+        model.load_state_dict(trainedModel['state_dict'])  
+    paramsToUpdate = model.parameters()
     print("Params to learn:")
     if featureExtract:
         paramsToUpdate = []
-    for name, param in modelFt.named_parameters():
+    for name, param in model.named_parameters():
         if param.requires_grad:
             if featureExtract:
                 paramsToUpdate.append(param)
             print("\t", name)
             
-    optimizerFt = optim.Adam(paramsToUpdate, lr = LR)
-    scheduler = optim.lr_scheduler.StepLR(optimizerFt, step_size = 7, gamma = 0.1)
+    optimizer = optim.Adam(paramsToUpdate, lr = LR)
+    scheduler = optim.lr_scheduler.StepLR(optimizer, step_size = 7, gamma = 0.1)
     criterion = nn.NLLLoss() # what is NLL?
     
     now = datetime.now()
     filename = now.strftime(modelType + " %Y-%m-%d %H-%M-%S")
 
-    modelFt, validAccHistory, trainAccHistory, validLosses, trainLosses, LRs, timeElapsed = trainModel(device, modelFt, criterion, optimizerFt, scheduler, filename + ".pth", dbName, crossValid, batchSize, numEpochs)
-    with open(os.path.join(".\\Log", filename + ".csv"), "w", newline="") as file:  
+    model, validAccHistory, trainAccHistory, validLosses, trainLosses, LRs, timeElapsed = trainModel(device, model, criterion, optimizer, scheduler, filename + ".pth", dbName, crossValid, batchSize, numEpochs)
+    with open(f"ODADS/Data/Results/{filename}/{filename}.csv", "w", newline="") as file:  
         writer = csv.writer(file)  
         writer.writerow(["Trained from ResNet152" if wtsName == "" else f"Trained from {wtsName}", f"Data: {dbName}", f"batchSize = {batchSize}", f"LR = {LRs[0]}", f"epochNum = {len(trainLosses)}", f"timeElapsed = {timeElapsed // 60 :.0f}m {timeElapsed % 60: .2f}s"])
         for i in range(len(trainLosses)):  
             writer.writerow([i + 1, validAccHistory[i].item(), trainAccHistory[i].item(), validLosses[i], trainLosses[i], LRs[i]])
     print(f"Data successfully written into {filename}.csv")
     
-    utils.curve(validAccHistory, trainAccHistory, validLosses, trainLosses, filename + ".pdf")
+    utils.curve(validAccHistory, trainAccHistory, validLosses, trainLosses, f"ODADS/Data/Results/{filename}/{filename}.pdf")

@@ -14,5 +14,5 @@ def convert_ppm_to_jpg(root_folder):
                 os.remove(ppm_path)
                 print(f'Converted and deleted: {ppm_path}')
 
-root_folder = './Fundus-Original - Copy'
+root_folder = ''
 convert_ppm_to_jpg(root_folder)

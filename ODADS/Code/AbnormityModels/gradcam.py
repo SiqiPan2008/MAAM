@@ -165,7 +165,7 @@ def camShow(img, cam, title = ""):
 def highlight(imgPath, numClasses, device, featureExtract, modelName, wtsName):
     modelFt, _ = trainClassify.initializeAbnormityModel(modelName, numClasses, featureExtract)
     modelFt = modelFt.to(device)
-    trainedModel = torch.load(os.path.join(".\\TrainedModel", wtsName + ".pth"))
+    trainedModel = torch.load(f"ODADS/Data/Weights/{wtsName}/{wtsName}.pth")
     modelFt.load_state_dict(trainedModel["state_dict"])
     img = Image.open(imgPath)
     img = classify.processImg(img, customResize = 224)

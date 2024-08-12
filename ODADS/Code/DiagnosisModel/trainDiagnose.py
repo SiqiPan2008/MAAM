@@ -163,33 +163,30 @@ def trainModel(device, diseaseName, oModel, fModel, wtsName, dTime, dbName, batc
     
     return dModel, trainAccHistory, validAccHistory, trainLosses, validLosses, LRs, timeElapsed
 
-def train(device, diseaseName, featureExtract, modelName, oWts, fWts, batchSize, gradeSize, numEpochs, LR, dbName, wtsName):
+def train(device, diseaseName, featureExtract, modelName, oWts, fWts, batchSize, gradeSize, numEpochs, LR, dbName, wtsName, dTime):
     criteria = utils.getCriteria()
     oNumClasses = len(criteria["All"]["OCT"])
     fNumClasses = len(criteria["All"]["Fundus"])
     
     oModel, _ = abnormityModel.initializeAbnormityModel(modelName, oNumClasses, featureExtract)
     oModel = oModel.to(device)
-    oTrainedModel = torch.load(os.path.join(".\\TrainedModel", oWts + ".pth"))
+    oTrainedModel = torch.load(f"ODADS/Data/Weights/{oWts}/{oWts}.pth")
     oModel.load_state_dict(oTrainedModel["state_dict"])
     
     fModel, _ = abnormityModel.initializeAbnormityModel(modelName, fNumClasses, featureExtract)
     fModel = fModel.to(device)
-    fTrainedModel = torch.load(os.path.join(".\\TrainedModel", fWts + ".pth"))
+    fTrainedModel = torch.load(f"ODADS/Data/Weights/{fWts}/{fWts}.pth")
     fModel.load_state_dict(fTrainedModel["state_dict"])
     
-    now = datetime.now()
-    dTime = now.strftime("%Y-%m-%d %H-%M-%S")
     filename = f"D {diseaseName} {dTime}"
-    filePath = f"D {dTime}/{filename}"
     
     dModel, validAccHistory, trainAccHistory, trainLosses, validLosses, LRs, timeElapsed = trainModel(device, diseaseName, oModel, fModel, wtsName, dTime, dbName, batchSize, LR, numEpochs, gradeSize)
     
-    with open(os.path.join(".\\Log", filename + ".csv"), "w", newline="") as file:  
+    with open(f"ODADS/Data/Results/D {dTime}/{filename}.csv", "w", newline="") as file:  
         writer = csv.writer(file)  
         writer.writerow(["Trained from scratch" if wtsName == "" else f"Trained from {wtsName}", f"Data: {dbName}", f"batchSize = {batchSize}", f"LR = {LRs[0]}", f"epochNum = {len(trainLosses)}", f"gradeSize = {gradeSize}", f"timeElapsed = {timeElapsed // 60 :.0f}m {timeElapsed % 60: .2f}s"])
         for i in range(len(trainLosses)):  
             writer.writerow([i + 1, validAccHistory[i].item(), trainAccHistory[i].item(), validLosses[i], trainLosses[i], LRs[i]])
     print(f"Data successfully written into {filename}.csv")
     
-    utils.curve(validAccHistory, trainAccHistory, validLosses, trainLosses, filename + ".pdf")
+    utils.curve(validAccHistory, trainAccHistory, validLosses, trainLosses, f"ODADS/Data/Results/D {dTime}/{filename}.pdf")

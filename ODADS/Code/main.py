@@ -1,7 +1,9 @@
 from AbnormityModels import classify, trainClassify, gradcam
 from DiagnosisModel import diagnose, trainDiagnose
+from Utils import utils
 import torch
 from PIL import Image
+import datetime
 import os
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 
@@ -13,36 +15,47 @@ def main():
           "CUDA not available.")
     device = torch.device("cuda:0" if useGpu else "cpu") # get to know how to use both GPUs
     print(device)
+    criteria = utils.getCriteria()
     
-    task = 2 # TASK!!!
-    numClasses = 2 # CHANGE NUM OF CLASSES!
-    numEpochs = 5
-    if task == 1: # train single OCT or Fundus
-        dataset = "ODADS/Data/Data/Original"
+    task = 1 
+    numClasses = len(criteria["All"]["OCT"])
+    
+    if task == 1: # train OCT or Fundus
+        dbName = "ODADS/Data/Data/Transformed/OCT/"
+        wtsName = ""
         batchSize = 16
-        epochs = 5
+        numEpochs = 200
         LR = 1e-3
-        imgType = "F"
-        trainClassify.train(device, featureExtract, modelName, numClasses, batchSize, epochs, LR, True, dataset, "", imgType, crossValid = True)
+        imgType = "O"
+        trainClassify.train(device, featureExtract, modelName, numClasses, batchSize, numEpochs, LR, True, dbName, wtsName, imgType, crossValid = True)
+        
     elif task == 2: # classify single image with OCT or Fundus
-        string = "./Data/Fundus-normal-DR-selected/train/DR/16_left.jpeg"
-        wts = "F 2024-08-07 16-48-56"
+        string = "ODADS/Data/Data/Original/OCT"
+        wts = ""
         img = Image.open(string)
         classify.classify(img, numClasses, device, featureExtract, modelName, wts)
+        
     elif task == 3: # gradCAM single image with OCT or Fundus
         string = "./Data/OCT-normal-drusen-large/train/drusen/DRUSEN-303435-2.jpeg"
         wts = "O 2024-05-09 22-42-15"
         gradcam.highlight(string, numClasses, device, featureExtract, modelName, wts)
+        
     elif task == 4: # train single disease
-        oModelName = "./Data/Fundus-normal-DR-selected/train/DR/16_left.jpeg"
-        fModelName = "O 2024-05-09 22-42-15"
+        now = datetime.now()
+        dTime = now.strftime("%Y-%m-%d %H-%M-%S")
+        oModelName = "2024-05-09 22-42-15"
+        fModelName = ""
+        numEpochs = 200
         wts = ""
         gradeSize = 3000
         batchsize = 16
         dbName = ""
         diseaseName = "CSC"
-        trainDiagnose.train(device, diseaseName, featureExtract, modelName, oModelName, fModelName, batchsize, gradeSize, numEpochs, LR, wts)
+        trainDiagnose.train(device, diseaseName, featureExtract, modelName, oModelName, fModelName, batchsize, gradeSize, numEpochs, LR, wts, dTime)
+        
     elif task == 5: # train all diseases
+        now = datetime.now()
+        dTime = now.strftime("%Y-%m-%d %H-%M-%S")
         fModelName = "O 2024-05-09 22-42-15"
         gradeSize = 3000
         batchsize = 16
@@ -50,7 +63,8 @@ def main():
         criteria = trainDiagnose.utils.getCriteria()
         for disease in criteria.keys():
             wts = ""
-            trainDiagnose.train(device, disease, featureExtract, modelName, oModelName, fModelName, batchsize, gradeSize, numEpochs, LR, dbName, wts)
+            trainDiagnose.train(device, disease, featureExtract, modelName, oModelName, fModelName, batchsize, gradeSize, numEpochs, LR, dbName, wts, dTime)
+            
     elif task == 6: # diagnose from images
         oImgPaths = []
         oImgs = [Image.open(imgPath) for imgPath in oImgPaths]

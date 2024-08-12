@@ -33,7 +33,7 @@ def diagnose(oImgs, fImgs, diseaseName, device, modelName, dWtsTime, oWts, fWts)
     
     dModel, _ = trainDiagnose.diagnosisModel.SimpleNet(abnormityNum, gradeLevels)
     dModel = dModel.to(device)
-    trainedModel = torch.load(f"./TrainedModel/D {dWtsTime}/D {diseaseName} {dWtsTime}.pth")
+    trainedModel = torch.load(f"ODADS/Data/Weights/D {dWtsTime}/D {diseaseName} {dWtsTime}.pth")
     dModel.load_state_dict(trainedModel["state_dict"])
     
     output = dModel(dInput.to(device))

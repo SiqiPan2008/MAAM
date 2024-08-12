@@ -25,7 +25,7 @@ def resizeLongEdge(img, longEdgeSize = 224):
     blackBackground.paste(img, loc)
     return blackBackground
 
-def curve(validAccHistory, trainAccHistory, validLosses, trainLosses, filename):
+def curve(validAccHistory, trainAccHistory, validLosses, trainLosses, filename, show = False):
     plt.clf()
     x = range(1, len(trainLosses) + 1)
     
@@ -48,8 +48,9 @@ def curve(validAccHistory, trainAccHistory, validLosses, trainLosses, filename):
     plt.legend() 
     
     plt.tight_layout()
-    plt.savefig(os.path.join(".\\Results", filename), format="pdf")
-    plt.show()
+    plt.savefig(filename, format="pdf")
+    if show:
+        plt.show()
 
 def processImg(img, customResize = 224):
     if customResize != 0:
