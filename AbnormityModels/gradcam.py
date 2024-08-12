@@ -1,8 +1,8 @@
 import torch
 import numpy as np
 from PIL import Image
-from TrainClassify import trainClassify
-from Classify import classify
+from AbnormityModels import trainClassify
+from AbnormityModels import classify
 import os
 import matplotlib.pyplot as plt
 from matplotlib.colors import LinearSegmentedColormap
@@ -163,7 +163,7 @@ def camShow(img, cam, title = ""):
     
 
 def highlight(imgPath, numClasses, device, featureExtract, modelName, wtsName):
-    modelFt, _ = trainClassify.initializeModel(modelName, numClasses, featureExtract)
+    modelFt, _ = trainClassify.initializeAbnormityModel(modelName, numClasses, featureExtract)
     modelFt = modelFt.to(device)
     trainedModel = torch.load(os.path.join(".\\TrainedModel", wtsName + ".pth"))
     modelFt.load_state_dict(trainedModel["state_dict"])

@@ -1,0 +1,63 @@
+from AbnormityModels import trainClassify
+import torch
+from torchvision import transforms, models
+import matplotlib.pyplot as plt
+import numpy as np
+import os
+from PIL import Image
+import torch.nn as nn
+
+def resizeLongEdge(img, longEdgeSize = 224):
+    width, height = img.size
+    if width > height:
+        newSize = (longEdgeSize, int(height * longEdgeSize / width))
+        loc = (0, int((longEdgeSize - newSize[1]) / 2))
+    else:
+        newSize = (int(longEdgeSize * width / height), longEdgeSize)
+        width, _ = img.size
+        loc = (int((longEdgeSize - newSize[0]) / 2), 0)
+    img = img.resize(newSize)
+    blackBackground = Image.new("RGB", (longEdgeSize, longEdgeSize), "black")
+    blackBackground.paste(img, loc)
+    return blackBackground
+
+def curve(validAccHistory, trainAccHistory, validLosses, trainLosses, filename):
+    plt.clf()
+    x = range(1, len(trainLosses) + 1)
+    
+    vAH = [validAccHistory[i].item() for i in range(len(x))]
+    tAH = [trainAccHistory[i].item() for i in range(len(x))]
+    plt.subplot(2, 1, 1)
+    plt.plot(x, vAH, label = "validAcc")
+    plt.plot(x, tAH, label = "trainAcc")
+    plt.title("Accuracy Curve")  
+    plt.xlabel("Epoch")  
+    plt.ylabel("Accuracy")  
+    plt.legend()  
+      
+    plt.subplot(2, 1, 2)
+    plt.plot(x, validLosses, label = "validLoss")
+    plt.plot(x, trainLosses, label = "trainLoss")
+    plt.title("Loss Curve")  
+    plt.xlabel("Epoch")  
+    plt.ylabel("Loss")  
+    plt.legend() 
+    
+    plt.tight_layout()
+    plt.savefig(os.path.join(".\\Log", filename), format="pdf")
+    plt.show()
+
+def processImg(img, customResize = 224):
+    if customResize != 0:
+        img = resizeLongEdge(img, longEdgeSize = customResize)
+    toTensor = transforms.ToTensor()
+    img = toTensor(img)
+    return img
+
+def imgShow(img, ax = None, title = None):
+    if ax is None:
+        fig, ax = plt.subplots()
+    img = np.array(img).transpose((1, 2, 0))
+    ax.imshow(img)
+    ax.set_title(title)
+    plt.show()

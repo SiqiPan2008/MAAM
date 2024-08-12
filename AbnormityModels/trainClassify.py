@@ -16,67 +16,11 @@ import json
 from PIL import Image
 import csv
 from datetime import datetime
+from Utils import utils
+import initAbnormityModel
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 
-def resizeLongEdge(img, longEdgeSize = 224):
-    width, height = img.size
-    if width > height:
-        newSize = (longEdgeSize, int(height * longEdgeSize / width))
-        loc = (0, int((longEdgeSize - newSize[1]) / 2))
-    else:
-        newSize = (int(longEdgeSize * width / height), longEdgeSize)
-        width, _ = img.size
-        loc = (int((longEdgeSize - newSize[0]) / 2), 0)
-    img = img.resize(newSize)
-    blackBackground = Image.new("RGB", (longEdgeSize, longEdgeSize), "black")
-    blackBackground.paste(img, loc)
-    return blackBackground
 
-def setParameterRequiresGrad(model, featureExtract):
-    if featureExtract:
-        for param in model.parameters():
-            param.requires_grad = False
-
-def initializeModel (modelName, numClasses, featureExtract, usePretrained = True):
-    modelFt = None
-    inputSize = 0
-    
-    if modelName == "resnet":
-        modelFt = models.resnet152(weights = models.ResNet152_Weights.DEFAULT if usePretrained else None)
-        setParameterRequiresGrad(modelFt, featureExtract if usePretrained else False)
-        numFtrs = modelFt.fc.in_features
-        modelFt.fc = nn.Sequential(nn.Linear(numFtrs, numClasses), nn.LogSoftmax(dim = 1))
-        inputSize = 224
-    else:
-        print("Invalid model name.")
-        exit()
-    
-    return modelFt, inputSize
-
-def curve(validAccHistory, trainAccHistory, validLosses, trainLosses, filename):
-    x = range(1, len(trainLosses) + 1)
-    
-    vAH = [validAccHistory[i].item() for i in range(len(x))]
-    tAH = [trainAccHistory[i].item() for i in range(len(x))]
-    plt.subplot(2, 1, 1)
-    plt.plot(x, vAH, label = "validAcc")
-    plt.plot(x, tAH, label = "trainAcc")
-    plt.title("Accuracy Curve")  
-    plt.xlabel("Epoch")  
-    plt.ylabel("Accuracy")  
-    plt.legend()  
-      
-    plt.subplot(2, 1, 2)
-    plt.plot(x, validLosses, label = "validLoss")
-    plt.plot(x, trainLosses, label = "trainLoss")
-    plt.title("Loss Curve")  
-    plt.xlabel("Epoch")  
-    plt.ylabel("Loss")  
-    plt.legend() 
-    
-    plt.tight_layout()
-    plt.savefig(os.path.join(".\\Log", filename), format="pdf")
-    # plt.show()
 
 def trainModel(device, model, criterion, optimizer, scheduler, filename, dbName, crossValid, batchSize, numEpochs, isInception = False):
     startTime = time.time()
@@ -91,7 +35,7 @@ def trainModel(device, model, criterion, optimizer, scheduler, filename, dbName,
     bestModelWts = copy.deepcopy(model.state_dict())
     
     dataDir = "./Data/" + dbName
-    dataTransforms = transforms.Compose([transforms.Lambda(resizeLongEdge), transforms.ToTensor()])
+    dataTransforms = transforms.Compose([transforms.Lambda(utils.resizeLongEdge), transforms.ToTensor()])
     if crossValid:
         imageDataset = datasets.ImageFolder(dataDir, dataTransforms)
     else:
@@ -186,7 +130,7 @@ def trainModel(device, model, criterion, optimizer, scheduler, filename, dbName,
     return model, validAccHistory, trainAccHistory, validLosses, trainLosses, LRs, timeElapsed
 
 def train(device, featureExtract, modelName, numClasses, batchSize, numEpochs, LR, usePretrained, dbName, wtsName, modelType, crossValid = True):
-    modelFt, inputSize = initializeModel(modelName, numClasses, featureExtract, usePretrained = usePretrained) # what does FT stand for?
+    modelFt, inputSize = initAbnormityModel.initializeAbnormityModel(modelName, numClasses, featureExtract, usePretrained = usePretrained) # what does FT stand for?
     modelFt = modelFt.to(device)
     if wtsName != "":
         trainedModel = torch.load(os.path.join(".\\TrainedModel", wtsName + ".pth"))
@@ -216,4 +160,4 @@ def train(device, featureExtract, modelName, numClasses, batchSize, numEpochs, L
             writer.writerow([i + 1, validAccHistory[i].item(), trainAccHistory[i].item(), validLosses[i], trainLosses[i], LRs[i]])
     print(f"Data successfully written into {filename}.csv")
     
-    curve(validAccHistory, trainAccHistory, validLosses, trainLosses, filename + ".pdf")
+    utils.curve(validAccHistory, trainAccHistory, validLosses, trainLosses, filename + ".pdf")

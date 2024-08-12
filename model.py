@@ -1,9 +1,8 @@
-from Classify import classify
-from Classify import gradcam
-from TrainClassify import trainClassify
-from Diagnose import diagnose
-from TrainDiagnose import trainDiagnose
-from Generate import generate
+from AbnormityModels import classify
+from AbnormityModels import gradcam
+from AbnormityModels import trainClassify
+from DiagnosisModel import diagnose
+from DiagnosisModel import trainDiagnose
 import torch
 from PIL import Image
 

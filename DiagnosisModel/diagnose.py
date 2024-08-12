@@ -14,9 +14,9 @@ import sys
 import copy
 import json
 from PIL import Image
-from Classify import classify
-from TrainClassify import trainClassify
-from TrainDiagnose import trainDiagnose
+from AbnormityModels import classify
+from AbnormityModels import trainClassify
+from DiagnosisModel import trainDiagnose
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 
 

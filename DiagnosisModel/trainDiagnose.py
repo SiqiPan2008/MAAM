@@ -16,8 +16,9 @@ import json
 from PIL import Image
 import csv
 from datetime import datetime
-from Classify import classify
-from TrainClassify import trainClassify
+from AbnormityModels import classify
+from AbnormityModels import trainClassify
+from Utils import utils
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 
 def getCriteria():
@@ -42,7 +43,8 @@ def getRandImageOutput(device, dbName, abnormity, oModel, fModel):
     files = os.listdir(foldername)
     randomImg = random.choice(files)
     imgPath = os.path.join(foldername, randomImg)
-    img = classify.processImgFromPath(imgPath)
+    img = Image.open(imgPath)
+    img = utils.processImg(img)
     img = img.unsqueeze(0)
     output = oModel(img.to(device)) if abnormityType == "OCT" else fModel(img.to(device))
     return output
@@ -72,7 +74,7 @@ def getOutputAndLabel(device, diseaseName, oAbnormityNum, fAbnormityNum, grade, 
     outputs = outputs.unsqueeze(0)
     return outputs
             
-def trainModel(device, diseaseName, oModel, fModel, wtsName, filename, dbName, batchSize, LR, numEpochs, gradeSize):
+def trainModel(device, diseaseName, oModel, fModel, wtsName, dTime, dbName, batchSize, LR, numEpochs, gradeSize):
     criteria = getCriteria()
     dNumClasses = len(criteria) - 1
     oNumClasses = len(criteria["All"]["OCT"])
@@ -177,8 +179,8 @@ def trainModel(device, diseaseName, oModel, fModel, wtsName, filename, dbName, b
                 "best_acc": bestAcc,
                 "optimizer": optimizer.state_dict()
             }
-            torch.save(state, os.path.join(".\\TrainedModel", filename))
-            print(f"Data successfully written into {filename}")
+            torch.save(state, os.path.join(f".\\TrainedModel\\D {dTime}\\D {diseaseName} {dTime}.pth"))
+            print(f"Data successfully written into .\\TrainedModel\\D {dTime}\\D {diseaseName} {dTime}.pth")
         
         scheduler.step()
         LRs.append(optimizer.param_groups[0]["lr"])
@@ -197,20 +199,22 @@ def train(device, diseaseName, featureExtract, modelName, oWts, fWts, batchSize,
     oNumClasses = len(criteria["All"]["OCT"])
     fNumClasses = len(criteria["All"]["Fundus"])
     
-    oModel, _ = trainClassify.initializeModel(modelName, oNumClasses, featureExtract)
+    oModel, _ = trainClassify.initializeAbnormityModel(modelName, oNumClasses, featureExtract)
     oModel = oModel.to(device)
     oTrainedModel = torch.load(os.path.join(".\\TrainedModel", oWts + ".pth"))
     oModel.load_state_dict(oTrainedModel["state_dict"])
     
-    fModel, _ = trainClassify.initializeModel(modelName, fNumClasses, featureExtract)
+    fModel, _ = trainClassify.initializeAbnormityModel(modelName, fNumClasses, featureExtract)
     fModel = fModel.to(device)
     fTrainedModel = torch.load(os.path.join(".\\TrainedModel", fWts + ".pth"))
     fModel.load_state_dict(fTrainedModel["state_dict"])
     
     now = datetime.now()
-    filename = now.strftime("D " + diseaseName + " %Y-%m-%d %H-%M-%S")
+    dTime = now.strftime("%Y-%m-%d %H-%M-%S")
+    filename = f"D {diseaseName} {dTime}"
+    filePath = f"D {dTime}/{filename}"
     
-    dModel, validAccHistory, trainAccHistory, trainLosses, validLosses, LRs, timeElapsed = trainModel(device, diseaseName, oModel, fModel, wtsName, "./TrainedModel/D %Y-%m-%d %H-%M-%S/" + filename + ".pth", dbName, batchSize, LR, numEpochs, gradeSize)
+    dModel, validAccHistory, trainAccHistory, trainLosses, validLosses, LRs, timeElapsed = trainModel(device, diseaseName, oModel, fModel, wtsName, dTime, dbName, batchSize, LR, numEpochs, gradeSize)
     
     with open(os.path.join(".\\Log", filename + ".csv"), "w", newline="") as file:  
         writer = csv.writer(file)  
@@ -219,4 +223,4 @@ def train(device, diseaseName, featureExtract, modelName, oWts, fWts, batchSize,
             writer.writerow([i + 1, validAccHistory[i].item(), trainAccHistory[i].item(), validLosses[i], trainLosses[i], LRs[i]])
     print(f"Data successfully written into {filename}.csv")
     
-    trainClassify.curve(validAccHistory, trainAccHistory, validLosses, trainLosses, filename + ".pdf")
+    utils.curve(validAccHistory, trainAccHistory, validLosses, trainLosses, filename + ".pdf")
