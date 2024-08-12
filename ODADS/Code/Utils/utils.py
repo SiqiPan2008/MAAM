@@ -7,7 +7,7 @@ import json
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 
 def getCriteria():
-    with open('criteria.json', 'r', encoding='utf-8') as file:
+    with open('Criteria.json', 'r', encoding='utf-8') as file:
         criteria = json.load(file)
     return criteria
 

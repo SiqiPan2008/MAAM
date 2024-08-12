@@ -1,0 +1,58 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "debug transform",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "transform.py",  
+            "console": "integratedTerminal",
+            "args": [],
+        },
+        {
+            "name": "debug movefake",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "movefake.py",  
+            "console": "integratedTerminal",
+            "args": [],
+        },
+
+        {
+            "name": "debug test",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "test.py",  
+            "console": "integratedTerminal",
+            "args": [
+                "--dataroot", "datasets/Final_Normal/trainA", 
+                "--name", "Transformed_Neo_ERM/maps_cyclegan", 
+                "--model", "test",
+                "--no_dropout", 
+                "--results_dir", "results/Final_Neo_ERM"
+            ],
+            "env": {
+                "CUDA_VISIBLE_DEVICES": "0"
+            }
+        },
+        {
+            "name": "debug train",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "train.py",  
+            "console": "integratedTerminal",
+            "args": [
+                "--dataroot", "./datasets/DATASET_NAME", 
+                "--name", "maps_cyclegan", 
+                "--model", "cycle_gan", 
+                "--checkpoints_dir", "./checkpoints/DATASET_NAME",
+            ],
+            "env": {
+                "CUDA_VISIBLE_DEVICES": "0"
+            }
+        },
+    ]
+}
