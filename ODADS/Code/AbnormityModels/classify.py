@@ -1,6 +1,6 @@
 import os
 import torch
-import abnormityModel
+from AbnormityModels import abnormityModel
 from Utils import utils
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 

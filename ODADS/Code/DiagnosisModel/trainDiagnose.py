@@ -10,7 +10,7 @@ import csv
 from datetime import datetime
 from AbnormityModels import abnormityModel
 from Utils import utils
-import diagnosisModel
+from DiagnosisModel import diagnosisModel
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 
 def getOutputs(device, diseaseName, oAbnormityNum, fAbnormityNum, grade, dbName, oModel, fModel):

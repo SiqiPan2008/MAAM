@@ -8,7 +8,7 @@ import copy
 import csv
 from datetime import datetime
 from Utils import utils
-import AbnormityModels.abnormityModel as abnormityModel
+from AbnormityModels import abnormityModel
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 
 

@@ -56,72 +56,65 @@
 		Fig: From Abnormity to Disease
 		Fig: 3 parts
 		Fig: fusion
-		
-	\section{Methodology}
+		how to find grade
 	
-		\subsection{Abnormity Models}
-		
-			\subsubsection{Data Preparation}
-			
-				Table: Data source
-				CycleGAN
-					Fig: Intro
-					Table: selection rates
-					selection criteria
-				Transformations
-				
-			\subsubsection{Training}
-				
-				intro to five-fold train/valid
-				parameters used
-				Fig: how batchSize, LR, and featureLayerSize affects accuracy
-				
-			\subsubsection{Testing}
-			
-				numerical results calculation method
-				t-SNE intro
-				GradCAM intro
-			
-		\subsection{Diagnosis Model}
-		
-			\subsubsection{Data Preparation}
-			
-				fusion method
-				how to choose data (with an example)
-			
-			\subsubsection{Training}
-			
-				parameters used
-				Fig: how batchSize, LR, gradeSize affects accuracy
-			
-			\subsubsection{Testing}
-			
-				numerical results list
-				t-SNE
+	\subsection{Abnormity Models}
 	
-	\section{Results and Discussion}
-	
-		\subsection{Abnormity Models}
+		\subsubsection{Data Preparation}
+		
+			Table: Data source
+			CycleGAN
+				Fig: Intro
+				Table: selection rates
+				selection criteria
+			Transformations
+			
+		\subsubsection{Training}
+			
+			intro to five-fold train/valid
+			parameters used, hard device parameters
+			
+		\subsubsection{Results}
 			
 			For both OCT and Fundus:
 				Fig: accuracy and loss over epochs
 				Table: total accuracy and abnormities accuracies
 				Table: numerical results for each abnormity
+				Fig: t-SNE
 				Fig: ROC for each abnormity
+				
+				Fig: GradCAM intro
 				Fig: GradCAM example
 		
-		\subsection{Diagnosis Model}
+	\subsection{Diagnosis Model}
+	
+		\subsubsection{Data Preparation}
 		
+			how to choose data (with an example)
+		
+		\subsubsection{Training}
+		
+			parameters used
+		
+		\subsubsection{Results}
+			
+			Do two models increase accuracy?
 			Fig: accuracy and loss over epochs
-			Table: total accuracy and abnormities accuracies
+			Table: total accuracy and disease accuracies
 			Table: numerical results for each disease
 			Fig: ROC for each disease
+	
+	\section{Conclusion}
+	
+		Comparison
+		Strengths and weaknesses
 	
 	\section{Appendix}
 	
 		Google Image source links
 		Table: OCT abnormities description
 		Table: Fundus abnormities description
+		APP/website description
 	
 	
 	

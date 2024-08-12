@@ -13,12 +13,12 @@ def main():
           "CUDA not available.")
     device = torch.device("cuda:0" if useGpu else "cpu") # get to know how to use both GPUs
     print(device)
-
+    
     task = 2 # TASK!!!
     numClasses = 2 # CHANGE NUM OF CLASSES!
     numEpochs = 5
     if task == 1: # train single OCT or Fundus
-        dataset = "Fundus-normal-DR-demo/train"
+        dataset = "ODADS/Data/Data/Original"
         batchSize = 16
         epochs = 5
         LR = 1e-3
