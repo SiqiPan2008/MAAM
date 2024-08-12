@@ -19,7 +19,7 @@ def main():
     
     task = 1 
     numClasses = len(criteria["All"]["OCT"])
-        
+    
     if task == 1: # train OCT or Fundus
         dbName = "ODADS/Data/Data/Transformed/OCT/"
         wtsName = ""

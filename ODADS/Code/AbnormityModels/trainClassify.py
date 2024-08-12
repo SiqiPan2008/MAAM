@@ -3,17 +3,19 @@ import torch
 from torch import nn
 import torch.optim as optim
 from torchvision import transforms, datasets
+from torch.utils.data import Subset
 import time
 import copy
 import csv
 from datetime import datetime
+import numpy as np
 from Utils import utils
 from AbnormityModels import abnormityModel
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 
 
 
-def trainModel(device, model, criterion, optimizer, scheduler, filename, dataDir, crossValid, batchSize, numEpochs, isInception = False):
+def trainModel(device, model, criterion, optimizer, scheduler, filename, dataDir, crossValid, batchSize, numEpochs, numClasses, isInception = False):
     startTime = time.time()
     bestAcc = 0
     model.to(device)
@@ -38,10 +40,17 @@ def trainModel(device, model, criterion, optimizer, scheduler, filename, dataDir
         print("-" * 10)
         
         if crossValid:
-            datasetSize = len(imageDataset)
-            trainSize = int(0.8 * datasetSize)
-            validSize = datasetSize - trainSize
-            trainDataset, validDataset = torch.utils.data.random_split(imageDataset, [trainSize, validSize])
+            labels = np.array(imageDataset.targets)
+            trainIndices = []
+            validIndices = []
+            for classId in range(numClasses):
+                classIndices = np.where(labels == classId)[0]
+                np.random.shuffle(classIndices)
+                splitPoint = int(0.8 * len(classIndices))
+                trainIndices.extend(classIndices[:splitPoint])
+                validIndices.extend(classIndices[splitPoint:])
+            trainDataset = Subset(imageDataset, trainIndices)
+            validDataset = Subset(imageDataset, validIndices)
             dataloaders = {
                 "train": torch.utils.data.DataLoader(trainDataset, batch_size = batchSize, shuffle=True),
                 "valid": torch.utils.data.DataLoader(validDataset, batch_size = batchSize, shuffle=True)
@@ -142,7 +151,7 @@ def train(device, featureExtract, modelName, numClasses, batchSize, numEpochs, L
     now = datetime.now()
     filename = now.strftime(modelType + " %Y-%m-%d %H-%M-%S")
 
-    model, validAccHistory, trainAccHistory, validLosses, trainLosses, LRs, timeElapsed = trainModel(device, model, criterion, optimizer, scheduler, filename + ".pth", dbName, crossValid, batchSize, numEpochs)
+    model, validAccHistory, trainAccHistory, validLosses, trainLosses, LRs, timeElapsed = trainModel(device, model, criterion, optimizer, scheduler, filename, dbName, crossValid, batchSize, numEpochs, numClasses)
     with open(f"ODADS/Data/Results/{filename}/{filename}.csv", "w", newline="") as file:  
         writer = csv.writer(file)  
         writer.writerow(["Trained from ResNet152" if wtsName == "" else f"Trained from {wtsName}", f"Data: {dbName}", f"batchSize = {batchSize}", f"LR = {LRs[0]}", f"epochNum = {len(trainLosses)}", f"timeElapsed = {timeElapsed // 60 :.0f}m {timeElapsed % 60: .2f}s"])

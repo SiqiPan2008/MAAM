@@ -10,17 +10,17 @@ def setParameterRequiresGrad(model, featureExtract):
             param.requires_grad = False
 
 def initializeAbnormityModel(modelName, numClasses, featureExtract, usePretrained = True):
-    modelFt = None
+    model = None
     inputSize = 0
     
     if modelName == "resnet":
-        modelFt = models.resnet152(weights = models.ResNet152_Weights.DEFAULT if usePretrained else None)
-        utils.setParameterRequiresGrad(modelFt, featureExtract if usePretrained else False)
-        numFtrs = modelFt.fc.in_features
-        modelFt.fc = nn.Sequential(nn.Linear(numFtrs, numClasses), nn.LogSoftmax(dim = 1))
+        model = models.resnet152(weights = models.ResNet152_Weights.DEFAULT if usePretrained else None)
+        setParameterRequiresGrad(model, featureExtract if usePretrained else False)
+        numFtrs = model.fc.in_features
+        model.fc = nn.Sequential(nn.Linear(numFtrs, numClasses), nn.LogSoftmax(dim = 1))
         inputSize = 224
     else:
         print("Invalid model name.")
         exit()
     
-    return modelFt, inputSize
+    return model, inputSize
