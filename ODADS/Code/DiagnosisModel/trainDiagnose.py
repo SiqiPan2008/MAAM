@@ -148,8 +148,9 @@ def trainModel(device, diseaseName, oModel, fModel, wtsName, dTime, dbName, batc
                 "best_acc": bestAcc,
                 "optimizer": optimizer.state_dict()
             }
-            torch.save(state, os.path.join(f".\\TrainedModel\\D {dTime}\\D {diseaseName} {dTime}.pth"))
-            print(f"Data successfully written into .\\TrainedModel\\D {dTime}\\D {diseaseName} {dTime}.pth")
+            os.makedirs(f"ODADS/Data/Weights/D {dTime}/", exist_ok=True)
+            torch.save(state, os.path.join(f"ODADS/Data/Weights/D {dTime}/D {diseaseName} {dTime}.pth"))
+            print(f"Data successfully written into ODADS/Data/Weights/D {dTime}/D {diseaseName} {dTime}.pth")
         
         scheduler.step()
         LRs.append(optimizer.param_groups[0]["lr"])
@@ -182,6 +183,7 @@ def train(device, diseaseName, featureExtract, modelName, oWts, fWts, batchSize,
     
     dModel, validAccHistory, trainAccHistory, trainLosses, validLosses, LRs, timeElapsed = trainModel(device, diseaseName, oModel, fModel, wtsName, dTime, dbName, batchSize, LR, numEpochs, gradeSize)
     
+    os.makedirs(f"ODADS/Data/Results/D {dTime}/", exist_ok=True)
     with open(f"ODADS/Data/Results/D {dTime}/{filename}.csv", "w", newline="") as file:  
         writer = csv.writer(file)  
         writer.writerow(["Trained from scratch" if wtsName == "" else f"Trained from {wtsName}", f"Data: {dbName}", f"batchSize = {batchSize}", f"LR = {LRs[0]}", f"epochNum = {len(trainLosses)}", f"gradeSize = {gradeSize}", f"timeElapsed = {timeElapsed // 60 :.0f}m {timeElapsed % 60: .2f}s"])

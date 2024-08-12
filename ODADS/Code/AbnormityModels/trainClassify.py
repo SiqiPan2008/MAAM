@@ -106,6 +106,7 @@ def trainModel(device, model, criterion, optimizer, scheduler, filename, dataDir
                     "best_acc": bestAcc,
                     "optimizer": optimizer.state_dict()
                 }
+                os.makedirs(f"ODADS/Data/Weights/{filename}/", exist_ok=True)
                 torch.save(state, f"ODADS/Data/Weights/{filename}/{filename}.pth")
                 print(f"Data successfully written into {filename}.pth")
                 
@@ -152,6 +153,8 @@ def train(device, featureExtract, modelName, numClasses, batchSize, numEpochs, L
     filename = now.strftime(modelType + " %Y-%m-%d %H-%M-%S")
 
     model, validAccHistory, trainAccHistory, validLosses, trainLosses, LRs, timeElapsed = trainModel(device, model, criterion, optimizer, scheduler, filename, dbName, crossValid, batchSize, numEpochs, numClasses)
+    
+    os.makedirs(f"ODADS/Data/Results/{filename}/", exist_ok=True)
     with open(f"ODADS/Data/Results/{filename}/{filename}.csv", "w", newline="") as file:  
         writer = csv.writer(file)  
         writer.writerow(["Trained from ResNet152" if wtsName == "" else f"Trained from {wtsName}", f"Data: {dbName}", f"batchSize = {batchSize}", f"LR = {LRs[0]}", f"epochNum = {len(trainLosses)}", f"timeElapsed = {timeElapsed // 60 :.0f}m {timeElapsed % 60: .2f}s"])

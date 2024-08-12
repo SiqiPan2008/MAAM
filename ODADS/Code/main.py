@@ -24,7 +24,7 @@ def main():
         dbName = "ODADS/Data/Data/Transformed/OCT/"
         wtsName = ""
         batchSize = 16
-        numEpochs = 200
+        numEpochs = 100
         LR = 1e-3
         imgType = "O"
         trainClassify.train(device, featureExtract, modelName, numClasses, batchSize, numEpochs, LR, True, dbName, wtsName, imgType, crossValid = True)
