@@ -22,32 +22,6 @@ def resizeLongEdge(img, longEdgeSize = 0):
     blackBackground.paste(img, loc)
     return blackBackground
 
-"""
-def normalizeBrightness(img, target_mean, target_std):
-       grayscale_img = transforms.Grayscale(num_output_channels=1)(img)
-        grayscale_tensor = transforms.ToTensor()(grayscale_img)
-        current_std = torch.std(grayscale_tensor)
-    
-        if current_std > 0:
-            std_adjustment_factor = target_std / (current_std + 1e-6)
-        else:
-            std_adjustment_factor = 1.0
-        
-        img_tensor = transforms.ToTensor()(img)
-        normalized_img_tensor = (img_tensor - img_tensor.mean(dim=[1,2], keepdim=True)) * std_adjustment_factor + target_mean
-        normalized_img_tensor = torch.clamp(normalized_img_tensor, 0.0, 1.0)
-        
-        grayscale_img = transforms.Grayscale(num_output_channels=1)(img)
-        grayscale_tensor = transforms.ToTensor()(grayscale_img)
-        min_grayscale = torch.min(grayscale_tensor)
-        max_grayscale = torch.max(grayscale_tensor)
-        
-        img = transforms.ToTensor()(img)
-        normalized_img_tensor = (img - min_grayscale) / (max_grayscale - min_grayscale + 1e-6)
-        
-        return normalized_img_tensor
-"""
-
 class MultiTransformDataset(torch.utils.data.Dataset):
     def __init__(self, root_dir, transform, num_transforms=5, exclude_classes=None):
         self.dataset = datasets.ImageFolder(root=root_dir)

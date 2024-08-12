@@ -1,5 +1,1 @@
-Update abnormity->disease criteria graph (according to the .json file)
-	Add O subretinal to D CNV
-	delete O retinal detachment
-	delete F&D glaucoma
-	delete F ERM
+divide train/valid set and test set

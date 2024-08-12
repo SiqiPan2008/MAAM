@@ -48,7 +48,7 @@ def curve(validAccHistory, trainAccHistory, validLosses, trainLosses, filename):
     plt.legend() 
     
     plt.tight_layout()
-    plt.savefig(os.path.join(".\\Log", filename), format="pdf")
+    plt.savefig(os.path.join(".\\Results", filename), format="pdf")
     plt.show()
 
 def processImg(img, customResize = 224):
