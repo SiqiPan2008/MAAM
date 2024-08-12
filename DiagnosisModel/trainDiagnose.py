@@ -46,7 +46,6 @@ def getOutputs(device, diseaseName, oAbnormityNum, fAbnormityNum, grade, dbName,
             
 def trainModel(device, diseaseName, oModel, fModel, wtsName, dTime, dbName, batchSize, LR, numEpochs, gradeSize):
     criteria = utils.getCriteria()
-    dNumClasses = len(criteria) - 1
     oNumClasses = len(criteria["All"]["OCT"])
     fNumClasses = len(criteria["All"]["Fundus"])
     
@@ -63,7 +62,7 @@ def trainModel(device, diseaseName, oModel, fModel, wtsName, dTime, dbName, batc
     validData = torch.empty(gradeLevels * gradeTrainSize, numClasses)
     validLabel = torch.empty(gradeLevels * gradeValidSize)
     
-    dModel = diagnosisModel.SimpleNet(abnormityNum, dNumClasses)
+    dModel = diagnosisModel.SimpleNet(abnormityNum, gradeLevels)
     if wtsName:
         dModel.load_state_dict("wtsName")
     criterion = nn.CrossEntropyLoss()

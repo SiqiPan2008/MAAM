@@ -8,10 +8,10 @@ def diagnose(oImgs, fImgs, diseaseName, device, modelName, dWtsTime, oWts, fWts)
     criteria = trainDiagnose.utils.getCriteria()
     oNumClasses = len(criteria["All"]["OCT"])
     fNumClasses = len(criteria["All"]["Fundus"])
-    dNumClasses = len(criteria) - 1
     oAbnormityNum = len(criteria[diseaseName]["OCT"])
     fAbnormityNum = len(criteria[diseaseName]["Fundus"])
-    numClasses = oAbnormityNum + fAbnormityNum
+    abnormityNum = oAbnormityNum + fAbnormityNum
+    gradeLevels = abnormityNum + 1
     
     if oAbnormityNum != 0:
         lenO = len(oImgs)
@@ -31,11 +31,12 @@ def diagnose(oImgs, fImgs, diseaseName, device, modelName, dWtsTime, oWts, fWts)
         fOutput, _ = torch.max(fOutputs, dim = 0)
     dInput = torch.concat((oOutput, fOutput), dim = 0)
     
-    dModel, _ = trainDiagnose.diagnosisModel.SimpleNet(numClasses, dNumClasses)
+    dModel, _ = trainDiagnose.diagnosisModel.SimpleNet(abnormityNum, gradeLevels)
     dModel = dModel.to(device)
     trainedModel = torch.load(f"./TrainedModel/D {dWtsTime}/D {diseaseName} {dWtsTime}.pth")
     dModel.load_state_dict(trainedModel["state_dict"])
     
     output = dModel(dInput.to(device))
-    print(output)
-    return output
+    print(output[0])
+    # calculate EXPECTED VALUE OF GRADE!
+    return output[0]

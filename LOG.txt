@@ -1,1 +1,2 @@
 divide train/valid set and test set
+calculate expected val of grade in diagnosisModel.diagnose
