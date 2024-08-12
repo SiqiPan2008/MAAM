@@ -24,6 +24,8 @@
 *.toc
 Paper/Paper.pdf
 __pycache__/
+ODADS/.vscode/
+CycleGAN/.vscode/
 
 .DS_Store
 debug*
