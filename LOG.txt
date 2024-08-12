@@ -1,2 +1,4 @@
 divide train/valid set and test set
 calculate expected val of grade in diagnosisModel.diagnose
+move data and code into ODADS folder
+copy cycleGAN here

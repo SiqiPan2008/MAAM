@@ -48,6 +48,87 @@
 	\pagebreak
 	
 	\section{Background}
+	
+	\section{Model Overview}
+		
+		Fig: OCT abnormities
+		Fig: Fundus abnormities
+		Fig: From Abnormity to Disease
+		Fig: 3 parts
+		Fig: fusion
+		
+	\section{Methodology}
+	
+		\subsection{Abnormity Models}
+		
+			\subsubsection{Data Preparation}
+			
+				Table: Data source
+				CycleGAN
+					Fig: Intro
+					Table: selection rates
+					selection criteria
+				Transformations
+				
+			\subsubsection{Training}
+				
+				intro to five-fold train/valid
+				parameters used
+				Fig: how batchSize, LR, and featureLayerSize affects accuracy
+				
+			\subsubsection{Testing}
+			
+				numerical results calculation method
+				t-SNE intro
+				GradCAM intro
+			
+		\subsection{Diagnosis Model}
+		
+			\subsubsection{Data Preparation}
+			
+				fusion method
+				how to choose data (with an example)
+			
+			\subsubsection{Training}
+			
+				parameters used
+				Fig: how batchSize, LR, gradeSize affects accuracy
+			
+			\subsubsection{Testing}
+			
+				numerical results list
+				t-SNE
+	
+	\section{Results and Discussion}
+	
+		\subsection{Abnormity Models}
+			
+			For both OCT and Fundus:
+				Fig: accuracy and loss over epochs
+				Table: total accuracy and abnormities accuracies
+				Table: numerical results for each abnormity
+				Fig: ROC for each abnormity
+				Fig: GradCAM example
+		
+		\subsection{Diagnosis Model}
+		
+			Fig: accuracy and loss over epochs
+			Table: total accuracy and abnormities accuracies
+			Table: numerical results for each disease
+			Fig: ROC for each disease
+	
+	\section{Appendix}
+	
+		Google Image source links
+		Table: OCT abnormities description
+		Table: Fundus abnormities description
+	
+	
+	
+	
+	
+	
+	\section{Background}
 		
 		Ocular diseases can be diagnosed through various methods, including using optical coherence tomography (OCT) and color fundus images. Ophthalmologists usually identify ocular abnormalities to deduce the disease.  Traditionally, the diagnosis primarily depends on the professional experience and knowledge of the ophthalmologists, which may result in high misdiagnosis rate and under-utilization of medical data.  With the widespread application of artificial intelligence (AI), deep learning (DL) has made great contributions in providing support to patients in remote areas by sharing expert knowledge \autocite{Ichhpujani_Thakur_2021}.  By leveraging DL, researchers have developed auxiliary diagnosis programs to help doctors in the process. Many studies use convolutional neural network (CNN) to analyze ocular images. Some commonly used CNNs are VGG16, ResNet50, and Inception \autocite{daich2023artificial}.  And for segmenting images and finding abnormalities, U-net is widely used \autocite{Ronneberger_Fischer_Brox_2015}. In training CNNs, most studies use transferred learning, which consists of three steps: learning, fine-tuning, and validation.
 		
