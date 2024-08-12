@@ -1,11 +1,15 @@
-from AbnormityModels import trainClassify
-import torch
-from torchvision import transforms, models
+from torchvision import transforms
 import matplotlib.pyplot as plt
 import numpy as np
 import os
 from PIL import Image
-import torch.nn as nn
+import json
+os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
+
+def getCriteria():
+    with open('criteria.json', 'r', encoding='utf-8') as file:
+        criteria = json.load(file)
+    return criteria
 
 def resizeLongEdge(img, longEdgeSize = 224):
     width, height = img.size
@@ -61,3 +65,9 @@ def imgShow(img, ax = None, title = None):
     ax.imshow(img)
     ax.set_title(title)
     plt.show()
+    
+def getRandImageOutput(device, dbName, img, abnormityType, oModel, fModel):
+    img = processImg(img)
+    img = img.unsqueeze(0)
+    output = oModel(img.to(device)) if abnormityType == "OCT" else fModel(img.to(device))
+    return output

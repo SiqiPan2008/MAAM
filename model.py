@@ -1,10 +1,9 @@
-from AbnormityModels import classify
-from AbnormityModels import gradcam
-from AbnormityModels import trainClassify
-from DiagnosisModel import diagnose
-from DiagnosisModel import trainDiagnose
+from AbnormityModels import classify, trainClassify, gradcam
+from DiagnosisModel import diagnose, trainDiagnose
 import torch
 from PIL import Image
+import os
+os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 
 def main():
     modelName = "resnet"
@@ -17,21 +16,8 @@ def main():
 
     task = 2 # TASK!!!
     numClasses = 2 # CHANGE NUM OF CLASSES!
-    if task == 0: # GAN
-        # UNUSED
-        batchSize = 1
-        numEpochs = 5
-        LR = 1e-5
-        numWorkers = 4
-        lambdaIdentity = 0.0
-        lambdaCycle = 10
-        normFolderName = "OCT-normal-ERM-fewshot/normal"
-        abnormFolderName = "OCT-normal-ERM-fewshot/ERM"
-        wtsName = ""
-        abnormName = "ERM"
-        dataType = "O"
-        generate.generate(device, batchSize, numEpochs, LR, numWorkers, lambdaIdentity, lambdaCycle, normFolderName, abnormFolderName, wtsName, abnormName, dataType)
-    elif task == 1: # train single OCT or Fundus
+    numEpochs = 5
+    if task == 1: # train single OCT or Fundus
         dataset = "Fundus-normal-DR-demo/train"
         batchSize = 16
         epochs = 5
@@ -61,7 +47,7 @@ def main():
         gradeSize = 3000
         batchsize = 16
         dbName = "./Data"
-        criteria = trainDiagnose.getCriteria()
+        criteria = trainDiagnose.utils.getCriteria()
         for disease in criteria.keys():
             wts = ""
             trainDiagnose.train(device, disease, featureExtract, modelName, oModelName, fModelName, batchsize, gradeSize, numEpochs, LR, dbName, wts)

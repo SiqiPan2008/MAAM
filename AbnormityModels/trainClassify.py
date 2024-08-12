@@ -1,23 +1,14 @@
 import os
-import matplotlib.pyplot as plt
-import numpy as np
 import torch
 from torch import nn
 import torch.optim as optim
-import torchvision
-from torchvision import transforms, models, datasets
-import imageio
+from torchvision import transforms, datasets
 import time
-import warnings
-import random
-import sys
 import copy
-import json
-from PIL import Image
 import csv
 from datetime import datetime
 from Utils import utils
-import initAbnormityModel
+import AbnormityModels.abnormityModel as abnormityModel
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 
 
@@ -130,7 +121,7 @@ def trainModel(device, model, criterion, optimizer, scheduler, filename, dbName,
     return model, validAccHistory, trainAccHistory, validLosses, trainLosses, LRs, timeElapsed
 
 def train(device, featureExtract, modelName, numClasses, batchSize, numEpochs, LR, usePretrained, dbName, wtsName, modelType, crossValid = True):
-    modelFt, inputSize = initAbnormityModel.initializeAbnormityModel(modelName, numClasses, featureExtract, usePretrained = usePretrained) # what does FT stand for?
+    modelFt, inputSize = abnormityModel.initializeAbnormityModel(modelName, numClasses, featureExtract, usePretrained = usePretrained) # what does FT stand for?
     modelFt = modelFt.to(device)
     if wtsName != "":
         trainedModel = torch.load(os.path.join(".\\TrainedModel", wtsName + ".pth"))

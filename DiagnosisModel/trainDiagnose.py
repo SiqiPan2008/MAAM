@@ -1,56 +1,20 @@
 import os
-import matplotlib.pyplot as plt
-import numpy as np
 import torch
 from torch import nn
 import torch.optim as optim
-import torchvision
-from torchvision import transforms, models, datasets
-import imageio
 import time
-import warnings
 import random
-import sys
 import copy
-import json
 from PIL import Image
 import csv
 from datetime import datetime
-from AbnormityModels import classify
-from AbnormityModels import trainClassify
+from AbnormityModels import abnormityModel
 from Utils import utils
+import diagnosisModel
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 
-def getCriteria():
-    with open('TrainDiagnose/criteria.json', 'r', encoding='utf-8') as file:
-        criteria = json.load(file)
-    return criteria
-
-class SimpleNet(nn.Module):
-    def __init__(self, numClasses, dNumClasses):
-        super(SimpleNet, self).__init__()
-        self.fc = nn.Linear(numClasses, dNumClasses)
-        self.softmax = nn.Softmax(dim = 1)
-
-    def forward(self, x):
-        x = self.fc(x)
-        x = self.softmax(x)
-        return x
-
-def getRandImageOutput(device, dbName, abnormity, oModel, fModel):
-    abnormityType, abnormityName = abnormity[0], abnormity[1]
-    foldername = f"{dbName}/{abnormityType}/{abnormityName}"
-    files = os.listdir(foldername)
-    randomImg = random.choice(files)
-    imgPath = os.path.join(foldername, randomImg)
-    img = Image.open(imgPath)
-    img = utils.processImg(img)
-    img = img.unsqueeze(0)
-    output = oModel(img.to(device)) if abnormityType == "OCT" else fModel(img.to(device))
-    return output
-
-def getOutputAndLabel(device, diseaseName, oAbnormityNum, fAbnormityNum, grade, dbName, oModel, fModel):
-    criteria = getCriteria()
+def getOutputs(device, diseaseName, oAbnormityNum, fAbnormityNum, grade, dbName, oModel, fModel):
+    criteria = utils.getCriteria()
    
     diseaseAbnormities = [(("Fundus", abnormity) for abnormity in criteria[diseaseName]["Fundus"])
                             + (("OCT", abnormity) for abnormity in criteria[diseaseName]["OCT"])]
@@ -69,13 +33,19 @@ def getOutputAndLabel(device, diseaseName, oAbnormityNum, fAbnormityNum, grade, 
     
     oOutputs = torch.empty([fAbnormityNum, len(allFAbnormity) + len(allOAbnormity)])
     for i in range(len(selAbnormities)):
-        outputs[i] = getRandImageOutput(device, dbName, selAbnormities[i], oModel, fModel)
+        abnormityType, abnormityName = selAbnormities[i][0], selAbnormities[i][1]
+        foldername = f"{dbName}/{abnormityType}/{abnormityName}"
+        files = os.listdir(foldername)
+        randomImg = random.choice(files)
+        imgPath = os.path.join(foldername, randomImg)
+        img = Image.open(imgPath)
+        outputs[i] = utils.getRandImageOutput(device, dbName, img, abnormityType, oModel, fModel)
     outputs = torch.max(outputs, dim=0)
     outputs = outputs.unsqueeze(0)
     return outputs
             
 def trainModel(device, diseaseName, oModel, fModel, wtsName, dTime, dbName, batchSize, LR, numEpochs, gradeSize):
-    criteria = getCriteria()
+    criteria = utils.getCriteria()
     dNumClasses = len(criteria) - 1
     oNumClasses = len(criteria["All"]["OCT"])
     fNumClasses = len(criteria["All"]["Fundus"])
@@ -93,7 +63,7 @@ def trainModel(device, diseaseName, oModel, fModel, wtsName, dTime, dbName, batc
     validData = torch.empty(gradeLevels * gradeTrainSize, numClasses)
     validLabel = torch.empty(gradeLevels * gradeValidSize)
     
-    dModel = SimpleNet(abnormityNum, dNumClasses)
+    dModel = diagnosisModel.SimpleNet(abnormityNum, dNumClasses)
     if wtsName:
         dModel.load_state_dict("wtsName")
     criterion = nn.CrossEntropyLoss()
@@ -114,12 +84,12 @@ def trainModel(device, diseaseName, oModel, fModel, wtsName, dTime, dbName, batc
     for epoch in range(numEpochs):
         for grade in range(gradeLevels):
             for i in range(gradeTrainSize):
-                output = getOutputAndLabel(device, diseaseName, oAbnormityNum, fAbnormityNum, grade, dbName, oModel, fModel)
+                output = getOutputs(device, diseaseName, oAbnormityNum, fAbnormityNum, grade, dbName, oModel, fModel)
                 trainData[grade * gradeTrainSize + i] = output
                 trainLabel[grade * gradeTrainSize + i] = grade
         for grade in range(gradeLevels):
             for i in range(gradeValidSize):
-                output = getOutputAndLabel(device, diseaseName, oAbnormityNum, fAbnormityNum, grade, dbName, oModel, fModel)
+                output = getOutputs(device, diseaseName, oAbnormityNum, fAbnormityNum, grade, dbName, oModel, fModel)
                 validData[grade * gradeValidSize + i] = output
                 validLabel[grade * gradeValidSize + i] = grade
         trainDataset = torch.utils.data.TensorDataset(trainData, validData)
@@ -195,16 +165,16 @@ def trainModel(device, diseaseName, oModel, fModel, wtsName, dTime, dbName, batc
     return dModel, trainAccHistory, validAccHistory, trainLosses, validLosses, LRs, timeElapsed
 
 def train(device, diseaseName, featureExtract, modelName, oWts, fWts, batchSize, gradeSize, numEpochs, LR, dbName, wtsName):
-    criteria = getCriteria()
+    criteria = utils.getCriteria()
     oNumClasses = len(criteria["All"]["OCT"])
     fNumClasses = len(criteria["All"]["Fundus"])
     
-    oModel, _ = trainClassify.initializeAbnormityModel(modelName, oNumClasses, featureExtract)
+    oModel, _ = abnormityModel.initializeAbnormityModel(modelName, oNumClasses, featureExtract)
     oModel = oModel.to(device)
     oTrainedModel = torch.load(os.path.join(".\\TrainedModel", oWts + ".pth"))
     oModel.load_state_dict(oTrainedModel["state_dict"])
     
-    fModel, _ = trainClassify.initializeAbnormityModel(modelName, fNumClasses, featureExtract)
+    fModel, _ = abnormityModel.initializeAbnormityModel(modelName, fNumClasses, featureExtract)
     fModel = fModel.to(device)
     fTrainedModel = torch.load(os.path.join(".\\TrainedModel", fWts + ".pth"))
     fModel.load_state_dict(fTrainedModel["state_dict"])
