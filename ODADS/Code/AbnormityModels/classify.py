@@ -11,7 +11,7 @@ def classify(img, model, device):
     img = img.unsqueeze(0)
     output = model(img.to(device))
     output = torch.exp(output[0])
-    print(output)
+    # print(output)
     return output
 
 def classifyImg(img, numClasses, device, featureExtract, modelName, wtsName):

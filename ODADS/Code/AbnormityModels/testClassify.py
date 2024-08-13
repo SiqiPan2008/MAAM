@@ -26,10 +26,10 @@ def testAcc(device, featureExtract, modelName, numClasses, dbName, wtsName):
         for imgName in os.listdir(classFolder):
             img = Image.open(f"{classFolder}{imgName}/")
             output = classify.classify(img, model, device)
-            _, pred = torch.max(x, dim=0) = torch.max(output, dim=0)
+            _, pred = torch.max(output, dim=0)
             corrects += pred == classToIdx[className]
             total += 1
     accuracy = corrects / total
     print(f"corrects: {corrects}/{total}")
-    print(f"accuracy: accuracy")
+    print(f"accuracy: {accuracy}")
     return accuracy

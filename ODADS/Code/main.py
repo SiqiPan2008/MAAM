@@ -17,7 +17,7 @@ def main():
     print(device)
     criteria = utils.getCriteria()
     
-    task = 3
+    task = 7
     numClasses = len(criteria["All"]["OCT"])
     
     if task == 0: # train OCT or Fundus
@@ -58,7 +58,7 @@ def main():
         
     elif task == 3: # gradCAM single image with OCT or Fundus
         string = "ODADS/Data/Data/Original/OCT/IntraretinalFluid/CNV-103044-13.jpeg"
-        wts = "O 2024-08-13 08-59-11"
+        wts = "O 2024-08-13 11-44-08"
         gradcam.highlight(string, numClasses, device, featureExtract, modelName, wts)
         
     elif task == 4: # train single disease
@@ -98,7 +98,7 @@ def main():
     
     elif task == 7: # test total accuracy for abnormity model
         dbName = "ODADS/Data/Data/Test/OCT/"
-        wtsName = "O 2024-08-13 11-44-08"
+        wtsName = "O 2024-08-13 08-59-11"
         testClassify.testAcc(device, featureExtract, modelName, numClasses, dbName, wtsName)
 
 if __name__ == "__main__":
