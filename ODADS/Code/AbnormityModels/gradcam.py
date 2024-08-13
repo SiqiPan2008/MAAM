@@ -1,8 +1,8 @@
 import torch
 import numpy as np
 from PIL import Image
-from AbnormityModels import trainClassify
-from AbnormityModels import classify
+from AbnormityModels import abnormityModel
+from Utils import utils
 import os
 import matplotlib.pyplot as plt
 from matplotlib.colors import LinearSegmentedColormap
@@ -63,21 +63,20 @@ class GradCam():
         self.model.eval()
         self.extractor = CamExtractor(self.model)
 
-    def generate_cam(self, input_image, target_layer, device, target_class=None):
+    def generate_cam(self, input_image, target_layer, device, model, target_class=None):
 
         # Full forward pass
         # conv_output is the output of convolutions at specified layer
         # model_output is the final output of the model (1, 1000)
         conv_output, model_output = self.extractor.forward_pass(input_image)
         if target_class is None:
-            target_class = 0
+            target_class_idx = 0
             for idx in range(len(model_output[0])):
-                if model_output[0][idx] > model_output[0][target_class]:
-                    target_class = idx
-            #target_class = np.argmax(model_output.data)
+                if model_output[0][idx] > model_output[0][target_class_idx]:
+                    target_class_idx = idx
         # Target for backprop
         one_hot_output = torch.FloatTensor(1, model_output.size()[-1]).zero_()
-        one_hot_output[0][target_class] = 1
+        one_hot_output[0][target_class_idx] = 1
         one_hot_output = one_hot_output.to(device)
 
         # Zero grads
@@ -163,14 +162,14 @@ def camShow(img, cam, title = ""):
     
 
 def highlight(imgPath, numClasses, device, featureExtract, modelName, wtsName):
-    modelFt, _ = trainClassify.initializeAbnormityModel(modelName, numClasses, featureExtract)
-    modelFt = modelFt.to(device)
+    model, _ = abnormityModel.initializeAbnormityModel(modelName, numClasses, featureExtract)
+    model = model.to(device)
     trainedModel = torch.load(f"ODADS/Data/Weights/{wtsName}/{wtsName}.pth")
-    modelFt.load_state_dict(trainedModel["state_dict"])
+    model.load_state_dict(trainedModel["state_dict"])
     img = Image.open(imgPath)
-    img = classify.processImg(img, customResize = 224)
+    img = utils.processImg(img, customResize = 224)
     imgUnsqueezed = img.unsqueeze(0)
     imgUnsqueezed = imgUnsqueezed.to(device)
-    modelWithGradCam = GradCam(modelFt)
-    cam = modelWithGradCam.generate_cam(imgUnsqueezed, 3, device)
+    modelWithGradCam = GradCam(model)
+    cam = modelWithGradCam.generate_cam(imgUnsqueezed, 3, device, model)
     camShow(img, cam)

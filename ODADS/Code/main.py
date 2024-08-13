@@ -13,18 +13,18 @@ def main():
     useGpu = torch.cuda.is_available()
     print("CUDA available." if useGpu else
           "CUDA not available.")
-    device = torch.device("cuda:0" if useGpu else "cpu") # get to know how to use both GPUs
+    device = torch.device("cuda:1" if useGpu else "cpu") # get to know how to use both GPUs
     print(device)
     criteria = utils.getCriteria()
     
-    task = 1 
+    task = 3
     numClasses = len(criteria["All"]["OCT"])
     
     if task == 1: # train OCT or Fundus
         dbName = "ODADS/Data/Data/Transformed/OCT/"
-        wtsName = "O 2024-08-13 08-07-02"
+        wtsName = "O 2024-08-13 08-59-11"
         batchSize = 16
-        numEpochs = 17
+        numEpochs = 30
         LR = 1e-3
         imgType = "O"
         usedPretrained = False
@@ -37,8 +37,8 @@ def main():
         classify.classify(img, numClasses, device, featureExtract, modelName, wts)
         
     elif task == 3: # gradCAM single image with OCT or Fundus
-        string = "./Data/OCT-normal-drusen-large/train/drusen/DRUSEN-303435-2.jpeg"
-        wts = "O 2024-05-09 22-42-15"
+        string = "ODADS/Data/Data/Original/OCT/IntraretinalFluid/CNV-103044-13.jpeg"
+        wts = "O 2024-08-13 08-59-11"
         gradcam.highlight(string, numClasses, device, featureExtract, modelName, wts)
         
     elif task == 4: # train single disease
