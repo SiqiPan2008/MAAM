@@ -22,12 +22,13 @@ def main():
     
     if task == 1: # train OCT or Fundus
         dbName = "ODADS/Data/Data/Transformed/OCT/"
-        wtsName = ""
+        wtsName = "O 2024-08-12 22-54-23"
         batchSize = 16
-        numEpochs = 100
+        numEpochs = 3
         LR = 1e-3
         imgType = "O"
-        trainClassify.train(device, featureExtract, modelName, numClasses, batchSize, numEpochs, LR, True, dbName, wtsName, imgType, crossValid = True)
+        usedPretrained = False
+        trainClassify.train(device, featureExtract, modelName, numClasses, batchSize, numEpochs, LR, usedPretrained, dbName, wtsName, imgType, crossValid = True)
         
     elif task == 2: # classify single image with OCT or Fundus
         string = "ODADS/Data/Data/Original/OCT"
