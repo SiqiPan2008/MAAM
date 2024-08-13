@@ -25,6 +25,7 @@
 Paper/Paper.pdf
 __pycache__/
 ODADS/Code/.vscode/
+ODADS/Data
 CycleGAN/.vscode/
 
 .DS_Store
