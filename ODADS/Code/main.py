@@ -1,4 +1,4 @@
-from AbnormityModels import classify, trainClassify, gradcam
+from AbnormityModels import classify, trainClassify, testClassify, gradcam
 from DiagnosisModel import diagnose, trainDiagnose
 from Utils import utils
 import torch
@@ -13,12 +13,12 @@ def main():
     useGpu = torch.cuda.is_available()
     print("CUDA available." if useGpu else
           "CUDA not available.")
-    device = torch.device("cuda:1" if useGpu else "cpu") # get to know how to use both GPUs
+    device = torch.device("cuda:0" if useGpu else "cpu") # get to know how to use both GPUs
     print(device)
     criteria = utils.getCriteria()
     
-    task = 1
-    numClasses = len(criteria["All"]["Fundus"])
+    task = 3
+    numClasses = len(criteria["All"]["OCT"])
     
     if task == 0: # train OCT or Fundus
         dbName = "ODADS/Data/Data/Train/OCT/"
@@ -54,7 +54,7 @@ def main():
         string = "ODADS/Data/Data/Original/OCT"
         wts = ""
         img = Image.open(string)
-        classify.classify(img, numClasses, device, featureExtract, modelName, wts)
+        classify.classifyImg(img, numClasses, device, featureExtract, modelName, wts)
         
     elif task == 3: # gradCAM single image with OCT or Fundus
         string = "ODADS/Data/Data/Original/OCT/IntraretinalFluid/CNV-103044-13.jpeg"
@@ -96,6 +96,10 @@ def main():
         fWts = "F 2024-08-07-16-48-56"
         diagnose.diagnose(oImgs, fImgs, diseaseName, device, modelName, dWtsTime, oWts, fWts)
     
+    elif task == 7: # test total accuracy for abnormity model
+        dbName = "ODADS/Data/Data/Test/OCT/"
+        wtsName = "O 2024-08-13 11-44-08"
+        testClassify.testAcc(device, featureExtract, modelName, numClasses, dbName, wtsName)
 
 if __name__ == "__main__":
     main()

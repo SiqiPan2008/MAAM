@@ -18,7 +18,7 @@ def diagnose(oImgs, fImgs, diseaseName, device, modelName, dWtsTime, oWts, fWts)
         oOutputs = torch.empty([lenO, oNumClasses])
         for i in range(lenO):
             img = oImgs[i]
-            output = classify.classify(img, oNumClasses, device, True, modelName, oWts)
+            output = classify.classifyImg(img, oNumClasses, device, True, modelName, oWts)
             oOutputs[i] = output
         oOutput, _ = torch.max(oOutputs, dim = 0)
     if oAbnormityNum != 0:
@@ -26,7 +26,7 @@ def diagnose(oImgs, fImgs, diseaseName, device, modelName, dWtsTime, oWts, fWts)
         fOutputs = torch.empty([lenF, fNumClasses])
         for i in range(lenF):
             img = fImgs[i]
-            output = classify.classify(img, fNumClasses, device, True, modelName, fWts)
+            output = classify.classifyImg(img, fNumClasses, device, True, modelName, fWts)
             fOutputs[i] = output
         fOutput, _ = torch.max(fOutputs, dim = 0)
     dInput = torch.concat((oOutput, fOutput), dim = 0)
