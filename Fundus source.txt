@@ -3,42 +3,40 @@
 
 ###################################################################
 	
-Normal 153
-	OF trghs22fpg-4
-	F E-ophtha (from both EX and MA)
-	F Kaggle1000
-	F HRF
+Normal
+	F E-ophtha (from both EX and MA) 100
+	F Kaggle1000 37
+	F HRF 15
 	F EyePACS !!!
 	
-Hard Exudates 90
-	F STARE
-	F E-ophtha
+Hard Exudates
+	F STARE 74
+	F E-ophtha 16
 	F EyePACS !!!
 
-Soft Exudates/Cotton Wool Patch 50
-	F STARE
+Soft Exudates/Cotton Wool Patch
+	F STARE 50
 	F EyePACS !!!
 
-Hemorrhage 171
-	F Kaggle1000
-	F STARE
-	F EyePACS !!!
-	
-
-drusen 50
-	F STARE
-
-Vascular Abnormity 78
-	F Kaggle1000
-	F STARE
-
-MH 25
-	F Google Image
-
-Microaneurysms 70
-	F E-ophtha
-	F STARE
+Hemorrhage
+	F Kaggle1000 66
+	F STARE 105
 	F EyePACS !!!
 	
-RP 22
-	F Kaggle1000
+drusen
+	F STARE 50
+
+Vascular Abnormity
+	F Kaggle1000 64
+	F STARE 14
+
+MH
+	F Google Image 25
+
+Microaneurysms
+	F E-ophtha 64
+	F STARE 6
+	F EyePACS !!!
+	
+RP
+	F Kaggle1000 22
