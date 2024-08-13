@@ -3,45 +3,47 @@
 
 ###################################################################
 
-CNV 2984
-	O Normal Disease Database
+CNV
+	O Normal Disease Database 2984
 
-CSC 134
-	O Few-shot
-	O OpenICPSR
+CSC
+	O Few-shot 32
+	O OpenICPSR 102
 	CYCLE_GAN generate 3000 select 1730
 
-DME 2500
-	O Normal Disease Database
+DME
+	O Normal Disease Database 2500
 
-drusen 2500
-	O Normal Disease Database
+drusen
+	O Normal Disease Database 2500
 
-ERM 19
-	O Google Image
+ERM
+	O Google Image 19
 	CYCLE_GAN generate 3000 select 1931
 
-intraretinal fluid 1097
-	O Normal Disease Database (CNV)
+intraretinal fluid
+	O Normal Disease Database (CNV) 1097
 
-Mactel 29
-	O Few-shot
+Mactel
+	O Few-shot 29
 	CYCLE_GAN 3000 select 1900
 
-MH 130
-	O Few-shot
+MH
+	O Few-shot 31
+	O 99
 	CYCLE_GAN generate 3000 select 1811
 
-Normal 5000
-	O Normal Disease Database
+Normal
+	O Normal Disease Database 5000
 
-RP 31
-	O Few-shot
+RP
+	O Few-shot 31
+	O OpenICPSR 102
 	CYCLE_GAN generate 3000 select 1923
 
-Stargardt 23
-	O Few-shot
+Stargardt
+	O Few-shot 23
 	CYCLE_GAN generate 3000 select 2582
 
-subretinal fluid 1083
-	O Normal Disease Database (CNV)
+subretinal fluid
+	O Normal Disease Database (CNV) 1083
