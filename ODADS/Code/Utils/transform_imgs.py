@@ -60,11 +60,19 @@ def delete_random_files(directory, num_files_to_delete):
 
 sideLength = 224
 
-transformAndResize = transforms.Compose([
-    transforms.Lambda(lambda x: resizeLongEdge(x, longEdgeSize = max(x.size[0], x.size[1]))),
+transformOCT = transforms.Compose([
     transforms.RandomHorizontalFlip(p=0.5),
     transforms.ColorJitter(brightness=0.1),
     transforms.RandomAffine(degrees = 10, translate = (0.05, 0.05), scale = (0.8, 1.2)),
+    transforms.Lambda(lambda x: resizeLongEdge(x, longEdgeSize = sideLength)),
+    transforms.ToTensor(),
+])
+transformFundus = transforms.Compose([
+    transforms.Lambda(lambda x: resizeLongEdge(x, longEdgeSize = max(x.size[0], x.size[1]))),
+    transforms.RandomHorizontalFlip(p=0.5),
+    transforms.RandomVerticalFlip(p=0.5),
+    transforms.ColorJitter(brightness=(0.8, 1.2), saturation=(0.8, 1.2), contrast=(0.8, 1.2)),
+    transforms.RandomAffine(degrees = 30, translate = (0.05, 0.05), scale = (0.9, 1.2)),
     transforms.Lambda(lambda x: resizeLongEdge(x, longEdgeSize = sideLength)),
     transforms.ToTensor(),
 ])
@@ -73,13 +81,19 @@ onlyResize = transforms.Compose([
     transforms.ToTensor(),
 ]) # for debugging
 
-transformation = transformAndResize
-input_dir = 'ODADS/Data/Data/Original/OCT' 
-output_dir = 'ODADS/Data/Data/Transformed/OCT'
+
+
+
+
+
+
+transformation = transformFundus
+input_dir = 'ODADS/Data/Data/Original/Fundus' 
+output_dir = 'ODADS/Data/Data/Train/Fundus'
 os.makedirs(output_dir, exist_ok=True)
 all_classes = [f.name for f in os.scandir(input_dir) if f.is_dir()]
 
-target_num = 5000
+target_num = 3000
 
 for class_name in all_classes:
     include_classes = [class_name]
@@ -106,6 +120,6 @@ for class_name in all_classes:
     print(f"Transformed images saved to {class_output_dir}")
     
     delete_random_files(class_output_dir, num_transforms_per_image * file_num - target_num)
-    print(f"There are now 5000 files in {class_output_dir}")
+    print(f"There are now {target_num} files in {class_output_dir}")
         
         

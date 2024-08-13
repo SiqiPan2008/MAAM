@@ -7,21 +7,21 @@ Normal
 	F E-ophtha (from both EX and MA) 100
 	F Kaggle1000 37
 	F HRF 15
-	F EyePACS !!!
 	
 Hard Exudates
-	F STARE 74
-	F E-ophtha 16
-	F EyePACS !!!
+	F STARE 75
+	F E-ophtha 20
+	F EyePACS 284
 
 Soft Exudates/Cotton Wool Patch
-	F STARE 50
-	F EyePACS !!!
+	F STARE 33
+	F EyePACS 205
 
 Hemorrhage
+	F E-ophtha 13
 	F Kaggle1000 66
 	F STARE 105
-	F EyePACS !!!
+	F EyePACS 278
 	
 drusen
 	F STARE 50
@@ -31,12 +31,13 @@ Vascular Abnormity
 	F STARE 14
 
 MH
-	F Google Image 25
+	F Google Image 34
 
 Microaneurysms
-	F E-ophtha 64
-	F STARE 6
-	F EyePACS !!!
+	F E-ophtha 55
+	F STARE 1
+	F EyePACS 219
 	
 RP
 	F Kaggle1000 22
+	F Google Image 44
