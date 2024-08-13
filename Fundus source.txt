@@ -3,7 +3,7 @@
 
 ###################################################################
 	
-Normal 169
+Normal 153
 	OF trghs22fpg-4
 	F E-ophtha (from both EX and MA)
 	F Kaggle1000

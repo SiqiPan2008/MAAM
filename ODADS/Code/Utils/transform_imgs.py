@@ -61,10 +61,11 @@ def delete_random_files(directory, num_files_to_delete):
 sideLength = 224
 
 transformAndResize = transforms.Compose([
-    transforms.Lambda(lambda x: resizeLongEdge(x, longEdgeSize = sideLength)),
+    transforms.Lambda(lambda x: resizeLongEdge(x, longEdgeSize = max(x.size[0], x.size[1]))),
     transforms.RandomHorizontalFlip(p=0.5),
     transforms.ColorJitter(brightness=0.1),
     transforms.RandomAffine(degrees = 10, translate = (0.05, 0.05), scale = (0.8, 1.2)),
+    transforms.Lambda(lambda x: resizeLongEdge(x, longEdgeSize = sideLength)),
     transforms.ToTensor(),
 ])
 onlyResize = transforms.Compose([

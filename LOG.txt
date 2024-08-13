@@ -1,2 +1,0 @@
-calculate expected val of grade in diagnosisModel.diagnose
-continue run
