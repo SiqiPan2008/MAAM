@@ -8,38 +8,37 @@ Normal 169
 	F E-ophtha (from both EX and MA)
 	F Kaggle1000
 	F HRF
+	F EyePACS !!!
 	
-Hard Exudates 112
+Hard Exudates 90
 	F STARE
 	F E-ophtha
+	F EyePACS !!!
 
-Soft Exudates/Cotton Wool Patch 53
+Soft Exudates/Cotton Wool Patch 50
 	F STARE
+	F EyePACS !!!
 
-Hemorrhage 287
-	STARE
-
-drusen 63
-	F STARE
-
-Vascular Abnormity 66
+Hemorrhage 171
 	F Kaggle1000
+	F STARE
+	F EyePACS !!!
+	
+
+drusen 50
+	F STARE
+
+Vascular Abnormity 78
+	F Kaggle1000
+	F STARE
 
 MH 25
 	F Google Image
 
-+ Microaneurysms 180
+Microaneurysms 70
 	F E-ophtha
 	F STARE
+	F EyePACS !!!
 	
-+ RP 22
+RP 22
 	F Kaggle1000
-	
-- Retinal nerve fiber layer defect
-	nihil
-
-- Choroidal Lesion
-	nihil
-
-- Fluid Accumulation
-	nihil
