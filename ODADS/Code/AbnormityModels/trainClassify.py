@@ -129,7 +129,7 @@ def trainModel(device, model, criterion, optimizer, scheduler, filename, dataDir
     
     return model, validAccHistory, trainAccHistory, validLosses, trainLosses, LRs, timeElapsed
 
-def train(device, featureExtract, modelName, numClasses, batchSize, numEpochs, LR, usePretrained, dbName, wtsName, modelType, crossValid = True):
+def train(filename, device, featureExtract, modelName, numClasses, batchSize, numEpochs, LR, usePretrained, dbName, wtsName, modelType, crossValid = True):
     model, _ = abnormityModel.initializeAbnormityModel(modelName, numClasses, featureExtract, usePretrained = usePretrained)
     model = model.to(device)
     if wtsName != "":
@@ -148,9 +148,6 @@ def train(device, featureExtract, modelName, numClasses, batchSize, numEpochs, L
     optimizer = optim.Adam(paramsToUpdate, lr = LR)
     scheduler = optim.lr_scheduler.StepLR(optimizer, step_size = 7, gamma = 0.1)
     criterion = nn.NLLLoss() # what is NLL?
-    
-    now = datetime.now()
-    filename = now.strftime(modelType + " %Y-%m-%d %H-%M-%S")
 
     model, validAccHistory, trainAccHistory, validLosses, trainLosses, LRs, timeElapsed = trainModel(device, model, criterion, optimizer, scheduler, filename, dbName, crossValid, batchSize, numEpochs, numClasses)
     

@@ -3,7 +3,7 @@ from DiagnosisModel import diagnose, trainDiagnose
 from Utils import utils
 import torch
 from PIL import Image
-import datetime
+from datetime import datetime
 import os
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 
@@ -17,18 +17,38 @@ def main():
     print(device)
     criteria = utils.getCriteria()
     
-    task = 3
-    numClasses = len(criteria["All"]["OCT"])
+    task = 1
+    numClasses = len(criteria["All"]["Fundus"])
     
-    if task == 1: # train OCT or Fundus
-        dbName = "ODADS/Data/Data/Transformed/OCT/"
+    if task == 0: # train OCT or Fundus
+        dbName = "ODADS/Data/Data/Train/OCT/"
         wtsName = "O 2024-08-13 08-59-11"
         batchSize = 16
         numEpochs = 30
         LR = 1e-3
         imgType = "O"
         usedPretrained = False
-        trainClassify.train(device, featureExtract, modelName, numClasses, batchSize, numEpochs, LR, usedPretrained, dbName, wtsName, imgType, crossValid = True)
+        now = datetime.now()
+        filename = now.strftime(imgType + " %Y-%m-%d %H-%M-%S")
+        trainClassify.train(filename, device, featureExtract, modelName, numClasses, batchSize, numEpochs, LR, usedPretrained, dbName, wtsName, imgType, crossValid = True)
+        
+    elif task == 1: # train and fine-tune OCT or Fundus
+        dbName = "ODADS/Data/Data/Train/Fundus/"
+        wtsName = ""
+        batchSize = 16
+        numEpochs = 100
+        LR = 1e-3
+        imgType = "F"
+        usedPretrained = True
+        now = datetime.now()
+        filename = now.strftime(imgType + " %Y-%m-%d %H-%M-%S")
+        trainClassify.train(filename, device, featureExtract, modelName, numClasses, batchSize, numEpochs, LR, usedPretrained, dbName, wtsName, imgType, crossValid = True)
+        wtsName = filename
+        numEpochs = 50
+        usedPretrained = False
+        now = datetime.now()
+        fineTuneFilename = now.strftime(imgType + " %Y-%m-%d %H-%M-%S")
+        trainClassify.train(fineTuneFilename, device, featureExtract, modelName, numClasses, batchSize, numEpochs, LR, usedPretrained, dbName, wtsName, imgType, crossValid = True)
         
     elif task == 2: # classify single image with OCT or Fundus
         string = "ODADS/Data/Data/Original/OCT"

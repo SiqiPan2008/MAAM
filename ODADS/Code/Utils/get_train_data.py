@@ -68,7 +68,7 @@ transformOCT = transforms.Compose([
     transforms.ToTensor(),
 ])
 transformFundus = transforms.Compose([
-    transforms.Lambda(lambda x: resizeLongEdge(x, longEdgeSize = max(x.size[0], x.size[1]))),
+    transforms.Lambda(lambda x: resizeLongEdge(x, longEdgeSize = int(sideLength * 1.2))),
     transforms.RandomHorizontalFlip(p=0.5),
     transforms.RandomVerticalFlip(p=0.5),
     transforms.ColorJitter(brightness=(0.8, 1.2), saturation=(0.8, 1.2), contrast=(0.8, 1.2)),
