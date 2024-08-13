@@ -22,9 +22,9 @@ def main():
     
     if task == 1: # train OCT or Fundus
         dbName = "ODADS/Data/Data/Transformed/OCT/"
-        wtsName = "O 2024-08-12 22-54-23"
+        wtsName = "O 2024-08-13 08-07-02"
         batchSize = 16
-        numEpochs = 3
+        numEpochs = 17
         LR = 1e-3
         imgType = "O"
         usedPretrained = False

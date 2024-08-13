@@ -36,7 +36,10 @@ def diagnose(oImgs, fImgs, diseaseName, device, modelName, dWtsTime, oWts, fWts)
     trainedModel = torch.load(f"ODADS/Data/Weights/D {dWtsTime}/D {diseaseName} {dWtsTime}.pth")
     dModel.load_state_dict(trainedModel["state_dict"])
     
-    output = dModel(dInput.to(device))
-    print(output[0])
-    # calculate EXPECTED VALUE OF GRADE!
-    return output[0]
+    output = dModel(dInput.to(device))[0]
+    print(output)
+    expectedVal = 0
+    for grade in range(len(output)):
+        expectedVal += grade * output[grade]
+    print(expectedVal)
+    return output, expectedVal
