@@ -17,7 +17,7 @@ def main():
     print(device)
     criteria = utils.getCriteria()
     
-    task = 2
+    task = 7
     
     if task == 0: # train OCT or Fundus
         numClasses = len(criteria["All"]["Fundus"])
@@ -105,11 +105,11 @@ def main():
         fWts = "F 2024-08-07-16-48-56"
         diagnose.diagnose(oImgs, fImgs, diseaseName, device, modelName, dWtsTime, oWts, fWts)
     
-    elif task == 7: # test total accuracy for abnormity model
-        numClasses = len(criteria["All"]["OCT"])
-        dbName = "ODADS/Data/Data/Test/OCT/"
-        wtsName = "O 2024-08-13 08-59-11"
-        testClassify.testAcc(device, featureExtract, modelName, numClasses, dbName, wtsName)
+    elif task == 7: # test accuracy for a series of abnormity models
+        numClasses = len(criteria["All"]["Fundus"])
+        dbName = "ODADS/Data/Data/Test/Fundus/"
+        wtsName = "F 2024-08-14 14-21-54 Transferred"
+        testClassify.testMultipleAcc(device, featureExtract, modelName, numClasses, dbName, wtsName)
 
     elif task == 8: # classify single image with OCT or Fundus
         numClasses = len(criteria["All"]["OCT"])

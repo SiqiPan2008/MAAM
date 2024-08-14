@@ -14,10 +14,10 @@ def classify(img, model, device):
     # print(output)
     return output
 
-def classifyImg(img, numClasses, device, featureExtract, modelName, wtsName):
+def classifyImg(img, numClasses, device, featureExtract, modelName, foldername, wtsName):
     model, _ = abnormityModel.initializeAbnormityModel(modelName, numClasses, featureExtract)
     model = model.to(device)
-    trainedModel = torch.load(f"ODADS/Data/Weights/{wtsName}/{wtsName}.pth")
+    trainedModel = torch.load(f"ODADS/Data/Weights/{foldername}/{wtsName}")
     model.load_state_dict(trainedModel["state_dict"])
     # utils.imgShow(img)
     return classify(img, model, device)
