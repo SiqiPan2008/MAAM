@@ -42,9 +42,12 @@
 	\date{}
 	\maketitle
 	
+	\section*{Abstract}
+	
+	
+	\pagebreak
 	\vspace{0.5cm}
 	\tableofcontents
-	
 	\pagebreak
 	
 	\section{Background}
@@ -71,62 +74,38 @@
 		
 		
 	
-	\section{Model Overview}
+	\section{Overview}
 		
 		The Optical Disease Auxiliary Diagnosis System (ODADS)
 		Model purpose: recognize abnormities, then diagnose disease; 
-		interpretable findings 
+			interpretable findings
 		
 		
 		
 		Fig: OCT abnormities
 		Fig: Fundus abnormities
 		
-		\begin{itemize}
-			\item Branch retinal vein occlusion (BRVO) or hemicentral retinal vein occlusion (HCRVO)
-			
-			\item Central retinal vein occlusion (CRVO)
-			
-			\item Central serous chorioretinopathy (CSC)
-			
-			\item Dry age-related macular dystrophy (dry AMD)
-			
-			\item Epiretinal membrane (ERM)
-			
-			\item Macular hole (MH)
-			
-			\item Macular telangiectasia (Mactel)
-			
-			\item Mild diabetic retinopathy (mild DR)
-			
-			\item Referable diabetic retinopathy (referable DR)
-			
-			\item Retinitis pigmentosa (RP)
-			
-			\item Stargardt disease (Stargardt)
-			
-			\item Wet age-related macular dystrophy (wet AMD)
-		\end{itemize}
-		
-		No real data. use the following criteria
+		No real data. use the following criteria. source for criteria
 		
 		Fig: From Abnormity to Disease
 		
-		Model consists of 3 parts: OCT-Model, Fundus-Model, and Diagnosis-Model. OCT-Model and Fundus-Model are collectively called the Abnormity-Models. They use the same architecture (ResNet152, flatten to 2048 features, and fc). Diagnosis Model consists of #num submodels, one of which is for normal, and the other ones for each disease. each submodel first fuses output from both Abnormity-Models, then uses an fc to get final results for normal or for the disease. 
-		
 		Fig: 3 parts
+		
+		Model consists of 3 parts: OCT-Model, Fundus-Model, and Diagnosis-Model. OCT-Model and Fundus-Model are collectively called the Abnormity-Models. They use the same architecture (ResNet152, flatten to 2048 features, and fc). Diagnosis Model consists of num submodels, one of which is for normal, and the other ones for each disease. each submodel first fuses output from both Abnormity-Models, then uses an fc to get final results for normal or for the disease. 
 		
 		fusion: max of OCT, max of fundus, concatenate
 		
 		Fig: fusion
 		
-		how to find grade (number of traits = grade for the disease as label during training), output - calculate expected grade. in order to compare, divide by total number of traits for this disease so that normalized grade falls in [0, 1]. )
+		output
 		
 	\section{Abnormity Models}
 	
 		\subsection{Data Preparation}
-		
-			Table: Data source for OCT
+			
+			Fig: overall flowchart
+			
+			Table: Data source for OCT and Fundus
 				numbered list of sources
 				columns for source number, final column = total number of imgs
 				rows for abnormities
@@ -135,20 +114,14 @@
 				Fig: Intro
 				Table: selection rates
 				selection criteria
+				Why I did not GAN Fundus
 				
 			transforms for OCT
 				for train: copy, flip, randomcomb1
 				for test: copy, flip, randomcomb2 -> explain truthfulness
-				
-				
-				
-			Table: Data source for Fundus - same as OCT
-				
-			Why I did not GAN Fundus
-			
-			transforms for Fundus
-				similar to OCT
-				explain differences
+				explain differences between train and test, OCT and fundus
+
+			Table: all data source
 			
 		\subsection{Training}
 			
@@ -158,18 +131,21 @@
 			prevent overfitting
 			
 			crossentropyloss, ADAM optimizer with LR 1e-3, batchSize 16, number of epochs...
+			running time
+			
+			Fig: accuracy and loss over epochs
+				trainAcc, validAcc, trainLosses, validLosses
+				testAcc for best weights - align below acc graph
 			
 			conda, PyTorch;
 			desktop computer with Intel® Xeon® Platinum 8352V Processor, 256G of RAM and 2 NVIDIA GPU (GeForce RTX 4090) with 48 VRAM
 			
 		\subsection{Results}
 			
+			time per image
+			
 			For both OCT and Fundus:
 			
-				Fig: accuracy and loss over epochs
-					trainAcc, validAcc, trainLosses, validLosses
-					testAcc for best weights - align below acc graph
-					
 				Table: for each abnormity:
 					accuracy (only present accuracy for TOTAL)
 					precision
@@ -185,6 +161,8 @@
 				
 				Fig: ROC for each abnormity
 				
+				comparison to other studies
+				
 			"co-dominance"??????????????????????????????
 				
 			Fig: GradCAM intro
@@ -195,20 +173,23 @@
 		\subsection{Data Preparation}
 		
 			how to choose data (with an example)
+			how to find grade (number of traits = grade for the disease as label during training)
 			
 		
 		\subsection{Training}
-		
+			
 			parameters used
-		
-		\subsection{Results}
-			
-			Do two models increase accuracy?
-				how do I compare?????????????????????????????????
-				any math here?
-			
+			running time
 			Fig: accuracy and loss over epochs
 				trainAcc, validAcc, trainLosses, validLosses
+				
+				
+		\subsection{Results}
+			
+			output - calculate expected grade. in order to compare, divide by total number of traits for this disease so that normalized grade falls in [0, 1]. 
+			
+			
+			
 			Table: for each disease:
 				accuracy (only present accuracy for TOTAL)
 				precision
@@ -216,15 +197,25 @@
 				specificity
 				F1
 				AUC
+			Fig: confusion matrix (is it suitable?)
 			Fig: ROC for each disease
 	
 			"co-dominance"???????????????????????????????????
 	
-	\section{Conclusion}
-	
+	\section{Discussion}
+		
+		Do two models increase accuracy?
+			how do I compare?????????????????????????????????
+			any math here?
+		
 		Comparison
 		
 		Strengths and weaknesses
+		how to improve
+		
+	\section{Conclusion}
+	
+		
 	
 	\section{Appendix}
 	
