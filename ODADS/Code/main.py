@@ -17,7 +17,7 @@ def main():
     print(device)
     criteria = utils.getCriteria()
     
-    task = 7
+    task = 8
     
     if task == 0: # train OCT or Fundus
         numClasses = len(criteria["All"]["Fundus"])
@@ -108,15 +108,16 @@ def main():
     elif task == 7: # test accuracy for a series of abnormity models
         numClasses = len(criteria["All"]["Fundus"])
         dbName = "ODADS/Data/Data/Test/Fundus/"
-        wtsName = "F 2024-08-14 14-21-54 Transferred"
-        testClassify.testMultipleAcc(device, featureExtract, modelName, numClasses, dbName, wtsName)
+        foldername = "F 2024-08-14 14-21-54 Transferred"
+        testClassify.testMultipleAcc(device, featureExtract, modelName, numClasses, dbName, foldername)
 
     elif task == 8: # classify single image with OCT or Fundus
-        numClasses = len(criteria["All"]["OCT"])
-        string = "ODADS/Data/Data/Original/OCT"
-        wts = ""
-        img = Image.open(string)
-        classify.classifyImg(img, numClasses, device, featureExtract, modelName, wts)
+        numClasses = len(criteria["All"]["Fundus"])
+        dbName = "ODADS/Data/Data/Small_test/Fundus/"
+        foldername = "F 2024-08-14 14-21-54 Transferred"
+        wtsName = "F 2024-08-14 14-21-54 Transferred Best Epoch in 81 to 90.pth"
+        testClassify.testAcc(device, featureExtract, modelName, numClasses, dbName, foldername, wtsName)
     
 if __name__ == "__main__":
     main()
+    

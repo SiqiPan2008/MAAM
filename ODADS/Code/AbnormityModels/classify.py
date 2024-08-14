@@ -10,7 +10,7 @@ def classify(img, model, device):
     img = transforms.ToTensor()(img)
     img = img.unsqueeze(0)
     output = model(img.to(device))
-    output = torch.exp(output[0])
+    output = torch.nn.functional.softmax(output[0], dim=0)
     # print(output)
     return output
 
@@ -19,5 +19,6 @@ def classifyImg(img, numClasses, device, featureExtract, modelName, foldername, 
     model = model.to(device)
     trainedModel = torch.load(f"ODADS/Data/Weights/{foldername}/{wtsName}")
     model.load_state_dict(trainedModel["state_dict"])
+    model.eval()
     # utils.imgShow(img)
     return classify(img, model, device)

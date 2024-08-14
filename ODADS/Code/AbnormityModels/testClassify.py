@@ -30,6 +30,7 @@ def testAcc(device, featureExtract, modelName, numClasses, dbName, foldername, w
             _, pred = torch.max(output, dim=0)
             corrects += pred == classToIdx[className]
             total += 1
+        print(f"completed {className}")
     accuracy = corrects / total
     print(f"corrects: {corrects}/{total}")
     print(f"accuracy: {accuracy}")
