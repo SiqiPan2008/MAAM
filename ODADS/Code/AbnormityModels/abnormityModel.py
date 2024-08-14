@@ -17,7 +17,7 @@ def initializeAbnormityModel(modelName, numClasses, featureExtract, usePretraine
         model = models.resnet152(weights = models.ResNet152_Weights.DEFAULT if usePretrained else None)
         setParameterDoNotRequireGrad(model, featureExtract if usePretrained else False)
         numFtrs = model.fc.in_features
-        model.fc = nn.Sequential(nn.Linear(numFtrs, numClasses), nn.LogSoftmax(dim = 1))
+        model.fc = nn.Sequential(nn.Linear(numFtrs, numClasses)) #, nn.LogSoftmax(dim = 1)
         inputSize = 224
     else:
         print("Invalid model name.")

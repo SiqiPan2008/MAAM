@@ -76,12 +76,14 @@ transformFundus = transforms.Compose([
     transforms.Lambda(lambda x: resizeLongEdge(x, longEdgeSize = sideLength)),
     transforms.ToTensor(),
 ])
-onlyResize = transforms.Compose([
+
+transforms.Compose([
+    transforms.RandomHorizontalFlip(p=0.5),
+    transforms.ColorJitter(brightness=0.1),
+    transforms.RandomAffine(degrees = 10, translate = (0.05, 0.05), scale = (0.8, 1.2)),
     transforms.Lambda(lambda x: resizeLongEdge(x, longEdgeSize = sideLength)),
     transforms.ToTensor(),
-]) # for debugging
-
-
+])
 
 
 

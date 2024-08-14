@@ -13,26 +13,46 @@ def main():
     useGpu = torch.cuda.is_available()
     print("CUDA available." if useGpu else
           "CUDA not available.")
-    device = torch.device("cuda:0" if useGpu else "cpu") # get to know how to use both GPUs
+    device = torch.device("cuda:1" if useGpu else "cpu") # get to know how to use both GPUs
     print(device)
     criteria = utils.getCriteria()
     
-    task = 7
-    numClasses = len(criteria["All"]["OCT"])
+    task = 2
     
     if task == 0: # train OCT or Fundus
-        dbName = "ODADS/Data/Data/Train/OCT/"
-        wtsName = "O 2024-08-13 08-59-11"
+        numClasses = len(criteria["All"]["Fundus"])
+        dbName = "ODADS/Data/Data/Old_train/Fundus/"
+        wtsName = "F 2024-08-13 21-29-01"
         batchSize = 16
-        numEpochs = 30
+        numEpochs = 50
         LR = 1e-3
-        imgType = "O"
+        imgType = "F"
         usedPretrained = False
         now = datetime.now()
         filename = now.strftime(imgType + " %Y-%m-%d %H-%M-%S")
         trainClassify.train(filename, device, featureExtract, modelName, numClasses, batchSize, numEpochs, LR, usedPretrained, dbName, wtsName, imgType, crossValid = True)
         
-    elif task == 1: # train and fine-tune OCT or Fundus
+    elif task == 1: # train and fine-tune OCT
+        numClasses = len(criteria["All"]["OCT"])
+        dbName = "ODADS/Data/Data/Train/OCT/"
+        wtsName = ""
+        batchSize = 16
+        numEpochs = 100
+        LR = 1e-3
+        imgType = "O"
+        usedPretrained = True
+        now = datetime.now()
+        filename = now.strftime(imgType + " %Y-%m-%d %H-%M-%S")
+        trainClassify.train(filename, device, featureExtract, modelName, numClasses, batchSize, numEpochs, LR, usedPretrained, dbName, wtsName, imgType, crossValid = True)
+        #wtsName = filename
+        #numEpochs = 30
+        #usedPretrained = False
+        #now = datetime.now()
+        #fineTuneFilename = now.strftime(imgType + " %Y-%m-%d %H-%M-%S")
+        #trainClassify.train(fineTuneFilename, device, featureExtract, modelName, numClasses, batchSize, numEpochs, LR, usedPretrained, dbName, wtsName, imgType, crossValid = True)
+        
+    elif task == 2: # train and fine-tune Fundus
+        numClasses = len(criteria["All"]["Fundus"])
         dbName = "ODADS/Data/Data/Train/Fundus/"
         wtsName = ""
         batchSize = 16
@@ -43,20 +63,9 @@ def main():
         now = datetime.now()
         filename = now.strftime(imgType + " %Y-%m-%d %H-%M-%S")
         trainClassify.train(filename, device, featureExtract, modelName, numClasses, batchSize, numEpochs, LR, usedPretrained, dbName, wtsName, imgType, crossValid = True)
-        wtsName = filename
-        numEpochs = 50
-        usedPretrained = False
-        now = datetime.now()
-        fineTuneFilename = now.strftime(imgType + " %Y-%m-%d %H-%M-%S")
-        trainClassify.train(fineTuneFilename, device, featureExtract, modelName, numClasses, batchSize, numEpochs, LR, usedPretrained, dbName, wtsName, imgType, crossValid = True)
-        
-    elif task == 2: # classify single image with OCT or Fundus
-        string = "ODADS/Data/Data/Original/OCT"
-        wts = ""
-        img = Image.open(string)
-        classify.classifyImg(img, numClasses, device, featureExtract, modelName, wts)
         
     elif task == 3: # gradCAM single image with OCT or Fundus
+        numClasses = len(criteria["All"]["OCT"])
         string = "ODADS/Data/Data/Original/OCT/IntraretinalFluid/CNV-103044-13.jpeg"
         wts = "O 2024-08-13 11-44-08"
         gradcam.highlight(string, numClasses, device, featureExtract, modelName, wts)
@@ -97,9 +106,17 @@ def main():
         diagnose.diagnose(oImgs, fImgs, diseaseName, device, modelName, dWtsTime, oWts, fWts)
     
     elif task == 7: # test total accuracy for abnormity model
+        numClasses = len(criteria["All"]["OCT"])
         dbName = "ODADS/Data/Data/Test/OCT/"
         wtsName = "O 2024-08-13 08-59-11"
         testClassify.testAcc(device, featureExtract, modelName, numClasses, dbName, wtsName)
 
+    elif task == 8: # classify single image with OCT or Fundus
+        numClasses = len(criteria["All"]["OCT"])
+        string = "ODADS/Data/Data/Original/OCT"
+        wts = ""
+        img = Image.open(string)
+        classify.classifyImg(img, numClasses, device, featureExtract, modelName, wts)
+    
 if __name__ == "__main__":
     main()

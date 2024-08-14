@@ -15,9 +15,9 @@ os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 
 
 
-def trainModel(device, model, criterion, optimizer, scheduler, filename, dataDir, crossValid, batchSize, numEpochs, numClasses, isInception = False):
+def trainModel(device, model, criterion, optimizer, scheduler, filename, dataDir, crossValid, batchSize, numEpochs, numClasses, usePretrained, isInception = False):
     startTime = time.time()
-    bestAcc = 0
+    bestAcc = [0]
     model.to(device)
     validAccHistory = []
     trainAccHistory = []
@@ -25,9 +25,7 @@ def trainModel(device, model, criterion, optimizer, scheduler, filename, dataDir
     trainLosses = []
     LRs = [optimizer.param_groups[0]["lr"]]
     
-    bestModelWts = copy.deepcopy(model.state_dict())
-    
-    dataTransforms = transforms.Compose([transforms.Lambda(utils.resizeLongEdge), transforms.ToTensor()])
+    dataTransforms = transforms.Compose([transforms.ToTensor()])
     if crossValid:
         imageDataset = datasets.ImageFolder(dataDir, dataTransforms)
     else:
@@ -58,9 +56,9 @@ def trainModel(device, model, criterion, optimizer, scheduler, filename, dataDir
     
         for phase in ["train", "valid"]:
             if phase == "train":
-                model.train() #看下定义
+                model.train()
             else:
-                model.eval() #看下定义
+                model.eval()
             
             runningLoss = 0.0
             runningCorrects = 0
@@ -83,12 +81,12 @@ def trainModel(device, model, criterion, optimizer, scheduler, filename, dataDir
                         outputs = model(inputs)
                         loss = criterion(outputs, labels)
                         
-                    preds = torch.max(outputs, 1)[1] # what does this function mean?
+                    preds = torch.max(outputs, 1)[1]
                     if phase == "train":
                         loss.to(device)
                         loss.backward()
                         optimizer.step()
-                runningLoss += loss.item() * inputs.size(0) # what does 0 mean
+                runningLoss += loss.item() * inputs.size(0)
                 runningCorrects += torch.sum(preds == labels.data)
             
             datasetLen = len(dataloaders[phase].dataset)
@@ -98,17 +96,18 @@ def trainModel(device, model, criterion, optimizer, scheduler, filename, dataDir
             print(f"time elapsed {timeElapsed // 60 :.0f}m {timeElapsed % 60 :.2f}s")
             print(f"{phase} loss: {epochLoss :.4f}, acc: {epochAcc :.4f}")
             
-            if phase == "valid" and epochAcc >= bestAcc:
-                bestAcc = epochAcc
-                bestModelWts = copy.deepcopy(model.state_dict())
+            if phase == "valid" and epochAcc >= bestAcc[-1]:
+                bestAcc[-1] = epochAcc
                 state = {
                     "state_dict": model.state_dict(),
-                    "best_acc": bestAcc,
                     "optimizer": optimizer.state_dict()
                 }
                 os.makedirs(f"ODADS/Data/Weights/{filename}/", exist_ok=True)
-                torch.save(state, f"ODADS/Data/Weights/{filename}/{filename}.pth")
-                print(f"Data successfully written into {filename}.pth")
+                epochRange = int(epoch / 10) * 10
+                torch.save(state, f"ODADS/Data/Weights/{filename}/{filename} Best Epoch in {epochRange + 1} to {epochRange + 10}.pth")
+                print(f"Data successfully written into {filename} Best Epoch in {epochRange + 1} to {epochRange + 10}.pth")
+            if phase == "valid" and (epoch + 1) % 10 == 0:
+                bestAcc.append(0)
                 
             if phase == "valid":
                 validAccHistory.append(epochAcc)
@@ -124,8 +123,7 @@ def trainModel(device, model, criterion, optimizer, scheduler, filename, dataDir
         
     timeElapsed = time.time() - startTime
     print(f"training complete in {timeElapsed // 60 :.0f}m {timeElapsed % 60 :.2f}s")
-    print(f"best valid acc: {bestAcc :.4f}")
-    model.load_state_dict(bestModelWts)
+    print(f"best valid acc: {bestAcc}")
     
     return model, validAccHistory, trainAccHistory, validLosses, trainLosses, LRs, timeElapsed
 
@@ -147,9 +145,11 @@ def train(filename, device, featureExtract, modelName, numClasses, batchSize, nu
             
     optimizer = optim.Adam(paramsToUpdate, lr = LR)
     scheduler = optim.lr_scheduler.StepLR(optimizer, step_size = 7, gamma = 0.1)
-    criterion = nn.NLLLoss() # what is NLL?
+    #criterion = nn.NLLLoss()
+    criterion = nn.CrossEntropyLoss()
 
-    model, validAccHistory, trainAccHistory, validLosses, trainLosses, LRs, timeElapsed = trainModel(device, model, criterion, optimizer, scheduler, filename, dbName, crossValid, batchSize, numEpochs, numClasses)
+    filename += " Transferred" if usePretrained else " Finetuning"
+    model, validAccHistory, trainAccHistory, validLosses, trainLosses, LRs, timeElapsed = trainModel(device, model, criterion, optimizer, scheduler, filename, dbName, crossValid, batchSize, numEpochs, numClasses, usePretrained)
     
     os.makedirs(f"ODADS/Data/Results/{filename}/", exist_ok=True)
     with open(f"ODADS/Data/Results/{filename}/{filename}.csv", "w", newline="") as file:  
