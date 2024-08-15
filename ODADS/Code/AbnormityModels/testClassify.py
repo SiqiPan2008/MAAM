@@ -1,6 +1,7 @@
 import os
 import torch
 import csv
+import numpy as np
 from torchvision import transforms, datasets
 from PIL import Image
 from Utils import utils
@@ -64,20 +65,24 @@ def testAccWithLoader(device, featureExtract, modelName, numClasses, dbName, fol
     imageDataset = datasets.ImageFolder(dbName, transform)
     dataloader = torch.utils.data.DataLoader(imageDataset, batch_size = 1, shuffle=True)
     
+    outputs = [[] for _ in range(numClasses)]
     runningCorrects = 0
     total = 0
     for inputs, labels in dataloader:
         inputs = inputs.to(device)
         labels = labels.to(device)
         with torch.set_grad_enabled(False):
-            outputs = model(inputs)
-            preds = torch.max(outputs, 1)[1]
+            batchOutputs = model(inputs)
+            output = torch.nn.functional.softmax(batchOutputs[0], dim = 0)
+            outputs[labels[0]].append(output.cpu().detach().tolist())
+            preds = torch.max(batchOutputs, 1)[1]
         total += len(preds)
         runningCorrects += torch.sum(preds == labels.data)
-        if total % 1000 == 0:
+        if total % 500 == 0:
             print(f"{runningCorrects}/{total}")
-    datasetLen = len(dataloader.dataset)
-    accuracy = runningCorrects / datasetLen
+            print(f"{runningCorrects/total}")
+    accuracy = runningCorrects / total
+    np.array(outputs).tofile(f"ODADS/Data/Results/{foldername}/{wtsName[:-4]}.bin")
     print(f"corrects: {runningCorrects}/{total}")
     print(f"accuracy: {accuracy}")
     return runningCorrects, total, accuracy

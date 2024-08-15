@@ -41,7 +41,7 @@ def getOutputs(device, diseaseName, oAbnormityNum, fAbnormityNum, grade, dbName,
     output = torch.concat([fOutput, oOutput])
     return output
 
-def getOutputsFromFile(device, allAbnormities, diseaseName, oAbnormityNum, fAbnormityNum, grade, outputsO, outputsF):
+"""def getOutputsFromFile(device, allAbnormities, diseaseName, oAbnormityNum, fAbnormityNum, grade, outputsO, outputsF):
     criteria = utils.getCriteria() 
     correctAbnormities = [("Fundus", abnormity) for abnormity in criteria[diseaseName]["Fundus"]] + \
                          [("OCT", abnormity) for abnormity in criteria[diseaseName]["OCT"]]
@@ -52,7 +52,8 @@ def getOutputsFromFile(device, allAbnormities, diseaseName, oAbnormityNum, fAbno
     
     for abnormity in selAbnormities:
         abnormityType, abnormityName = abnormity[0], abnormity[1]
-        
+        if abnormityType == "OCT":
+            output = random.choice(outputsO[criteria["All"]["OCT"].index(abnormityName)])
         files = os.listdir(foldername)
         randomImg = random.choice(files)
         imgPath = os.path.join(foldername, randomImg)
@@ -63,7 +64,7 @@ def getOutputsFromFile(device, allAbnormities, diseaseName, oAbnormityNum, fAbno
         elif abnormityType == "Fundus":
             fOutput = torch.maximum(fOutput, output)
     output = torch.concat([fOutput, oOutput])
-    return output
+    return output"""
     
     
     
