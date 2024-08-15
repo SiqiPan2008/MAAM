@@ -5,11 +5,13 @@ import torch
 from PIL import Image
 from datetime import datetime
 import os
+import sys
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 
 def main():
     modelName = "resnet"
-    cudaDevice = "cuda:1"
+    task = sys.argv[1]
+    cudaDevice = sys.argv[2]
     featureExtract = True # True -> freeze conv layers; False -> train all layers
     useGpu = torch.cuda.is_available()
     print("CUDA available." if useGpu else
@@ -18,33 +20,33 @@ def main():
     print(device)
     criteria = utils.getCriteria()
     
-    task = 7
-    
-    if task == 0: # train OCT or Fundus
-        numClasses = len(criteria["All"]["Fundus"])
-        dbName = "ODADS/Data/Data/Old_train/Fundus/"
-        wtsName = "F 2024-08-13 21-29-01"
+    if task == "train OCT": # train OCT or Fundus
+        numClasses = len(criteria["All"]["OCT"])
+        dbName = "ODADS/Data/Data/Train/OCT/"
+        foldername = "O 2024-08-14 14-21-20 Transferred"
+        wtsName = "O 2024-08-14 14-21-20 Transferred Best Epoch in 61 to 70.pth"
         batchSize = 16
-        numEpochs = 50
+        numEpochs = 30
         LR = 1e-3
-        imgType = "F"
+        imgType = "O"
         usedPretrained = False
         now = datetime.now()
         filename = now.strftime(imgType + " %Y-%m-%d %H-%M-%S")
-        trainClassify.train(filename, device, featureExtract, modelName, numClasses, batchSize, numEpochs, LR, usedPretrained, dbName, wtsName, imgType, crossValid = True)
+        trainClassify.train(filename, device, featureExtract, modelName, numClasses, batchSize, numEpochs, LR, usedPretrained, dbName, foldername, wtsName, imgType, crossValid = True)
         
-    elif task == 1: # train and fine-tune OCT
+    elif task == "train fundus": # train and fine-tune OCT
         numClasses = len(criteria["All"]["Fundus"])
         dbName = "ODADS/Data/Data/Train/Fundus/"
-        wtsName = ""
+        foldername = "F 2024-08-14 14-21-54 Transferred"
+        wtsName = "F 2024-08-14 14-21-54 Transferred Best Epoch in 41 to 50.pth"
         batchSize = 16
-        numEpochs = 20
+        numEpochs = 30
         LR = 1e-3
         imgType = "F"
         usedPretrained = False
         now = datetime.now()
         filename = now.strftime(imgType + " %Y-%m-%d %H-%M-%S")
-        trainClassify.train(filename, device, featureExtract, modelName, numClasses, batchSize, numEpochs, LR, usedPretrained, dbName, wtsName, imgType, crossValid = True)
+        trainClassify.train(filename, device, featureExtract, modelName, numClasses, batchSize, numEpochs, LR, usedPretrained, dbName, foldername, wtsName, imgType, crossValid = True)
         #wtsName = filename
         #numEpochs = 30
         #usedPretrained = False

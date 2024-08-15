@@ -17,6 +17,7 @@ os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 
 def trainModel(device, model, criterion, optimizer, scheduler, filename, dataDir, crossValid, batchSize, numEpochs, numClasses, usePretrained, isInception = False):
     startTime = time.time()
+    lastTime = startTime
     bestAcc = [0]
     model.to(device)
     validAccHistory = []
@@ -92,8 +93,11 @@ def trainModel(device, model, criterion, optimizer, scheduler, filename, dataDir
             datasetLen = len(dataloaders[phase].dataset)
             epochLoss = runningLoss / datasetLen
             epochAcc = runningCorrects / datasetLen
-            timeElapsed = time.time() - startTime
-            print(f"time elapsed {timeElapsed // 60 :.0f}m {timeElapsed % 60 :.2f}s")
+            totalTimeElapsed = time.time() - startTime
+            timeElapsed = time.time() - lastTime
+            lastTime = time.time()
+            print(f"total time elapsed {totalTimeElapsed // 60 :.0f}m {totalTimeElapsed % 60 :.2f}s")
+            print(f"time elapsed {timeElapsed // 60 :.0f}m {totalTimeElapsed % 60 :.2f}s")
             print(f"{phase} loss: {epochLoss :.4f}, acc: {epochAcc :.4f}")
             
             if phase == "valid" and epochAcc >= bestAcc[-1]:
@@ -121,17 +125,17 @@ def trainModel(device, model, criterion, optimizer, scheduler, filename, dataDir
         LRs.append(optimizer.param_groups[0]["lr"])
         print()
         
-    timeElapsed = time.time() - startTime
-    print(f"training complete in {timeElapsed // 60 :.0f}m {timeElapsed % 60 :.2f}s")
+    totalTimeElapsed = time.time() - startTime
+    print(f"training complete in {totalTimeElapsed // 60 :.0f}m {totalTimeElapsed % 60 :.2f}s")
     print(f"best valid acc: {bestAcc}")
     
-    return model, validAccHistory, trainAccHistory, validLosses, trainLosses, LRs, timeElapsed
+    return model, validAccHistory, trainAccHistory, validLosses, trainLosses, LRs, totalTimeElapsed
 
-def train(filename, device, featureExtract, modelName, numClasses, batchSize, numEpochs, LR, usePretrained, dbName, wtsName, modelType, crossValid = True):
+def train(filename, device, featureExtract, modelName, numClasses, batchSize, numEpochs, LR, usePretrained, dbName, foldername, wtsName, modelType, crossValid = True):
     model, _ = abnormityModel.initializeAbnormityModel(modelName, numClasses, featureExtract, usePretrained = usePretrained)
     model = model.to(device)
     if wtsName:
-        trainedModel = torch.load(f"ODADS/Data/Weights/{wtsName}/{wtsName}.pth")
+        trainedModel = torch.load(f"ODADS/Data/Weights/{foldername}/{wtsName}")
         model.load_state_dict(trainedModel['state_dict'])  
     paramsToUpdate = model.parameters()
     print("Params to learn:")
