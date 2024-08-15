@@ -67,11 +67,19 @@ def main():
         foldername = now.strftime(imgType + " %Y-%m-%d %H-%M-%S")
         trainClassify.train(foldername, device, featureExtract, modelName, numClasses, batchSize, numEpochs, LR, usedPretrained, dbName, wtsName, imgType, crossValid = True)
         
-    elif task == 3: # gradCAM single image with OCT or Fundus
+    elif task == "classify OCT database": # gradCAM single image with OCT or Fundus
         numClasses = len(criteria["All"]["OCT"])
-        string = "ODADS/Data/Data/Original/OCT/IntraretinalFluid/CNV-103044-13.jpeg"
-        wts = "O 2024-08-13 11-44-08"
-        gradcam.highlight(string, numClasses, device, featureExtract, modelName, wts)
+        dbName = "ODADS/Data/Data/Train/OCT/"
+        foldername = "O 2024-08-15 12-32-19 Finetuning/"
+        wtsName = "O 2024-08-15 12-32-19 Finetuning Best Epoch in 21 to 30.pth"
+        classify.classifyDatabase(dbName, numClasses, device, featureExtract, modelName, foldername, wtsName)
+        
+    elif task == "get prob Fundus database": # gradCAM single image with OCT or Fundus
+        numClasses = len(criteria["All"]["Fundus"])
+        dbName = "ODADS/Data/Data/Train/Fundus/"
+        foldername = "F 2024-08-15 12-32-17 Finetuning/"
+        wtsName = "F 2024-08-15 12-32-17 Finetuning Best Epoch in 21 to 30.pth"
+        classify.classifyDatabase(dbName, numClasses, device, featureExtract, modelName, foldername, wtsName)
         
     elif task == "train single disease": # train single disease
         now = datetime.now()
