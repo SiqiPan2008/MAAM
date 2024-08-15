@@ -107,18 +107,17 @@ def main():
         diagnose.diagnose(oImgs, fImgs, diseaseName, device, modelName, dWtsTime, oWts, fWts)
     
     elif task == 7: # test accuracy for a series of abnormity models
-        numClasses = len(criteria["All"]["Fundus"])
-        dbName = "ODADS/Data/Data/Test/Fundus/"
-        foldername = "F 2024-08-15 07-12-51 From Scratch"
+        numClasses = len(criteria["All"]["OCT"])
+        dbName = "ODADS/Data/Data/Test/OCT/"
+        foldername = "O 2024-08-14 14-21-20 Transferred"
         testClassify.testMultipleAcc(device, featureExtract, modelName, numClasses, dbName, foldername)
 
-    elif task == 8: # classify single image with OCT or Fundus
+    elif task == 8: # test accuracy for a series of abnormity models
         numClasses = len(criteria["All"]["Fundus"])
         dbName = "ODADS/Data/Data/Test/Fundus/"
         foldername = "F 2024-08-14 14-21-54 Transferred"
-        wtsName = "F 2024-08-14 14-21-54 Transferred Best Epoch in 81 to 90.pth"
-        print("Test")
         testClassify.testMultipleAcc(device, featureExtract, modelName, numClasses, dbName, foldername)
+        
     
 if __name__ == "__main__":
     main()

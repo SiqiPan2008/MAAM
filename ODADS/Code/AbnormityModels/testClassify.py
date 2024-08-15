@@ -45,7 +45,8 @@ def testMultipleAcc(device, featureExtract, modelName, numClasses, dbName, folde
     with open(f"ODADS/Data/Results/{foldername}/{foldername} Test Acc.csv", "w", newline="") as file:  
         writer = csv.writer(file)
         writer.writerow(["Filename", "Corrects", "Total", "Accuracy"])
-        for filename in os.listdir(wtsFolder):
+        sortedFiles = sorted(os.listdir(wtsFolder), reverse=True)
+        for filename in sortedFiles:
             if os.path.splitext(filename)[1] == ".pth":
                 corrects, total, accuracy = testAcc(device, featureExtract, modelName, numClasses, dbName, foldername, filename)
             writer.writerow([filename, corrects, total, accuracy])

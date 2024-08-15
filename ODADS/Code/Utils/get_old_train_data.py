@@ -1,3 +1,5 @@
+# For generating datasets Train1
+
 import os
 from PIL import Image
 import torchvision.transforms as transforms
@@ -123,5 +125,3 @@ for class_name in all_classes:
     
     delete_random_files(class_output_dir, num_transforms_per_image * file_num - target_num)
     print(f"There are now {target_num} files in {class_output_dir}")
-        
-        
