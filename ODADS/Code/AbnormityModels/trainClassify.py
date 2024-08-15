@@ -10,7 +10,7 @@ import csv
 from datetime import datetime
 import numpy as np
 from Utils import utils
-from AbnormityModels import abnormityModel
+from AbnormityModels import abnormityModel, testClassify
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 
 
@@ -130,7 +130,7 @@ def trainModel(device, model, criterion, optimizer, scheduler, filename, dataDir
 def train(filename, device, featureExtract, modelName, numClasses, batchSize, numEpochs, LR, usePretrained, dbName, wtsName, modelType, crossValid = True):
     model, _ = abnormityModel.initializeAbnormityModel(modelName, numClasses, featureExtract, usePretrained = usePretrained)
     model = model.to(device)
-    if wtsName != "":
+    if wtsName:
         trainedModel = torch.load(f"ODADS/Data/Weights/{wtsName}/{wtsName}.pth")
         model.load_state_dict(trainedModel['state_dict'])  
     paramsToUpdate = model.parameters()
@@ -148,7 +148,10 @@ def train(filename, device, featureExtract, modelName, numClasses, batchSize, nu
     #criterion = nn.NLLLoss()
     criterion = nn.CrossEntropyLoss()
 
-    filename += " Transferred" if usePretrained else " Finetuning"
+    if wtsName:
+        filename += " Transferred Continued" if usePretrained else " Finetuning"
+    else:
+        filename += " Tranferred" if usePretrained else " From Scratch"
     model, validAccHistory, trainAccHistory, validLosses, trainLosses, LRs, timeElapsed = trainModel(device, model, criterion, optimizer, scheduler, filename, dbName, crossValid, batchSize, numEpochs, numClasses, usePretrained)
     
     os.makedirs(f"ODADS/Data/Results/{filename}/", exist_ok=True)

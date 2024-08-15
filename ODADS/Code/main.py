@@ -9,15 +9,16 @@ os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 
 def main():
     modelName = "resnet"
+    cudaDevice = "cuda:1"
     featureExtract = True # True -> freeze conv layers; False -> train all layers
     useGpu = torch.cuda.is_available()
     print("CUDA available." if useGpu else
           "CUDA not available.")
-    device = torch.device("cuda:1" if useGpu else "cpu") # get to know how to use both GPUs
+    device = torch.device(cudaDevice if useGpu else "cpu") # get to know how to use both GPUs
     print(device)
     criteria = utils.getCriteria()
     
-    task = 8
+    task = 7
     
     if task == 0: # train OCT or Fundus
         numClasses = len(criteria["All"]["Fundus"])
@@ -33,14 +34,14 @@ def main():
         trainClassify.train(filename, device, featureExtract, modelName, numClasses, batchSize, numEpochs, LR, usedPretrained, dbName, wtsName, imgType, crossValid = True)
         
     elif task == 1: # train and fine-tune OCT
-        numClasses = len(criteria["All"]["OCT"])
-        dbName = "ODADS/Data/Data/Train/OCT/"
+        numClasses = len(criteria["All"]["Fundus"])
+        dbName = "ODADS/Data/Data/Train/Fundus/"
         wtsName = ""
         batchSize = 16
-        numEpochs = 100
+        numEpochs = 20
         LR = 1e-3
-        imgType = "O"
-        usedPretrained = True
+        imgType = "F"
+        usedPretrained = False
         now = datetime.now()
         filename = now.strftime(imgType + " %Y-%m-%d %H-%M-%S")
         trainClassify.train(filename, device, featureExtract, modelName, numClasses, batchSize, numEpochs, LR, usedPretrained, dbName, wtsName, imgType, crossValid = True)
@@ -51,7 +52,7 @@ def main():
         #fineTuneFilename = now.strftime(imgType + " %Y-%m-%d %H-%M-%S")
         #trainClassify.train(fineTuneFilename, device, featureExtract, modelName, numClasses, batchSize, numEpochs, LR, usedPretrained, dbName, wtsName, imgType, crossValid = True)
         
-    elif task == 2: # train and fine-tune Fundus
+    elif task == 2: # train Fundus
         numClasses = len(criteria["All"]["Fundus"])
         dbName = "ODADS/Data/Data/Train/Fundus/"
         wtsName = ""
@@ -59,10 +60,10 @@ def main():
         numEpochs = 100
         LR = 1e-3
         imgType = "F"
-        usedPretrained = True
+        usedPretrained = False
         now = datetime.now()
-        filename = now.strftime(imgType + " %Y-%m-%d %H-%M-%S")
-        trainClassify.train(filename, device, featureExtract, modelName, numClasses, batchSize, numEpochs, LR, usedPretrained, dbName, wtsName, imgType, crossValid = True)
+        foldername = now.strftime(imgType + " %Y-%m-%d %H-%M-%S")
+        trainClassify.train(foldername, device, featureExtract, modelName, numClasses, batchSize, numEpochs, LR, usedPretrained, dbName, wtsName, imgType, crossValid = True)
         
     elif task == 3: # gradCAM single image with OCT or Fundus
         numClasses = len(criteria["All"]["OCT"])
@@ -108,16 +109,16 @@ def main():
     elif task == 7: # test accuracy for a series of abnormity models
         numClasses = len(criteria["All"]["Fundus"])
         dbName = "ODADS/Data/Data/Test/Fundus/"
-        foldername = "F 2024-08-14 14-21-54 Transferred"
+        foldername = "F 2024-08-15 07-12-51 From Scratch"
         testClassify.testMultipleAcc(device, featureExtract, modelName, numClasses, dbName, foldername)
 
     elif task == 8: # classify single image with OCT or Fundus
         numClasses = len(criteria["All"]["Fundus"])
-        dbName = "ODADS/Data/Data/Small_test/Fundus/"
+        dbName = "ODADS/Data/Data/Test/Fundus/"
         foldername = "F 2024-08-14 14-21-54 Transferred"
         wtsName = "F 2024-08-14 14-21-54 Transferred Best Epoch in 81 to 90.pth"
-        testClassify.testAcc(device, featureExtract, modelName, numClasses, dbName, foldername, wtsName)
+        print("Test")
+        testClassify.testMultipleAcc(device, featureExtract, modelName, numClasses, dbName, foldername)
     
 if __name__ == "__main__":
     main()
-    

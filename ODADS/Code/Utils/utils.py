@@ -1,4 +1,5 @@
 from torchvision import transforms
+import torch
 import matplotlib.pyplot as plt
 import numpy as np
 import os
@@ -71,3 +72,15 @@ def getRandImageOutput(device, dbName, img, abnormityType, oModel, fModel):
     img = img.unsqueeze(0)
     output = oModel(img.to(device)) if abnormityType == "OCT" else fModel(img.to(device))
     return output
+
+def getTopProbIndices(output, allowNum, minScore):
+    sortedOutput, indices = torch.sort(output, descending=True)
+    sum = 0
+    topIndices = []
+    for i in range(allowNum):
+        if sum >= minScore:
+            break
+        sum += sortedOutput[i]
+        topIndices.append(indices[i])
+    return topIndices
+        

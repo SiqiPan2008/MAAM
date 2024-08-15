@@ -7,7 +7,7 @@ from Utils import utils
 from AbnormityModels import abnormityModel, classify
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 
-def testAcc(device, featureExtract, modelName, numClasses, dbName, foldername, wtsName):
+def testAcc(device, featureExtract, modelName, numClasses, dbName, foldername, wtsName): # with getTopProbIndices
     model, _ = abnormityModel.initializeAbnormityModel(modelName, numClasses, featureExtract)
     model = model.to(device)
     trainedModel = torch.load(f"ODADS/Data/Weights/{foldername}/{wtsName}")
@@ -27,8 +27,12 @@ def testAcc(device, featureExtract, modelName, numClasses, dbName, foldername, w
         for imgName in os.listdir(classFolder):
             img = Image.open(f"{classFolder}{imgName}/")
             output = classify.classify(img, model, device)
-            _, pred = torch.max(output, dim=0)
-            corrects += pred == classToIdx[className]
+            
+            #_, pred = torch.max(output, dim=0)
+            #corrects += pred == classToIdx[className]
+            topIndices = utils.getTopProbIndices(output, 4, 0.9)
+            corrects += classToIdx[className] in topIndices
+            
             total += 1
         print(f"completed {className}")
     accuracy = corrects / total
@@ -46,3 +50,32 @@ def testMultipleAcc(device, featureExtract, modelName, numClasses, dbName, folde
                 corrects, total, accuracy = testAcc(device, featureExtract, modelName, numClasses, dbName, foldername, filename)
             writer.writerow([filename, corrects, total, accuracy])
     print(f"Data successfully written into {filename}.csv")
+    
+def testAccWithLoader(device, featureExtract, modelName, numClasses, dbName, foldername, wtsName): # only top prob
+    model, _ = abnormityModel.initializeAbnormityModel(modelName, numClasses, featureExtract)
+    model = model.to(device)
+    trainedModel = torch.load(f"ODADS/Data/Weights/{foldername}/{wtsName}")
+    model.load_state_dict(trainedModel["state_dict"])
+    model.eval()
+    transform = transforms.Compose([
+                    transforms.Lambda(lambda x: utils.resizeLongEdge(x)),
+                    transforms.ToTensor()
+                ])
+    imageDataset = datasets.ImageFolder(dbName, transform)
+    dataloader = torch.utils.data.DataLoader(imageDataset, batch_size = 1, shuffle=True)
+    
+    runningCorrects = 0
+    total = 0
+    for inputs, labels in dataloader:
+        inputs = inputs.to(device)
+        labels = labels.to(device)
+        with torch.set_grad_enabled(False):
+            outputs = model(inputs)
+            preds = torch.max(outputs, 1)[1]
+        total += len(preds)
+        runningCorrects += torch.sum(preds == labels.data)
+    datasetLen = len(dataloader.dataset)
+    accuracy = runningCorrects / datasetLen
+    print(f"corrects: {runningCorrects}/{total}")
+    print(f"accuracy: {accuracy}")
+    return runningCorrects, total, accuracy

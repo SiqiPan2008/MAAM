@@ -1,29 +1,29 @@
 {
     "All": {
         "OCT": [
-            "Normal",
-            "CSC",
-            "Stargardt",
-            "Mactel",
-            "ERM",
-            "MH",
-            "Drusen",
-            "RP",
             "CNV",
+            "CSC",
+            "DME",
+            "Drusen",
+            "ERM",
             "IntraretinalFluid",
-            "SubretinalFluid",
-            "DME"
+            "Mactel",
+            "MH",
+            "Normal",
+            "RP",
+            "Stargardt",
+            "SubretinalFluid"
         ],
         "Fundus": [
-            "MH",
-            "Drusen",
             "CottonWoolPatch",
+            "Drusen",
             "HardExudate",
             "Hemorrhage",
+            "MH",
             "Microaneurysm",
+            "Normal",
             "RP",
-            "VascularAbnormity",
-            "Normal"
+            "VascularAbnormity"
         ]
     },
     "CSC": {
