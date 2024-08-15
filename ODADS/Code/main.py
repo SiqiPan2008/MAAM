@@ -127,11 +127,16 @@ def main():
         testClassify.testAccWithLoader(device, featureExtract, modelName, numClasses, dbName, foldername, wtsName)
 
     elif task == "test fundus": # test accuracy for a series of abnormity models
-        pass
+        numClasses = len(criteria["All"]["Fundus"])
+        dbName = "ODADS/Data/Data/Train/Fundus/"
+        foldername = "F 2024-08-15 12-32-17 Finetuning"
+        wtsName = "F 2024-08-15 12-32-17 Finetuning Best Epoch in 21 to 30.pth"
+        testClassify.testAccWithLoader(device, featureExtract, modelName, numClasses, dbName, foldername, wtsName)
         
     
 if __name__ == "__main__":
-    outputs = np.fromfile("ODADS/Data/Results/F 2024-08-15 12-32-17 Finetuning/F 2024-08-15 12-32-17 Finetuning Best Epoch in 21 to 30.pth.bin", dtype = np.float64)
-    outputs = outputs.reshape((9, 3000, 9))
-    print(outputs)
+    outputsF = np.fromfile("ODADS/Data/Results/F 2024-08-15 12-32-17 Finetuning/F 2024-08-15 12-32-17 Finetuning Best Epoch in 21 to 30.pth.bin", dtype = np.float64)
+    outputsF = outputsF.reshape((9, 3000, 9))
+    outputsO = np.fromfile("ODADS/Data/Results/O 2024-08-15 12-32-19 Finetuning/O 2024-08-15 12-32-19 Finetuning Best Epoch in 21 to 30.pth.bin", dtype = np.float64)
+    outputsO = outputsO.reshape((12, 5000, 12))
     main()

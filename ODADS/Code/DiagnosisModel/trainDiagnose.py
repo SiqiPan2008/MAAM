@@ -41,7 +41,7 @@ def getOutputs(device, diseaseName, oAbnormityNum, fAbnormityNum, grade, dbName,
     output = torch.concat([fOutput, oOutput])
     return output
 
-"""def getOutputsFromFile(device, allAbnormities, diseaseName, oAbnormityNum, fAbnormityNum, grade, outputsO, outputsF):
+def getOutputsFromFile(allAbnormities, diseaseName, oAbnormityNum, fAbnormityNum, grade, outputsO, outputsF):
     criteria = utils.getCriteria() 
     correctAbnormities = [("Fundus", abnormity) for abnormity in criteria[diseaseName]["Fundus"]] + \
                          [("OCT", abnormity) for abnormity in criteria[diseaseName]["OCT"]]
@@ -50,21 +50,18 @@ def getOutputs(device, diseaseName, oAbnormityNum, fAbnormityNum, grade, dbName,
     selIncorrectAbnormities = random.sample(incorrectAbnormities, oAbnormityNum + fAbnormityNum - grade)
     selAbnormities = selCorrectAbnormities + selIncorrectAbnormities
     
+    oOutput = torch.zeros({len(criteria["All"]["OCT"])})
+    fOutput = torch.zeros({len(criteria["All"]["Fundus"])})
     for abnormity in selAbnormities:
         abnormityType, abnormityName = abnormity[0], abnormity[1]
         if abnormityType == "OCT":
             output = random.choice(outputsO[criteria["All"]["OCT"].index(abnormityName)])
-        files = os.listdir(foldername)
-        randomImg = random.choice(files)
-        imgPath = os.path.join(foldername, randomImg)
-        img = Image.open(imgPath)
-        output = utils.getRandImageOutput(device, dbName, img, abnormityType, oModel, fModel)
-        if abnormityType == "OCT":
-            oOutput = torch.maximum(oOutput, output)
+            oOutput = torch.max(torch.tensor(output), oOutput)
         elif abnormityType == "Fundus":
-            fOutput = torch.maximum(fOutput, output)
+            output = random.choice(outputsF[criteria["All"]["Fundus"].index(abnormityName)])
+            fOutput = torch.max(torch.tensor(output), fOutput)
     output = torch.concat([fOutput, oOutput])
-    return output"""
+    return output
     
     
     
@@ -111,12 +108,12 @@ def trainModel(device, diseaseName, oFoldername, oName, oBatchSize, fFoldername,
     for epoch in range(numEpochs):
         for grade in range(gradeLevels):
             for i in range(gradeTrainSize):
-                output = getOutputs(device, diseaseName, oAbnormityNum, fAbnormityNum, grade, dbName, oModel, fModel)
+                output = getOutputsFromFile(allAbnormities, diseaseName, oAbnormityNum, fAbnormityNum, grade, outputsO, outputsF)
                 trainData[grade * gradeTrainSize + i] = output
                 trainLabel[grade * gradeTrainSize + i] = grade
         for grade in range(gradeLevels):
             for i in range(gradeValidSize):
-                output = getOutputs(device, diseaseName, oAbnormityNum, fAbnormityNum, grade, dbName, oModel, fModel)
+                output = getOutputsFromFile(allAbnormities, diseaseName, oAbnormityNum, fAbnormityNum, grade, outputsO, outputsF)
                 validData[grade * gradeValidSize + i] = output
                 validLabel[grade * gradeValidSize + i] = grade
         trainDataset = torch.utils.data.TensorDataset(trainData, validData)
