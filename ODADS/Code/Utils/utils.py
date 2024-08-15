@@ -69,8 +69,9 @@ def imgShow(img, ax = None, title = None):
     
 def getRandImageOutput(device, dbName, img, abnormityType, oModel, fModel):
     img = processImg(img)
-    img = img.unsqueeze(0)
-    output = oModel(img.to(device)) if abnormityType == "OCT" else fModel(img.to(device))
+    img = img.to(device).unsqueeze(0)
+    output = oModel(img) if abnormityType == "OCT" else fModel(img.to(device))
+    output = torch.nn.functional.softmax(output[0], dim=0)
     return output
 
 def getTopProbIndices(output, allowNum, minScore):

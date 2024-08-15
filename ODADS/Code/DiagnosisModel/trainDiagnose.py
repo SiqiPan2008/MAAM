@@ -14,55 +14,48 @@ from DiagnosisModel import diagnosisModel
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 
 def getOutputs(device, diseaseName, oAbnormityNum, fAbnormityNum, grade, dbName, oModel, fModel):
-    criteria = utils.getCriteria()
-   
-    diseaseAbnormities = [(("Fundus", abnormity) for abnormity in criteria[diseaseName]["Fundus"])
-                            + (("OCT", abnormity) for abnormity in criteria[diseaseName]["OCT"])]
-    selCorrectAbnormities = random.sample(diseaseAbnormities, grade)
-    correctFs = sum((abnormity[0] == "Fundus") for abnormity in diseaseAbnormities)
-    correctOs = sum((abnormity[0] == "OCT") for abnormity in diseaseAbnormities)
+    criteria = utils.getCriteria() 
+    correctAbnormities = [("Fundus", abnormity) for abnormity in criteria[diseaseName]["Fundus"]] + \
+                         [("OCT", abnormity) for abnormity in criteria[diseaseName]["OCT"]]
+    allAbnormities = [("Fundus", abnormity) for abnormity in criteria["All"]["Fundus"]] + \
+                     [("OCT", abnormity) for abnormity in criteria["All"]["OCT"]]
+    incorrectAbnormities = [abnormity for abnormity in allAbnormities if abnormity not in correctAbnormities]
+    selCorrectAbnormities = random.sample(correctAbnormities, grade)
+    selIncorrectAbnormities = random.sample(incorrectAbnormities, oAbnormityNum + fAbnormityNum - grade)
+    selAbnormities = selCorrectAbnormities + selIncorrectAbnormities
     
-    allFAbnormity = [("Fundus", abnormity) for abnormity in criteria["All"]["Fundus"]]
-    allOAbnormity = [("OCT", abnormity) for abnormity in criteria["All"]["OCT"]]
-    incorrectFAbnormities = [abnormity for abnormity in allFAbnormity if (abnormity not in diseaseAbnormities)]
-    incorrectOAbnormities = [abnormity for abnormity in allOAbnormity if (abnormity not in diseaseAbnormities)]
-    selIncorrectFAbnormities = random.sample(incorrectFAbnormities, fAbnormityNum - correctFs)
-    selIncorrectOAbnormities = random.sample(incorrectOAbnormities, oAbnormityNum - correctOs)
-    
-    selAbnormities = selCorrectAbnormities + selIncorrectFAbnormities + selIncorrectOAbnormities
-    
-    oOutputs = torch.empty([fAbnormityNum, len(allFAbnormity) + len(allOAbnormity)])
-    for i in range(len(selAbnormities)):
-        abnormityType, abnormityName = selAbnormities[i][0], selAbnormities[i][1]
+    oOutput = torch.zeros([len(criteria["All"]["OCT"])]).to(device)
+    fOutput = torch.zeros([len(criteria["All"]["Fundus"])]).to(device)
+    for abnormity in selAbnormities:
+        abnormityType, abnormityName = abnormity[0], abnormity[1]
         foldername = f"{dbName}/{abnormityType}/{abnormityName}"
         files = os.listdir(foldername)
         randomImg = random.choice(files)
         imgPath = os.path.join(foldername, randomImg)
         img = Image.open(imgPath)
-        outputs[i] = utils.getRandImageOutput(device, dbName, img, abnormityType, oModel, fModel)
-    outputs = torch.max(outputs, dim=0)
-    outputs = outputs.unsqueeze(0)
-    return outputs
+        output = utils.getRandImageOutput(device, dbName, img, abnormityType, oModel, fModel)
+        if abnormityType == "OCT":
+            oOutput = torch.maximum(oOutput, output)
+        elif abnormityType == "Fundus":
+            fOutput = torch.maximum(fOutput, output)
+    output = torch.concat([fOutput, oOutput])
+    return output
             
 def trainModel(device, diseaseName, oModel, fModel, wtsName, dTime, dbName, batchSize, LR, numEpochs, gradeSize):
     criteria = utils.getCriteria()
-    oNumClasses = len(criteria["All"]["OCT"])
-    fNumClasses = len(criteria["All"]["Fundus"])
-    
     oAbnormityNum = len(criteria[diseaseName]["OCT"])
     fAbnormityNum = len(criteria[diseaseName]["Fundus"])
-    numClasses = oNumClasses * (oAbnormityNum == 0) + fNumClasses * (fAbnormityNum == 0)
-    abnormityNum = oAbnormityNum + fAbnormityNum
-    gradeLevels = abnormityNum + 1
+    allAbnormityNum = len(criteria["All"]["OCT"]) + len(criteria["All"]["Fundus"])
+    gradeLevels = oAbnormityNum + fAbnormityNum + 1
     
     gradeTrainSize = int(0.8 * gradeSize)
     gradeValidSize = gradeSize - gradeTrainSize
-    trainData = torch.empty(gradeLevels * gradeTrainSize, numClasses)
-    trainLabel = torch.empty(gradeLevels * gradeValidSize)
-    validData = torch.empty(gradeLevels * gradeTrainSize, numClasses)
+    trainData = torch.empty(gradeLevels * gradeTrainSize, allAbnormityNum)
+    trainLabel = torch.empty(gradeLevels * gradeTrainSize)
+    validData = torch.empty(gradeLevels * gradeValidSize, allAbnormityNum)
     validLabel = torch.empty(gradeLevels * gradeValidSize)
     
-    dModel = diagnosisModel.SimpleNet(abnormityNum, gradeLevels)
+    dModel = diagnosisModel.SimpleNet(allAbnormityNum, gradeLevels)
     if wtsName:
         dModel.load_state_dict("wtsName")
     criterion = nn.CrossEntropyLoss()
@@ -73,8 +66,6 @@ def trainModel(device, diseaseName, oModel, fModel, wtsName, dTime, dbName, batc
     bestAcc = 0.0
     bestModelWts = copy.deepcopy(dModel.state_dict())
     LRs = [optimizer.param_groups[0]["lr"]]
-    accHistory = []
-    losses = []
     
     trainAccHistory = []
     validAccHistory = []
@@ -171,12 +162,12 @@ def train(device, diseaseName, featureExtract, modelName, oWts, fWts, batchSize,
     
     oModel, _ = abnormityModel.initializeAbnormityModel(modelName, oNumClasses, featureExtract)
     oModel = oModel.to(device)
-    oTrainedModel = torch.load(f"ODADS/Data/Weights/{oWts}/{oWts}.pth")
+    oTrainedModel = torch.load(f"ODADS/Data/Weights/{oWts}")
     oModel.load_state_dict(oTrainedModel["state_dict"])
     
     fModel, _ = abnormityModel.initializeAbnormityModel(modelName, fNumClasses, featureExtract)
     fModel = fModel.to(device)
-    fTrainedModel = torch.load(f"ODADS/Data/Weights/{fWts}/{fWts}.pth")
+    fTrainedModel = torch.load(f"ODADS/Data/Weights/{fWts}")
     fModel.load_state_dict(fTrainedModel["state_dict"])
     
     filename = f"D {diseaseName} {dTime}"

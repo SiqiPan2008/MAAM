@@ -22,3 +22,16 @@ def classifyImg(img, numClasses, device, featureExtract, modelName, foldername, 
     model.load_state_dict(trainedModel["state_dict"])
     # utils.imgShow(img)
     return classify(img, model, device)
+
+def classifyDatabase(dbName, numClasses, device, featureExtract, modelName, foldername, wtsName):
+    model, _ = abnormityModel.initializeAbnormityModel(modelName, numClasses, featureExtract)
+    model = model.to(device)
+    trainedModel = torch.load(f"ODADS/Data/Weights/{foldername}/{wtsName}")
+    model.load_state_dict(trainedModel["state_dict"])
+    classNames = [f for f in os.scandir(dbName) if f.is_dir(f)]
+    total = 0
+    corrects = 0
+    for label in range(len(classNames)):
+        className = classNames[label]
+        
+    return classify(img, model, device)
