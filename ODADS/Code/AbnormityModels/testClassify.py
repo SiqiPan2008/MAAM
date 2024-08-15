@@ -74,6 +74,8 @@ def testAccWithLoader(device, featureExtract, modelName, numClasses, dbName, fol
             preds = torch.max(outputs, 1)[1]
         total += len(preds)
         runningCorrects += torch.sum(preds == labels.data)
+        if total % 1000 == 0:
+            print(f"{runningCorrects}/{total}")
     datasetLen = len(dataloader.dataset)
     accuracy = runningCorrects / datasetLen
     print(f"corrects: {runningCorrects}/{total}")

@@ -30,7 +30,6 @@ def classifyDatabase(dbName, numClasses, device, featureExtract, modelName, fold
     model = model.to(device)
     trainedModel = torch.load(f"ODADS/Data/Weights/{foldername}{wtsName}")
     model.load_state_dict(trainedModel["state_dict"])
-    model.eval()
     classNames = [f for f in os.scandir(dbName) if f.is_dir()]
     total = 0
     corrects = 0
@@ -41,6 +40,7 @@ def classifyDatabase(dbName, numClasses, device, featureExtract, modelName, fold
         imgPaths = [f for f in os.listdir(classFolder) if any(f.endswith(imgSuffix) for imgSuffix in [".jpg", ".png", ".jpeg", ".JPG", ".PNG", ".JPEG"])]
         classOutput = []
         for i in range(len(imgPaths)):
+            model.eval()
             img = Image.open(os.path.join(classFolder, imgPaths[i])).convert("RGB")
             img = utils.resizeLongEdge(img)
             img = transforms.ToTensor()(img)

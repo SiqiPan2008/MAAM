@@ -2,6 +2,7 @@ from AbnormityModels import classify, trainClassify, testClassify, gradcam
 from DiagnosisModel import diagnose, trainDiagnose
 from Utils import utils
 import torch
+import numpy as np
 from PIL import Image
 from datetime import datetime
 import os
@@ -120,16 +121,17 @@ def main():
     
     elif task == "test OCT": # test accuracy for a series of abnormity models
         numClasses = len(criteria["All"]["OCT"])
-        dbName = "ODADS/Data/Data/Test/OCT/"
+        dbName = "ODADS/Data/Data/Train/OCT/"
         foldername = "O 2024-08-15 12-32-19 Finetuning"
-        testClassify.testMultipleAcc(device, featureExtract, modelName, numClasses, dbName, foldername)
+        wtsName = "O 2024-08-15 12-32-19 Finetuning Best Epoch in 21 to 30.pth"
+        testClassify.testAccWithLoader(device, featureExtract, modelName, numClasses, dbName, foldername, wtsName)
 
     elif task == "test fundus": # test accuracy for a series of abnormity models
-        numClasses = len(criteria["All"]["Fundus"])
-        dbName = "ODADS/Data/Data/Test/Fundus/"
-        foldername = "F 2024-08-15 12-32-17 Finetuning"
-        testClassify.testMultipleAcc(device, featureExtract, modelName, numClasses, dbName, foldername)
+        pass
         
     
 if __name__ == "__main__":
+    outputs = np.fromfile("ODADS/Data/Results/F 2024-08-15 12-32-17 Finetuning/F 2024-08-15 12-32-17 Finetuning Best Epoch in 21 to 30.pth.bin", dtype = np.float64)
+    outputs = outputs.reshape((9, 3000, 9))
+    print(outputs)
     main()
