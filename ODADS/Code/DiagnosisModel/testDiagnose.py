@@ -13,6 +13,34 @@ from Utils import utils
 from DiagnosisModel import diagnosisModel
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 
+def getOutputs(device, diseaseName, oAbnormityNum, fAbnormityNum, grade, dbName, oModel, fModel):
+    criteria = utils.getCriteria() 
+    correctAbnormities = [("Fundus", abnormity) for abnormity in criteria[diseaseName]["Fundus"]] + \
+                         [("OCT", abnormity) for abnormity in criteria[diseaseName]["OCT"]]
+    allAbnormities = [("Fundus", abnormity) for abnormity in criteria["All"]["Fundus"]] + \
+                     [("OCT", abnormity) for abnormity in criteria["All"]["OCT"]]
+    incorrectAbnormities = [abnormity for abnormity in allAbnormities if abnormity not in correctAbnormities]
+    selCorrectAbnormities = random.sample(correctAbnormities, grade)
+    selIncorrectAbnormities = random.sample(incorrectAbnormities, oAbnormityNum + fAbnormityNum - grade)
+    selAbnormities = selCorrectAbnormities + selIncorrectAbnormities
+    
+    oOutput = torch.zeros([len(criteria["All"]["OCT"])]).to(device)
+    fOutput = torch.zeros([len(criteria["All"]["Fundus"])]).to(device)
+    for abnormity in selAbnormities:
+        abnormityType, abnormityName = abnormity[0], abnormity[1]
+        foldername = f"{dbName}/{abnormityType}/{abnormityName}"
+        files = os.listdir(foldername)
+        randomImg = random.choice(files)
+        imgPath = os.path.join(foldername, randomImg)
+        img = Image.open(imgPath)
+        output = utils.getRandImageOutput(device, dbName, img, abnormityType, oModel, fModel)
+        if abnormityType == "OCT":
+            oOutput = torch.maximum(oOutput, output)
+        elif abnormityType == "Fundus":
+            fOutput = torch.maximum(fOutput, output)
+    output = torch.concat([fOutput, oOutput])
+    return output
+
 def getOutputsFromFile(allAbnormities, diseaseName, oAbnormityNum, fAbnormityNum, grade, outputsO, outputsF):
     criteria = utils.getCriteria() 
     correctAbnormities = [("Fundus", abnormity) for abnormity in criteria[diseaseName]["Fundus"]] + \
@@ -35,6 +63,9 @@ def getOutputsFromFile(allAbnormities, diseaseName, oAbnormityNum, fAbnormityNum
     output = torch.concat([fOutput, oOutput])
     return output
     
+    
+    
+
 def trainAbnormityNumModel(device, diseaseName, oFoldername, oName, oClassSize, fFoldername, fName, fClassSize, dWtsDTime, dTime, batchSize, LR, numEpochs, gradeSize):
     criteria = utils.getCriteria()
     oAbnormityNum = len(criteria[diseaseName]["OCT"])

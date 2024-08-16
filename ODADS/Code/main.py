@@ -80,18 +80,33 @@ def main():
         now = datetime.now()
         dTime = now.strftime("%Y-%m-%d %H-%M-%S")
         oFoldername = "O 2024-08-15 12-32-19 Finetuning"
-        oName = "O 2024-08-15 12-32-19 Finetuning Best Epoch in 21 to 30.pth"
+        oName = "Train O 2024-08-15 12-32-19 Finetuning Best Epoch in 21 to 30"
         oClassSize = 5000
         fFoldername = "F 2024-08-15 12-32-17 Finetuning"
-        fName = "F 2024-08-15 12-32-17 Finetuning Best Epoch in 21 to 30.pth"
+        fName = "Train F 2024-08-15 12-32-17 Finetuning Best Epoch in 21 to 30"
         fClassSize = 3000
         numEpochs = 2
-        dWtsName = ""
+        dWtsDTime = ""
         gradeSize = 5000
         batchSize = 16
         diseaseName = "ERM"
         LR = 1e-3
-        trainDiagnose.train(device, diseaseName, oFoldername, oName, oClassSize, fFoldername, fName, fClassSize, batchSize, gradeSize, numEpochs, LR, dWtsName, dTime)
+        trainDiagnose.train(device, diseaseName, oFoldername, oName, oClassSize, fFoldername, fName, fClassSize, batchSize, gradeSize, numEpochs, LR, dWtsDTime, dTime)
+
+    elif task == "train disease prob model": # train single disease
+        dTime = "D 2024-08-16 08-35-28"
+        oFoldername = "O 2024-08-15 12-32-19 Finetuning"
+        oName = "Train O 2024-08-15 12-32-19 Finetuning Best Epoch in 21 to 30"
+        oClassSize = 5000
+        fFoldername = "F 2024-08-15 12-32-17 Finetuning"
+        fName = "Train F 2024-08-15 12-32-17 Finetuning Best Epoch in 21 to 30"
+        fClassSize = 3000
+        numEpochs = 10
+        dWtsDTime = "D 2024-08-16 08-35-28"
+        diseaseSize = 5000
+        batchSize = 16
+        LR = 1e-3
+        trainDiagnose.train(device, "all disease prob", oFoldername, oName, oClassSize, fFoldername, fName, fClassSize, batchSize, diseaseSize, numEpochs, LR, dWtsDTime, dTime)
         
     elif task == "train all diseases": # train all diseases
         now = datetime.now()
@@ -108,7 +123,7 @@ def main():
         batchSize = 16
         LR = 1e-3
         for disease in criteria.keys():
-            if disease == "All":
+            if disease == "All" or disease == "Normal":
                 continue
             trainDiagnose.train(device, disease, oFoldername, oName, oClassSize, fFoldername, fName, fClassSize, batchSize, gradeSize, numEpochs, LR, dWtsName, dTime)
             
