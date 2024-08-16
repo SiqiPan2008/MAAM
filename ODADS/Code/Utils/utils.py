@@ -5,6 +5,8 @@ import numpy as np
 import os
 from PIL import Image
 import json
+import Setting
+from typing import Dict
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 
 # read Criteria.json and get criteria
@@ -12,6 +14,16 @@ def getCriteria():
     with open(r'ODADS\Code\Criteria.json', 'r', encoding='utf-8') as file:
         criteria = json.load(file)
     return criteria
+
+# load json file
+def load_json(filename: str) -> Dict:
+    with open(filename, 'r') as file:
+        return json.load(file)
+
+# read Setting.json
+def getSetting():
+    json_data = load_json('ODADS/CODE/Setting.json')
+    return Setting.Setting.from_dict(json_data)
 
 # resize the image so that its longer edge has length "longEdgeSize"
 # then paste it on a square black background

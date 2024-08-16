@@ -7,7 +7,12 @@ from PIL import Image
 from datetime import datetime
 import os
 import sys
+import Setting
+import json
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
+
+setting = utils.getSetting()
+a = 1
 
 def main():
     modelName = "resnet"

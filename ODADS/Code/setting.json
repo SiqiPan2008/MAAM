@@ -1,0 +1,7 @@
+{
+    "root": "ODADS",
+    "images_folder": "Data/Images",
+    "ab_folder": "Data/Abnormity",
+    "d1_folder": "Data/Diagnosis1",
+    "d2_folder": "Data/Diagnosis2"
+}
