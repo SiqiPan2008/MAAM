@@ -8,7 +8,7 @@ from Utils import utils
 from AbnormityModels import abnormityModel, classify
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 
-def testAcc(device, name, filename):
+def test_acc(device, name, filename):
     setting = utils.getSetting()
     use_top_probs = setting.use_top_probs
     feature_extract = setting.feature_extract
@@ -31,7 +31,7 @@ def testAcc(device, name, filename):
         abnormity_folder = os.path.join(img_folder, abnormity)
         for img_name in os.listdir(abnormity_folder):
             img = Image.open(os.path.join(abnormity_folder, img_name))
-            output = classify.classify(img, model, device)
+            output = classify.get_abnormities_probs(img, model, device)
             if use_top_probs:
                 top_indices = utils.getTopProbIndices(output, 4, 0.9)
                 corrects += class_to_idx[abnormity] in top_indices
@@ -45,7 +45,7 @@ def testAcc(device, name, filename):
     print(f"accuracy: {accuracy}")
     return corrects, total, accuracy
 
-def testMultipleAcc(device, name):
+def test_multiple_acc(device, name):
     setting = utils.getSetting()
     folder_path = setting.get_folder_path(name)
     temp_wts_folder = os.path.join(folder_path, setting.get_wt_file_name(name))
@@ -54,6 +54,40 @@ def testMultipleAcc(device, name):
         writer = csv.writer(file)
         for filename in os.listdir(temp_wts_folder):
             if os.path.splitext(filename)[1] == ".pth":
-                corrects, total, accuracy = testAcc(device, name, filename)
+                corrects, total, accuracy = test_acc(device, name, filename)
             writer.writerow([filename, corrects, total, accuracy])
     print(f"Data successfully written into {filename}.csv")
+    
+    
+    
+def get_model_results(device, name):
+    setting = utils.getSetting()
+    feature_extract = setting.feature_extract
+    net_name = setting.get_net(name)
+    img_folder = setting.get_img_folder(name)
+    folder_path = setting.get_folder_path(name)
+    num_classes = setting.get_num_abnormities(name)
+    wt_file_name = setting.get_wt_file_name(name)
+    
+    model, _ = abnormityModel.initializeAbnormityModel(net_name, num_classes, feature_extract)
+    model = model.to(device)
+    trained_model = torch.load(os.path.join(folder_path, wt_file_name + ".pth"))
+    model.load_state_dict(trained_model["state_dict"])
+    model.eval()
+    transform = transforms.Compose([
+                    transforms.Lambda(lambda x: utils.resizeLongEdge(x)),
+                    transforms.ToTensor()
+                ])
+    image_dataset = datasets.ImageFolder(img_folder, transform)
+    dataloader = torch.utils.data.DataLoader(image_dataset, batch_size = 1, shuffle=True)
+    
+    outputs = [[] for _ in range(num_classes)]
+    for inputs, labels in dataloader:
+        inputs = inputs.to(device)
+        labels = labels.to(device)
+        with torch.set_grad_enabled(False):
+            batch_outputs = model(inputs)
+            output = torch.nn.functional.softmax(batch_outputs[0], dim = 0)
+            outputs[labels[0]].append(output.cpu().detach().tolist())
+            
+    np.array(outputs).tofile(os.path.join(folder_path, name + ".bin"))

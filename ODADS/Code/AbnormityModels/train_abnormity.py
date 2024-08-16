@@ -9,11 +9,12 @@ import copy
 import csv
 from datetime import datetime
 import numpy as np
+from ODADS.Code.AbnormityModels import test_abnormity
 from Utils import utils
-from AbnormityModels import abnormityModel, testClassify
+from AbnormityModels import abnormityModel
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 
-def train(name, device):
+def train(device, name):
     setting = utils.getSetting()
     LR = setting.LR
     batch_size = setting.batch_size

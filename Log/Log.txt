@@ -13,3 +13,5 @@ TODO:
 * delete old training result data before training abnormity models
 
 * convert images in TO_Original to TO
+
+* refactor gradcam.py and classify.py

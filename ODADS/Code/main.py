@@ -23,21 +23,21 @@ print(device)
 
 if task == "train":
     if setting.is_abnormity(name):
-        train_abnormity.train(name, device)
+        train_abnormity.train(device, name)
     elif setting.is_diagnosis1(name):
-        trainDiagnose.trainAbnormityNumModel(name, device)
+        trainDiagnose.trainAbnormityNumModel(device, name)
     elif setting.is_diagnosis2(name):
-        trainDiagnose.trainDiseaseProbModel(name, device)
+        trainDiagnose.trainDiseaseProbModel(device, name)
 elif task == "test":
     if setting.is_abnormity(name):
-        test_abnormity.testMultipleAcc(name, device)
+        test_abnormity.test_multiple_acc(device, name)
     elif setting.is_diagnosis1(name):
-        testDiagnose.testAbnormityNumModel(name, device)
+        testDiagnose.testAbnormityNumModel(device, name)
     elif setting.is_diagnosis2(name):
-        testDiagnose.testDiseaseProbModel(name, device)
+        testDiagnose.testDiseaseProbModel(device, name)
 elif task == "get MR":
     if setting.is_abnormity(name):
-        classify.classifyDatabase(name, device)
+        test_abnormity.get_model_results(device, name)
         
 elif task == "":
     pass
@@ -192,7 +192,7 @@ elif task == "test OCT": # test accuracy for a series of abnormity models
     dbPath = f"ODADS/Data/Data/{dbName}/OCT/"
     foldername = "O 2024-08-15 12-32-19 Finetuning"
     wtsName = "O 2024-08-15 12-32-19 Finetuning Best Epoch in 21 to 30.pth"
-    test_abnormity.testAccWithLoader(device, featureExtract, modelName, numClasses, dbPath, dbName, foldername, wtsName)
+    test_abnormity.get_model_results(device, featureExtract, modelName, numClasses, dbPath, dbName, foldername, wtsName)
 
 elif task == "test fundus": # test accuracy for a series of abnormity models
     numClasses = len(criteria["All"]["Fundus"])
@@ -200,4 +200,4 @@ elif task == "test fundus": # test accuracy for a series of abnormity models
     dbPath = f"ODADS/Data/Data/{dbName}/Fundus/"
     foldername = "F 2024-08-15 12-32-17 Finetuning"
     wtsName = "F 2024-08-15 12-32-17 Finetuning Best Epoch in 21 to 30.pth"
-    test_abnormity.testAccWithLoader(device, featureExtract, modelName, numClasses, dbPath, dbName, foldername, wtsName)
+    test_abnormity.get_model_results(device, featureExtract, modelName, numClasses, dbPath, dbName, foldername, wtsName)
