@@ -1,5 +1,6 @@
-from AbnormityModels import classify, trainClassify, testClassify, gradcam
+from AbnormityModels import classify, gradcam
 from DiagnosisModel import diagnose, trainDiagnose, testDiagnose
+from ODADS.Code.AbnormityModels import test_abnormity, train_abnormity
 from Utils import utils
 import torch
 import numpy as np
@@ -22,14 +23,14 @@ print(device)
 
 if task == "train":
     if setting.is_abnormity(name):
-        trainClassify.train(name, device)
+        train_abnormity.train(name, device)
     elif setting.is_diagnosis1(name):
         trainDiagnose.trainAbnormityNumModel(name, device)
     elif setting.is_diagnosis2(name):
         trainDiagnose.trainDiseaseProbModel(name, device)
 elif task == "test":
     if setting.is_abnormity(name):
-        testClassify.testMultipleAcc(name, device)
+        test_abnormity.testMultipleAcc(name, device)
     elif setting.is_diagnosis1(name):
         testDiagnose.testAbnormityNumModel(name, device)
     elif setting.is_diagnosis2(name):
@@ -59,7 +60,7 @@ if task == "train OCT": # train OCT or Fundus
     usedPretrained = False
     now = datetime.now()
     filename = now.strftime(imgType + " %Y-%m-%d %H-%M-%S")
-    trainClassify.train(filename, device, featureExtract, modelName, numClasses, batchSize, numEpochs, LR, usedPretrained, dbName, foldername, wtsName, imgType, crossValid = True)
+    train_abnormity.train(filename, device, featureExtract, modelName, numClasses, batchSize, numEpochs, LR, usedPretrained, dbName, foldername, wtsName, imgType, crossValid = True)
     
 elif task == "train fundus": # train and fine-tune OCT
     numClasses = len(criteria["All"]["Fundus"])
@@ -73,7 +74,7 @@ elif task == "train fundus": # train and fine-tune OCT
     usedPretrained = False
     now = datetime.now()
     filename = now.strftime(imgType + " %Y-%m-%d %H-%M-%S")
-    trainClassify.train(filename, device, featureExtract, modelName, numClasses, batchSize, numEpochs, LR, usedPretrained, dbName, foldername, wtsName, imgType, crossValid = True)
+    train_abnormity.train(filename, device, featureExtract, modelName, numClasses, batchSize, numEpochs, LR, usedPretrained, dbName, foldername, wtsName, imgType, crossValid = True)
     
 elif task == 2: # train Fundus
     numClasses = len(criteria["All"]["Fundus"])
@@ -86,7 +87,7 @@ elif task == 2: # train Fundus
     usedPretrained = False
     now = datetime.now()
     foldername = now.strftime(imgType + " %Y-%m-%d %H-%M-%S")
-    trainClassify.train(foldername, device, featureExtract, modelName, numClasses, batchSize, numEpochs, LR, usedPretrained, dbName, wtsName, imgType, crossValid = True)
+    train_abnormity.train(foldername, device, featureExtract, modelName, numClasses, batchSize, numEpochs, LR, usedPretrained, dbName, wtsName, imgType, crossValid = True)
     
 elif task == "classify OCT database": # gradCAM single image with OCT or Fundus
     numClasses = len(criteria["All"]["OCT"])
@@ -191,7 +192,7 @@ elif task == "test OCT": # test accuracy for a series of abnormity models
     dbPath = f"ODADS/Data/Data/{dbName}/OCT/"
     foldername = "O 2024-08-15 12-32-19 Finetuning"
     wtsName = "O 2024-08-15 12-32-19 Finetuning Best Epoch in 21 to 30.pth"
-    testClassify.testAccWithLoader(device, featureExtract, modelName, numClasses, dbPath, dbName, foldername, wtsName)
+    test_abnormity.testAccWithLoader(device, featureExtract, modelName, numClasses, dbPath, dbName, foldername, wtsName)
 
 elif task == "test fundus": # test accuracy for a series of abnormity models
     numClasses = len(criteria["All"]["Fundus"])
@@ -199,4 +200,4 @@ elif task == "test fundus": # test accuracy for a series of abnormity models
     dbPath = f"ODADS/Data/Data/{dbName}/Fundus/"
     foldername = "F 2024-08-15 12-32-17 Finetuning"
     wtsName = "F 2024-08-15 12-32-17 Finetuning Best Epoch in 21 to 30.pth"
-    testClassify.testAccWithLoader(device, featureExtract, modelName, numClasses, dbPath, dbName, foldername, wtsName)
+    test_abnormity.testAccWithLoader(device, featureExtract, modelName, numClasses, dbPath, dbName, foldername, wtsName)

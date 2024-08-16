@@ -21,6 +21,7 @@ class Setting:
     LR: float
     use_cross_valid: bool
     save_model_frequency: int
+    use_top_probs: bool
 
     @staticmethod
     def from_dict(data: Dict) -> 'Setting':
@@ -34,6 +35,7 @@ class Setting:
         setting.LR = float(setting.LR)
         setting.use_cross_valid = bool(setting.use_cross_valid)
         setting.save_model_frequency = int(setting.save_model_frequency)
+        setting.use_top_probs = bool(setting.use_top_probs)
         return setting
     
     def get_net(self, name: str) -> bool:
@@ -67,6 +69,17 @@ class Setting:
         else:
             return len(criteria["All"]["Fundus"])
         
+    def get_abnormities(self, name: str = "All Abnormities") -> int:
+        criteria = utils.getCriteria()
+        oct_abnormities = [("OCT", abnormity) for abnormity in criteria["All"]["OCT"]]
+        fundus_abnormities = [("Fundus", abnormity) for abnormity in criteria["All"]["Fundus"]]
+        if name == "All Abnormities":
+            return  oct_abnormities + fundus_abnormities
+        elif self.is_OCT(name):
+            return oct_abnormities
+        else:
+            return fundus_abnormities
+        
     def get_num_epochs(self, name: str) -> int:
         if self.is_abnormity(name):
             if self.is_transfer_learning(name):
@@ -92,7 +105,7 @@ class Setting:
             return self.D2_folder
         
     def get_wt_file_name(self, name: str) -> str:
-        return name[:8] + "WT" + name[10:]
+        return name[:6] + "TRWT" + name[10:]
     
     def get_rs_file_name(self, name: str) -> str:
         return name[:8] + "RS" + name[10:]

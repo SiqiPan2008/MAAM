@@ -13,5 +13,6 @@
     "D2_num_epochs": "30",
     "LR": "1e-3",
     "use_cross_valid": "True",
-    "save_model_frequency": "10"
+    "save_model_frequency": "10",
+    "use_top_probs": "True"
 }

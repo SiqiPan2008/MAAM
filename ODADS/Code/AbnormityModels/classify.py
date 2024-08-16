@@ -1,6 +1,6 @@
 import os
 import torch
-from torchvision import transforms
+from torchvision import transforms, datasets
 from PIL import Image
 import numpy as np
 from AbnormityModels import abnormityModel
@@ -60,4 +60,39 @@ def classifyDatabase(dbName, numClasses, device, featureExtract, modelName, fold
     np.array(outputs).tofile(f"ODADS/Data/Results/{foldername}/{wtsName}.bin")
     print(f"corrects: {corrects}/{total}")
     print(f"accuracy: {corrects/total}")
-        
+
+
+def testAccWithLoader(device, featureExtract, modelName, numClasses, dbPath, dbName, foldername, wtsName): # only top prob
+    model, _ = abnormityModel.initializeAbnormityModel(modelName, numClasses, featureExtract)
+    model = model.to(device)
+    trainedModel = torch.load(f"ODADS/Data/Weights/{foldername}/{wtsName}")
+    model.load_state_dict(trainedModel["state_dict"])
+    model.eval()
+    transform = transforms.Compose([
+                    transforms.Lambda(lambda x: utils.resizeLongEdge(x)),
+                    transforms.ToTensor()
+                ])
+    imageDataset = datasets.ImageFolder(dbPath, transform)
+    dataloader = torch.utils.data.DataLoader(imageDataset, batch_size = 1, shuffle=True)
+    
+    outputs = [[] for _ in range(numClasses)]
+    runningCorrects = 0
+    total = 0
+    for inputs, labels in dataloader:
+        inputs = inputs.to(device)
+        labels = labels.to(device)
+        with torch.set_grad_enabled(False):
+            batchOutputs = model(inputs)
+            output = torch.nn.functional.softmax(batchOutputs[0], dim = 0)
+            outputs[labels[0]].append(output.cpu().detach().tolist())
+            preds = torch.max(batchOutputs, 1)[1]
+        total += len(preds)
+        runningCorrects += torch.sum(preds == labels.data)
+        if total % 500 == 0:
+            print(f"{runningCorrects}/{total}")
+            print(f"{runningCorrects/total}")
+    accuracy = runningCorrects / total
+    np.array(outputs).tofile(f"ODADS/Data/Results/{foldername}/{dbName} {wtsName[:-4]}.bin")
+    print(f"corrects: {runningCorrects}/{total}")
+    print(f"accuracy: {accuracy}")
+    return runningCorrects, total, accuracy
