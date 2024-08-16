@@ -48,12 +48,6 @@ def main():
         now = datetime.now()
         filename = now.strftime(imgType + " %Y-%m-%d %H-%M-%S")
         trainClassify.train(filename, device, featureExtract, modelName, numClasses, batchSize, numEpochs, LR, usedPretrained, dbName, foldername, wtsName, imgType, crossValid = True)
-        #wtsName = filename
-        #numEpochs = 30
-        #usedPretrained = False
-        #now = datetime.now()
-        #fineTuneFilename = now.strftime(imgType + " %Y-%m-%d %H-%M-%S")
-        #trainClassify.train(fineTuneFilename, device, featureExtract, modelName, numClasses, batchSize, numEpochs, LR, usedPretrained, dbName, wtsName, imgType, crossValid = True)
         
     elif task == 2: # train Fundus
         numClasses = len(criteria["All"]["Fundus"])
@@ -85,29 +79,38 @@ def main():
     elif task == "train single disease": # train single disease
         now = datetime.now()
         dTime = now.strftime("%Y-%m-%d %H-%M-%S")
-        oModelName = "O 2024-08-15 12-32-19 Finetuning/O 2024-08-15 12-32-19 Finetuning Best Epoch in 21 to 30.pth"
-        fModelName = "F 2024-08-15 12-32-17 Finetuning/F 2024-08-15 12-32-17 Finetuning Best Epoch in 21 to 30.pth"
+        oFoldername = "O 2024-08-15 12-32-19 Finetuning"
+        oName = "O 2024-08-15 12-32-19 Finetuning Best Epoch in 21 to 30.pth"
+        oClassSize = 5000
+        fFoldername = "F 2024-08-15 12-32-17 Finetuning"
+        fName = "F 2024-08-15 12-32-17 Finetuning Best Epoch in 21 to 30.pth"
+        fClassSize = 3000
         numEpochs = 2
-        wts = ""
+        dWtsName = ""
         gradeSize = 5000
-        batchsize = 16
-        dbName = ""
+        batchSize = 16
         diseaseName = "ERM"
         LR = 1e-3
-        dbName = "ODADS/Data/Data/Train/"
-        trainDiagnose.train(device, diseaseName, featureExtract, modelName, oModelName, fModelName, batchsize, gradeSize, numEpochs, LR, dbName, wts, dTime)
+        trainDiagnose.train(device, diseaseName, oFoldername, oName, oClassSize, fFoldername, fName, fClassSize, batchSize, gradeSize, numEpochs, LR, dWtsName, dTime)
         
-    elif task == 5: # train all diseases
+    elif task == "train all diseases": # train all diseases
         now = datetime.now()
         dTime = now.strftime("%Y-%m-%d %H-%M-%S")
-        fModelName = "O 2024-05-09 22-42-15"
-        gradeSize = 3000
-        batchsize = 16
-        dbName = "./Data"
-        criteria = trainDiagnose.utils.getCriteria()
+        oFoldername = "O 2024-08-15 12-32-19 Finetuning"
+        oName = "Test_out O 2024-08-15 12-32-19 Finetuning Best Epoch in 21 to 30"
+        oClassSize = 500
+        fFoldername = "F 2024-08-15 12-32-17 Finetuning"
+        fName = "Test_out F 2024-08-15 12-32-17 Finetuning Best Epoch in 21 to 30"
+        fClassSize = 300
+        numEpochs = 5
+        dWtsName = ""
+        gradeSize = 5000
+        batchSize = 16
+        LR = 1e-3
         for disease in criteria.keys():
-            wts = ""
-            trainDiagnose.train(device, disease, featureExtract, modelName, oModelName, fModelName, batchsize, gradeSize, numEpochs, LR, dbName, wts, dTime)
+            if disease == "All":
+                continue
+            trainDiagnose.train(device, disease, oFoldername, oName, oClassSize, fFoldername, fName, fClassSize, batchSize, gradeSize, numEpochs, LR, dWtsName, dTime)
             
     elif task == 6: # diagnose from images
         oImgPaths = []
@@ -121,22 +124,20 @@ def main():
     
     elif task == "test OCT": # test accuracy for a series of abnormity models
         numClasses = len(criteria["All"]["OCT"])
-        dbName = "ODADS/Data/Data/Train/OCT/"
+        dbName = "Test_out"
+        dbPath = f"ODADS/Data/Data/{dbName}/OCT/"
         foldername = "O 2024-08-15 12-32-19 Finetuning"
         wtsName = "O 2024-08-15 12-32-19 Finetuning Best Epoch in 21 to 30.pth"
-        testClassify.testAccWithLoader(device, featureExtract, modelName, numClasses, dbName, foldername, wtsName)
+        testClassify.testAccWithLoader(device, featureExtract, modelName, numClasses, dbPath, dbName, foldername, wtsName)
 
     elif task == "test fundus": # test accuracy for a series of abnormity models
         numClasses = len(criteria["All"]["Fundus"])
-        dbName = "ODADS/Data/Data/Train/Fundus/"
+        dbName = "Test_out"
+        dbPath = f"ODADS/Data/Data/{dbName}/Fundus/"
         foldername = "F 2024-08-15 12-32-17 Finetuning"
         wtsName = "F 2024-08-15 12-32-17 Finetuning Best Epoch in 21 to 30.pth"
-        testClassify.testAccWithLoader(device, featureExtract, modelName, numClasses, dbName, foldername, wtsName)
+        testClassify.testAccWithLoader(device, featureExtract, modelName, numClasses, dbPath, dbName, foldername, wtsName)
         
     
 if __name__ == "__main__":
-    outputsF = np.fromfile("ODADS/Data/Results/F 2024-08-15 12-32-17 Finetuning/F 2024-08-15 12-32-17 Finetuning Best Epoch in 21 to 30.pth.bin", dtype = np.float64)
-    outputsF = outputsF.reshape((9, 3000, 9))
-    outputsO = np.fromfile("ODADS/Data/Results/O 2024-08-15 12-32-19 Finetuning/O 2024-08-15 12-32-19 Finetuning Best Epoch in 21 to 30.pth.bin", dtype = np.float64)
-    outputsO = outputsO.reshape((12, 5000, 12))
     main()

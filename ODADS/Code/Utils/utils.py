@@ -29,8 +29,8 @@ def curve(validAccHistory, trainAccHistory, validLosses, trainLosses, filename, 
     plt.clf()
     x = range(1, len(trainLosses) + 1)
     
-    vAH = [validAccHistory[i].item() for i in range(len(x))]
-    tAH = [trainAccHistory[i].item() for i in range(len(x))]
+    vAH = [validAccHistory[i] for i in range(len(x))]
+    tAH = [trainAccHistory[i] for i in range(len(x))]
     plt.subplot(2, 1, 1)
     plt.plot(x, vAH, label = "validAcc")
     plt.plot(x, tAH, label = "trainAcc")

@@ -51,8 +51,8 @@ def testMultipleAcc(device, featureExtract, modelName, numClasses, dbName, folde
                 corrects, total, accuracy = testAcc(device, featureExtract, modelName, numClasses, dbName, foldername, filename)
             writer.writerow([filename, corrects, total, accuracy])
     print(f"Data successfully written into {filename}.csv")
-    
-def testAccWithLoader(device, featureExtract, modelName, numClasses, dbName, foldername, wtsName): # only top prob
+
+def testAccWithLoader(device, featureExtract, modelName, numClasses, dbPath, dbName, foldername, wtsName): # only top prob
     model, _ = abnormityModel.initializeAbnormityModel(modelName, numClasses, featureExtract)
     model = model.to(device)
     trainedModel = torch.load(f"ODADS/Data/Weights/{foldername}/{wtsName}")
@@ -62,7 +62,7 @@ def testAccWithLoader(device, featureExtract, modelName, numClasses, dbName, fol
                     transforms.Lambda(lambda x: utils.resizeLongEdge(x)),
                     transforms.ToTensor()
                 ])
-    imageDataset = datasets.ImageFolder(dbName, transform)
+    imageDataset = datasets.ImageFolder(dbPath, transform)
     dataloader = torch.utils.data.DataLoader(imageDataset, batch_size = 1, shuffle=True)
     
     outputs = [[] for _ in range(numClasses)]
@@ -82,7 +82,7 @@ def testAccWithLoader(device, featureExtract, modelName, numClasses, dbName, fol
             print(f"{runningCorrects}/{total}")
             print(f"{runningCorrects/total}")
     accuracy = runningCorrects / total
-    np.array(outputs).tofile(f"ODADS/Data/Results/{foldername}/{wtsName[:-4]}.bin")
+    np.array(outputs).tofile(f"ODADS/Data/Results/{foldername}/{dbName} {wtsName[:-4]}.bin")
     print(f"corrects: {runningCorrects}/{total}")
     print(f"accuracy: {accuracy}")
     return runningCorrects, total, accuracy
