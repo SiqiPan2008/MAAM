@@ -7,11 +7,14 @@ from PIL import Image
 import json
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 
+# read Criteria.json and get criteria
 def getCriteria():
     with open(r'ODADS\Code\Criteria.json', 'r', encoding='utf-8') as file:
         criteria = json.load(file)
     return criteria
 
+# resize the image so that its longer edge has length "longEdgeSize"
+# then paste it on a square black background
 def resizeLongEdge(img, longEdgeSize = 224):
     width, height = img.size
     if width > height:
@@ -25,6 +28,7 @@ def resizeLongEdge(img, longEdgeSize = 224):
     blackBackground.paste(img, loc)
     return blackBackground
 
+# use valid and train accuracies and losses to draw curves
 def curve(validAccHistory, trainAccHistory, validLosses, trainLosses, filename, show = False):
     plt.clf()
     x = range(1, len(trainLosses) + 1)
@@ -52,13 +56,15 @@ def curve(validAccHistory, trainAccHistory, validLosses, trainLosses, filename, 
     if show:
         plt.show()
 
-def processImg(img, customResize = 224):
+# resizeLongEdge() an image and then convert it to Tensor
+def resizeAndToTensor(img, customResize = 224):
     if customResize != 0:
         img = resizeLongEdge(img, longEdgeSize = customResize)
     toTensor = transforms.ToTensor()
     img = toTensor(img)
     return img
 
+# show an image in Matplotlib
 def imgShow(img, ax = None, title = None):
     if ax is None:
         fig, ax = plt.subplots()
@@ -67,6 +73,8 @@ def imgShow(img, ax = None, title = None):
     ax.set_title(title)
     plt.show()
 
+# get the least number of probabilities so that their sum is greater tham minScore
+# returns the indices of the top probabilities
 def getTopProbIndices(output, allowNum, minScore):
     sortedOutput, indices = torch.sort(output, descending=True)
     sum = 0

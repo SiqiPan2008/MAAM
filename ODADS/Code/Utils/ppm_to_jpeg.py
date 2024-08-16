@@ -1,6 +1,8 @@
 import os
 from PIL import Image
 
+# convert all images within root_folder from .ppm to .jpg
+
 def convert_ppm_to_jpg(root_folder):
     for root, _, files in os.walk(root_folder):
         for file in files:

@@ -1,6 +1,8 @@
 import os
 from PIL import Image
 
+# Crop white borders of images in source folder and save to target folder 
+
 source_folder = 'ODADS/Data/Data/Original/OCT/Drusen'
 target_folder = 'ODADS/Data/Data/Transformed/OCT/Drusen'
 

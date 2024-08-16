@@ -167,7 +167,7 @@ def highlight(imgPath, numClasses, device, featureExtract, modelName, wtsName):
     trainedModel = torch.load(f"ODADS/Data/Weights/{wtsName}/{wtsName}.pth")
     model.load_state_dict(trainedModel["state_dict"])
     img = Image.open(imgPath)
-    img = utils.processImg(img, customResize = 224)
+    img = utils.resizeAndToTensor(img, customResize = 224)
     imgUnsqueezed = img.unsqueeze(0)
     imgUnsqueezed = imgUnsqueezed.to(device)
     modelWithGradCam = GradCam(model)

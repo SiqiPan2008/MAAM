@@ -1,10 +1,16 @@
-# For generating datasets Train and Test2 
-
 import os
 import random
 import shutil
 from PIL import Image
 import torchvision.transforms as transforms
+
+# read from Original images
+# split non-GAN images into test and train
+# add GAN images to train
+
+# transform and save test images to test folder
+# resize and save train images to temp_train folder
+# transform and save train images from temp_train to train folder
 
 def resize_long_edge(img, longEdgeSize = 224):
     width, height = img.size
