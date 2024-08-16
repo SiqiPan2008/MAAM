@@ -2,95 +2,133 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "test disease-prob model",
+            "name": "AO transfer learning",
             "type": "debugpy",
             "request": "launch",
             "program": "ODADS/Code/main.py",
             "console": "integratedTerminal",
-            "args": ["test disease-prob model", "cuda:1"]
+            "args": ["train", "152AOTRRS - T", "cuda:0"]
         },
         {
-            "name": "test all diseases",
+            "name": "AO test transfer-learned model",
             "type": "debugpy",
             "request": "launch",
             "program": "ODADS/Code/main.py",
             "console": "integratedTerminal",
-            "args": ["test all diseases", "cuda:1"]
+            "args": ["test", "152AOTORS - T", "cuda:0"]
         },
         {
-            "name": "classify OCT database",
+            "name": "AO finetuning",
             "type": "debugpy",
             "request": "launch",
             "program": "ODADS/Code/main.py",
             "console": "integratedTerminal",
-            "args": ["classify OCT database", "cuda:0"]
+            "args": ["train", "152AOTRRS - F", "cuda:0"]
         },
         {
-            "name": "get prob Fundus database",
+            "name": "AO test finetuned model",
             "type": "debugpy",
             "request": "launch",
             "program": "ODADS/Code/main.py",
             "console": "integratedTerminal",
-            "args": [
-                "get prob Fundus database",
-                 "cuda:1"
-                ]
+            "args": ["test", "152AOTORS - F", "cuda:0"]
         },
         {
-            "name": "train disease prob model",
+            "name": "AO get MR",
             "type": "debugpy",
             "request": "launch",
             "program": "ODADS/Code/main.py",
             "console": "integratedTerminal",
-            "args": ["train disease prob model", "cuda:0"]
+            "args": ["get MR", "152AOTRMR", "cuda:0"]
+        },
+
+
+
+        {
+            "name": "AF transfer learning",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "ODADS/Code/main.py",
+            "console": "integratedTerminal",
+            "args": ["train", "152AFTRRS - T", "cuda:1"]
         },
         {
-            "name": "train single disease",
+            "name": "AF test transfer-learned model",
             "type": "debugpy",
             "request": "launch",
             "program": "ODADS/Code/main.py",
             "console": "integratedTerminal",
-            "args": ["train single disease", "cuda:0"]
+            "args": ["test", "152AFTORS - T", "cuda:1"]
         },
         {
-            "name": "train all diseases",
+            "name": "AF finetuning",
             "type": "debugpy",
             "request": "launch",
             "program": "ODADS/Code/main.py",
             "console": "integratedTerminal",
-            "args": ["train all diseases", "cuda:0"]
+            "args": ["train", "152AFTRRS - F", "cuda:1"]
         },
         {
-            "name": "train fundus",
+            "name": "AF test fine-tuned model",
             "type": "debugpy",
             "request": "launch",
             "program": "ODADS/Code/main.py",
             "console": "integratedTerminal",
-            "args": ["train fundus", "cuda:1"]
+            "args": ["test", "152AFTORS - F", "cuda:1"]
         },
         {
-            "name": "train OCT",
+            "name": "AF get MR",
             "type": "debugpy",
             "request": "launch",
             "program": "ODADS/Code/main.py",
             "console": "integratedTerminal",
-            "args": ["train OCT", "cuda:0"]
+            "args": ["get MR", "152AFTRMR", "cuda:1"]
+        },
+
+
+
+        {
+            "name": "D1 train single disease",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "ODADS/Code/main.py",
+            "console": "integratedTerminal",
+            "args": ["train", "152D1TRRS - ERM", "cuda:0"]
         },
         {
-            "name": "test fundus",
+            "name": "D1 train all",
             "type": "debugpy",
             "request": "launch",
             "program": "ODADS/Code/main.py",
             "console": "integratedTerminal",
-            "args": ["test fundus", "cuda:1"]
+            "args": ["train", "152D1TRRS", "cuda:0"]
         },
         {
-            "name": "test OCT",
+            "name": "D1 test all",
             "type": "debugpy",
             "request": "launch",
             "program": "ODADS/Code/main.py",
             "console": "integratedTerminal",
-            "args": ["test OCT", "cuda:0"]
+            "args": ["test", "152D1TORS", "cuda:1"]
         },
+
+
+
+        {
+            "name": "D2 train",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "ODADS/Code/main.py",
+            "console": "integratedTerminal",
+            "args": ["train", "152D2TRRS", "cuda:0"]
+        },
+        {
+            "name": "D2 test",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "ODADS/Code/main.py",
+            "console": "integratedTerminal",
+            "args": ["test", "152D2TORS", "cuda:1"]
+        }
     ]
 }

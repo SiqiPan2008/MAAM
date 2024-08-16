@@ -5,7 +5,7 @@ import numpy as np
 import os
 from PIL import Image
 import json
-import Setting
+import setting
 from typing import Dict
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 
@@ -23,7 +23,7 @@ def load_json(filename: str) -> Dict:
 # read Setting.json
 def getSetting():
     json_data = load_json('ODADS/CODE/Setting.json')
-    return Setting.Setting.from_dict(json_data)
+    return setting.Setting.from_dict(json_data)
 
 # resize the image so that its longer edge has length "longEdgeSize"
 # then paste it on a square black background
@@ -41,7 +41,7 @@ def resizeLongEdge(img, longEdgeSize = 224):
     return blackBackground
 
 # use valid and train accuracies and losses to draw curves
-def curve(validAccHistory, trainAccHistory, validLosses, trainLosses, filename, show = False):
+def curve(validAccHistory, trainAccHistory, validLosses, trainLosses, rs_file_name, show = False):
     plt.clf()
     x = range(1, len(trainLosses) + 1)
     
@@ -64,7 +64,7 @@ def curve(validAccHistory, trainAccHistory, validLosses, trainLosses, filename, 
     plt.legend() 
     
     plt.tight_layout()
-    plt.savefig(filename, format="pdf")
+    plt.savefig(rs_file_name, format="pdf")
     if show:
         plt.show()
 
