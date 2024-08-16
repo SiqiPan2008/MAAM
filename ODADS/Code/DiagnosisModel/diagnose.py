@@ -7,7 +7,7 @@ os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 ### OUTDATED!!!!!
 
 def diagnose(oImgs, fImgs, diseaseName, device, modelName, dWtsTime, oWts, fWts):
-    criteria = trainDiagnose.utils.getCriteria()
+    criteria = trainDiagnose.utils.get_criteria()
     oNumClasses = len(criteria["All"]["OCT"])
     fNumClasses = len(criteria["All"]["Fundus"])
     oAbnormityNum = len(criteria[diseaseName]["OCT"])

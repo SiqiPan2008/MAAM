@@ -11,7 +11,7 @@ from matplotlib.colors import LinearSegmentedColormap
 
 # from https://blog.csdn.net/sjhKevin/article/details/121747933
 
-class CamExtractor():
+class Cam_Extractor():
     def __init__(self, model):
         self.model = model
         self.gradients = []
@@ -63,7 +63,7 @@ class GradCam():
     def __init__(self, model):
         self.model = model
         self.model.eval()
-        self.extractor = CamExtractor(self.model)
+        self.extractor = Cam_Extractor(self.model)
 
     def generate_cam(self, input_image, target_layer, device, model, target_class=None):
 
@@ -120,7 +120,6 @@ def camShow(img, cam, title = ""):
     cam = (cam - min) / (max - min)
     
     fig, axs = plt.subplots(2, 3)
-    #custom_cmap = "viridis"
     custom_cmap = [
         LinearSegmentedColormap.from_list('red_outline', [(0, 'black'), (0.3, 'black'), (0.5, 'red'), (0.7, 'black'), (1, 'black')]),
         LinearSegmentedColormap.from_list('red_yellow_green_blue', [(0, 'blue'), (0.4, 'green'), (0.6, 'yellow'), (1, 'red')]),
@@ -169,7 +168,7 @@ def highlight(imgPath, numClasses, device, featureExtract, modelName, wtsName):
     trainedModel = torch.load(f"ODADS/Data/Weights/{wtsName}/{wtsName}.pth")
     model.load_state_dict(trainedModel["state_dict"])
     img = Image.open(imgPath)
-    img = utils.resizeAndToTensor(img, customResize = 224)
+    img = utils.resize_and_to_tensor(img, custom_resize = 224)
     imgUnsqueezed = img.unsqueeze(0)
     imgUnsqueezed = imgUnsqueezed.to(device)
     modelWithGradCam = GradCam(model)

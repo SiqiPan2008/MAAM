@@ -15,7 +15,7 @@ from AbnormityModels import abnormityModel
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 
 def train(device, name):
-    setting = utils.getSetting()
+    setting = utils.get_setting()
     LR = setting.LR
     batch_size = setting.batch_size
     cross_valid = setting.use_cross_valid

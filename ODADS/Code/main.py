@@ -11,7 +11,7 @@ import sys
 import json
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 
-setting = utils.getSetting()
+setting = utils.get_setting()
 
 task = sys.argv[1]
 name = sys.argv[2]

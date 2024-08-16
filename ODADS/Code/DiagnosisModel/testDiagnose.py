@@ -14,7 +14,7 @@ from DiagnosisModel import diagnosisModel, trainDiagnose
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
     
 def testAbnormityNumModel(device, diseaseName, oFoldername, oName, oClassSize, fFoldername, fName, fClassSize, dWtsDTime, batchSize, gradeSize):
-    criteria = utils.getCriteria()
+    criteria = utils.get_criteria()
     oAbnormityNum = len(criteria[diseaseName]["OCT"])
     fAbnormityNum = len(criteria[diseaseName]["Fundus"])
     allAbnormities = [("Fundus", abnormity) for abnormity in criteria["All"]["Fundus"]] + \
@@ -63,7 +63,7 @@ def testAbnormityNumModel(device, diseaseName, oFoldername, oName, oClassSize, f
 
         
 def testDiseaseProbModel(device, oFoldername, oName, oClassSize, fFoldername, fName, fClassSize, dWtsDTime, ddWtsDTime, batchSize, diseaseSize):
-    criteria = utils.getCriteria()
+    criteria = utils.get_criteria()
     diseaseIncludingNormal = [disease for disease in criteria.keys() if disease != "All"]
     diseaseNum = len(diseaseIncludingNormal)
     abnormityVectorSize = sum([(len(criteria[disease]["OCT"]) + len(criteria[disease]["Fundus"]) + 1) \

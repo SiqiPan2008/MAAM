@@ -11,7 +11,7 @@ os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 
 def get_abnormities_probs(img, model, device):
     model.eval()
-    img = utils.resizeLongEdge(img)
+    img = utils.resize_long_edge(img)
     img = transforms.ToTensor()(img)
     img = img.unsqueeze(0)
     output = model(img.to(device))
@@ -24,5 +24,5 @@ def get_abnormity_probs_from_img(img, numClasses, device, featureExtract, modelN
     model = model.to(device)
     trainedModel = torch.load(f"ODADS/Data/Weights/{foldername}/{wtsName}")
     model.load_state_dict(trainedModel["state_dict"])
-    utils.imgShow(img)
+    utils.img_show(img)
     return get_abnormities_probs(img, model, device)

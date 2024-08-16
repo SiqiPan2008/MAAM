@@ -14,7 +14,7 @@ from DiagnosisModel import diagnosisModel
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 
 def getOutputs(device, diseaseName, oAbnormityNum, fAbnormityNum, grade, dbName, oModel, fModel):
-    criteria = utils.getCriteria() 
+    criteria = utils.get_criteria() 
     correctAbnormities = [("Fundus", abnormity) for abnormity in criteria[diseaseName]["Fundus"]] + \
                          [("OCT", abnormity) for abnormity in criteria[diseaseName]["OCT"]]
     allAbnormities = [("Fundus", abnormity) for abnormity in criteria["All"]["Fundus"]] + \
@@ -42,7 +42,7 @@ def getOutputs(device, diseaseName, oAbnormityNum, fAbnormityNum, grade, dbName,
     return output
 
 def getOutputsFromFile(allAbnormities, diseaseName, oAbnormityNum, fAbnormityNum, grade, outputsO, outputsF):
-    criteria = utils.getCriteria() 
+    criteria = utils.get_criteria() 
     correctAbnormities = [("Fundus", abnormity) for abnormity in criteria[diseaseName]["Fundus"]] + \
                          [("OCT", abnormity) for abnormity in criteria[diseaseName]["OCT"]]
     incorrectAbnormities = [abnormity for abnormity in allAbnormities if abnormity not in correctAbnormities]
@@ -67,7 +67,7 @@ def getOutputsFromFile(allAbnormities, diseaseName, oAbnormityNum, fAbnormityNum
     
 
 def trainAbnormityNumModel(device, diseaseName, oFoldername, oName, oClassSize, fFoldername, fName, fClassSize, dWtsDTime, dTime, batchSize, LR, numEpochs, gradeSize):
-    criteria = utils.getCriteria()
+    criteria = utils.get_criteria()
     oAbnormityNum = len(criteria[diseaseName]["OCT"])
     fAbnormityNum = len(criteria[diseaseName]["Fundus"])
     allAbnormities = [("Fundus", abnormity) for abnormity in criteria["All"]["Fundus"]] + \
@@ -196,7 +196,7 @@ def trainAbnormityNumModel(device, diseaseName, oFoldername, oName, oClassSize, 
 
 
 def getAbnormityNumsVectorFromFile(device, diseaseName, outputsO, outputsF, allAbnormities, dModels):
-    criteria = utils.getCriteria()
+    criteria = utils.get_criteria()
     oAbnormityNum = len(criteria[diseaseName]["OCT"])
     fAbnormityNum = len(criteria[diseaseName]["Fundus"])
     abnormityOutput = getOutputsFromFile(allAbnormities, diseaseName, oAbnormityNum, fAbnormityNum, oAbnormityNum + fAbnormityNum, outputsO, outputsF)
@@ -211,7 +211,7 @@ def getAbnormityNumsVectorFromFile(device, diseaseName, outputsO, outputsF, allA
     return abnormityNumsVector
         
 def trainDiseaseProbModel(device, oFoldername, oName, oClassSize, fFoldername, fName, fClassSize, dWtsDTime, ddWtsDTime, batchSize, LR, numEpochs, diseaseSize):
-    criteria = utils.getCriteria()
+    criteria = utils.get_criteria()
     diseaseIncludingNormal = [disease for disease in criteria.keys() if disease != "All"]
     diseaseNum = len(diseaseIncludingNormal)
     abnormityVectorSize = sum([(len(criteria[disease]["OCT"]) + len(criteria[disease]["Fundus"]) + 1) \

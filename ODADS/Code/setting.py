@@ -61,7 +61,7 @@ class Setting:
         return name[3:5] == "D2"
     
     def get_num_abnormities(self, name: str = "All Abnormities") -> int:
-        criteria = utils.getCriteria()
+        criteria = utils.get_criteria()
         if name == "All Abnormities":
             return len(criteria["All"]["OCT"] + criteria["All"]["Fundus"])
         elif self.is_OCT(name):
@@ -70,7 +70,7 @@ class Setting:
             return len(criteria["All"]["Fundus"])
         
     def get_abnormities(self, name: str = "All Abnormities") -> int:
-        criteria = utils.getCriteria()
+        criteria = utils.get_criteria()
         oct_abnormities = [("OCT", abnormity) for abnormity in criteria["All"]["OCT"]]
         fundus_abnormities = [("Fundus", abnormity) for abnormity in criteria["All"]["Fundus"]]
         if name == "All Abnormities":

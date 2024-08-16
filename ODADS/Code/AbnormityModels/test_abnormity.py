@@ -9,7 +9,7 @@ from AbnormityModels import abnormityModel, classify
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 
 def test_acc(device, name, filename):
-    setting = utils.getSetting()
+    setting = utils.get_setting()
     use_top_probs = setting.use_top_probs
     feature_extract = setting.feature_extract
     net_name = setting.get_net(name)
@@ -33,7 +33,7 @@ def test_acc(device, name, filename):
             img = Image.open(os.path.join(abnormity_folder, img_name))
             output = classify.get_abnormities_probs(img, model, device)
             if use_top_probs:
-                top_indices = utils.getTopProbIndices(output, 4, 0.9)
+                top_indices = utils.get_top_prob_indices(output, 4, 0.9)
                 corrects += class_to_idx[abnormity] in top_indices
             else:
                 _, pred = torch.max(output, dim=0)
@@ -46,7 +46,7 @@ def test_acc(device, name, filename):
     return corrects, total, accuracy
 
 def test_multiple_acc(device, name):
-    setting = utils.getSetting()
+    setting = utils.get_setting()
     folder_path = setting.get_folder_path(name)
     temp_wts_folder = os.path.join(folder_path, setting.get_wt_file_name(name))
     
@@ -61,7 +61,7 @@ def test_multiple_acc(device, name):
     
     
 def get_model_results(device, name):
-    setting = utils.getSetting()
+    setting = utils.get_setting()
     feature_extract = setting.feature_extract
     net_name = setting.get_net(name)
     img_folder = setting.get_img_folder(name)
@@ -75,7 +75,7 @@ def get_model_results(device, name):
     model.load_state_dict(trained_model["state_dict"])
     model.eval()
     transform = transforms.Compose([
-                    transforms.Lambda(lambda x: utils.resizeLongEdge(x)),
+                    transforms.Lambda(lambda x: utils.resize_long_edge(x)),
                     transforms.ToTensor()
                 ])
     image_dataset = datasets.ImageFolder(img_folder, transform)
