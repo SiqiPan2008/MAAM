@@ -73,3 +73,4 @@ test/data/legacy_serialized.pt
 .idea
 
 wandb/
+BackupData/
