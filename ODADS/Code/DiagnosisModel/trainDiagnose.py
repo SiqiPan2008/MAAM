@@ -13,6 +13,34 @@ from Utils import utils
 from DiagnosisModel import diagnosisModel
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 
+def getOutputs(device, diseaseName, oAbnormityNum, fAbnormityNum, grade, dbName, oModel, fModel):
+    criteria = utils.getCriteria() 
+    correctAbnormities = [("Fundus", abnormity) for abnormity in criteria[diseaseName]["Fundus"]] + \
+                         [("OCT", abnormity) for abnormity in criteria[diseaseName]["OCT"]]
+    allAbnormities = [("Fundus", abnormity) for abnormity in criteria["All"]["Fundus"]] + \
+                     [("OCT", abnormity) for abnormity in criteria["All"]["OCT"]]
+    incorrectAbnormities = [abnormity for abnormity in allAbnormities if abnormity not in correctAbnormities]
+    selCorrectAbnormities = random.sample(correctAbnormities, grade)
+    selIncorrectAbnormities = random.sample(incorrectAbnormities, oAbnormityNum + fAbnormityNum - grade)
+    selAbnormities = selCorrectAbnormities + selIncorrectAbnormities
+    
+    oOutput = torch.zeros([len(criteria["All"]["OCT"])]).to(device)
+    fOutput = torch.zeros([len(criteria["All"]["Fundus"])]).to(device)
+    for abnormity in selAbnormities:
+        abnormityType, abnormityName = abnormity[0], abnormity[1]
+        foldername = f"{dbName}/{abnormityType}/{abnormityName}"
+        files = os.listdir(foldername)
+        randomImg = random.choice(files)
+        imgPath = os.path.join(foldername, randomImg)
+        img = Image.open(imgPath)
+        output = utils.getRandImageOutput(device, dbName, img, abnormityType, oModel, fModel)
+        if abnormityType == "OCT":
+            oOutput = torch.maximum(oOutput, output)
+        elif abnormityType == "Fundus":
+            fOutput = torch.maximum(fOutput, output)
+    output = torch.concat([fOutput, oOutput])
+    return output
+
 def getOutputsFromFile(allAbnormities, diseaseName, oAbnormityNum, fAbnormityNum, grade, outputsO, outputsF):
     criteria = utils.getCriteria() 
     correctAbnormities = [("Fundus", abnormity) for abnormity in criteria[diseaseName]["Fundus"]] + \
@@ -35,6 +63,9 @@ def getOutputsFromFile(allAbnormities, diseaseName, oAbnormityNum, fAbnormityNum
     output = torch.concat([fOutput, oOutput])
     return output
     
+    
+    
+
 def trainAbnormityNumModel(device, diseaseName, oFoldername, oName, oClassSize, fFoldername, fName, fClassSize, dWtsDTime, dTime, batchSize, LR, numEpochs, gradeSize):
     criteria = utils.getCriteria()
     oAbnormityNum = len(criteria[diseaseName]["OCT"])
@@ -179,7 +210,7 @@ def getAbnormityNumsVectorFromFile(device, diseaseName, outputsO, outputsF, allA
         abnormityNumsVector = torch.cat([abnormityNumsVector, abnormityNumOutput])
     return abnormityNumsVector
         
-def trainDiseaseProbModel(device, oFoldername, oName, oClassSize, fFoldername, fName, fClassSize, dTime, ddWtsDTime, batchSize, LR, numEpochs, diseaseSize):
+def trainDiseaseProbModel(device, oFoldername, oName, oClassSize, fFoldername, fName, fClassSize, dWtsDTime, ddWtsDTime, batchSize, LR, numEpochs, diseaseSize):
     criteria = utils.getCriteria()
     diseaseIncludingNormal = [disease for disease in criteria.keys() if disease != "All"]
     diseaseNum = len(diseaseIncludingNormal)
@@ -213,7 +244,7 @@ def trainDiseaseProbModel(device, oFoldername, oName, oClassSize, fFoldername, f
     dModels = {disease: diagnosisModel.SimpleNet(allAbnormityNum, len(criteria[disease]["OCT"]) + len(criteria[disease]["Fundus"]) + 1).to(device) \
          for disease in criteria.keys() if disease not in ["Normal", "All"]}
     for disease in dModels.keys():
-         trainedModel = torch.load(os.path.join("ODADS/Data/Weights", os.path.join(dTime, f"{dTime} {disease}.pth")))
+         trainedModel = torch.load(os.path.join("ODADS/Data/Weights", os.path.join(dWtsDTime, f"{dWtsDTime} {disease}.pth")))
          dModels[disease].load_state_dict(trainedModel["state_dict"])
     
     startTime = time.time()
@@ -297,9 +328,9 @@ def trainDiseaseProbModel(device, oFoldername, oName, oClassSize, fFoldername, f
                 "best_acc": bestAcc,
                 "optimizer": optimizer.state_dict()
             }
-            os.makedirs(f"ODADS/Data/Weights/D{dTime}/", exist_ok=True)
-            torch.save(state, os.path.join(f"ODADS/Data/Weights/D{dTime}/D{dTime}.pth"))
-            print(f"Data successfully written into ODADS/Data/Weights/D{dTime}/D{dTime}.pth")
+            os.makedirs(f"ODADS/Data/Weights/D{dWtsDTime}/", exist_ok=True)
+            torch.save(state, os.path.join(f"ODADS/Data/Weights/D{dWtsDTime}/D{dWtsDTime}.pth"))
+            print(f"Data successfully written into ODADS/Data/Weights/D{dWtsDTime}/D{dWtsDTime}.pth")
         
         scheduler.step()
         LRs.append(optimizer.param_groups[0]["lr"])
@@ -322,7 +353,7 @@ def train(device, diseaseName, oFoldername, oName, oClassSize, fFoldername, fNam
     filename = f"D{dTime}" if diseaseName == "all disease prob" else f"D {dTime} {diseaseName}"
     
     if diseaseName == "all disease prob":
-        dModel, trainAccHistory, validAccHistory, trainLosses, validLosses, LRs, timeElapsed = trainDiseaseProbModel(device, oFoldername, oName, oClassSize, fFoldername, fName, fClassSize, dTime, ddWtsDTime, batchSize, LR, numEpochs, classSize)
+        dModel, trainAccHistory, validAccHistory, trainLosses, validLosses, LRs, timeElapsed = trainDiseaseProbModel(device, oFoldername, oName, oClassSize, fFoldername, fName, fClassSize, dWtsDTime, ddWtsDTime, batchSize, LR, numEpochs, classSize)
     else:
         dModel, trainAccHistory, validAccHistory, trainLosses, validLosses, LRs, timeElapsed = trainAbnormityNumModel(device, diseaseName, oFoldername, oName, oClassSize, fFoldername, fName, fClassSize, dWtsDTime, dTime, batchSize, LR, numEpochs, classSize)
 

@@ -4,6 +4,8 @@ from AbnormityModels import classify
 from DiagnosisModel import trainDiagnose
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 
+### OUTDATED!!!!!
+
 def diagnose(oImgs, fImgs, diseaseName, device, modelName, dWtsTime, oWts, fWts):
     criteria = trainDiagnose.utils.getCriteria()
     oNumClasses = len(criteria["All"]["OCT"])

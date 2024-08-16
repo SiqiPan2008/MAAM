@@ -1,5 +1,5 @@
 from AbnormityModels import classify, trainClassify, testClassify, gradcam
-from DiagnosisModel import diagnose, trainDiagnose
+from DiagnosisModel import diagnose, trainDiagnose, testDiagnose
 from Utils import utils
 import torch
 import numpy as np
@@ -127,15 +127,37 @@ def main():
                 continue
             trainDiagnose.train(device, disease, oFoldername, oName, oClassSize, fFoldername, fName, fClassSize, batchSize, gradeSize, numEpochs, LR, dWtsName, dTime)
             
-    elif task == 6: # diagnose from images
-        oImgPaths = []
-        oImgs = [Image.open(imgPath) for imgPath in oImgPaths]
-        fImgPaths = []
-        fImgs = [Image.open(imgPath) for imgPath in fImgPaths]
-        dWtsTime = "2024-01-01 00-00-00"
-        oWts = "O 2024-05-09 22-42-15"
-        fWts = "F 2024-08-07-16-48-56"
-        diagnose.diagnose(oImgs, fImgs, diseaseName, device, modelName, dWtsTime, oWts, fWts)
+    elif task == "test all diseases": # test all diseases
+        now = datetime.now()
+        oFoldername = "O 2024-08-15 12-32-19 Finetuning"
+        oName = "Test_out O 2024-08-15 12-32-19 Finetuning Best Epoch in 21 to 30"
+        oClassSize = 500
+        fFoldername = "F 2024-08-15 12-32-17 Finetuning"
+        fName = "Test_out F 2024-08-15 12-32-17 Finetuning Best Epoch in 21 to 30"
+        dWtsDTime = "D 2024-08-16 08-35-28"
+        fClassSize = 300
+        dWtsName = ""
+        classSize = 10000
+        batchSize = 16
+        for disease in criteria.keys():
+            if disease == "All" or disease == "Normal":
+                continue
+            testDiagnose.test(device, disease, oFoldername, oName, oClassSize, fFoldername, fName, fClassSize, batchSize, classSize, dWtsDTime)
+    
+    elif task == "test disease-prob model": # test all diseases
+        now = datetime.now()
+        oFoldername = "O 2024-08-15 12-32-19 Finetuning"
+        oName = "Test_out O 2024-08-15 12-32-19 Finetuning Best Epoch in 21 to 30"
+        oClassSize = 500
+        fFoldername = "F 2024-08-15 12-32-17 Finetuning"
+        fName = "Test_out F 2024-08-15 12-32-17 Finetuning Best Epoch in 21 to 30"
+        dWtsDTime = "D 2024-08-16 08-35-28"
+        fClassSize = 300
+        dWtsName = ""
+        classSize = 10000
+        batchSize = 16
+        ddWtsDTime = "DD 2024-08-16 08-35-28"
+        testDiagnose.test(device, "all disease prob", oFoldername, oName, oClassSize, fFoldername, fName, fClassSize, batchSize, classSize, dWtsDTime, ddWtsDTime)
     
     elif task == "test OCT": # test accuracy for a series of abnormity models
         numClasses = len(criteria["All"]["OCT"])

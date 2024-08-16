@@ -2,6 +2,22 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "test disease-prob model",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "ODADS/Code/main.py",
+            "console": "integratedTerminal",
+            "args": ["test disease-prob model", "cuda:1"]
+        },
+        {
+            "name": "test all diseases",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "ODADS/Code/main.py",
+            "console": "integratedTerminal",
+            "args": ["test all diseases", "cuda:1"]
+        },
+        {
             "name": "classify OCT database",
             "type": "debugpy",
             "request": "launch",
