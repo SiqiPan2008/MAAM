@@ -1,0 +1,12 @@
+File Name Format:
+MMMNNIITT - [Additional]
+
+MMM: 016 = VGG16; 018 = ResNet18; 050 = ResNet50; 152 = ResNet152
+NN: AO = OCT abnormity model; AF = Fundusabnormity model; D1 = first diagnosis model; D2 = second diagnosis model;
+II: TR: train data; TO: test other data; TI: test inside of train data
+TT: RS - acc/... result; WT - weight; MR - model results
+[Additional]: T001100[TI] = Transfer learning from epoch 1~100, tested in TI; F101110 = Fine tuning from epoch 101~110
+
+TODO:
+* convert images in TO_Original to TO
+* delete old training result data before training abnormity models
