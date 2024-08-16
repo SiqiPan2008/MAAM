@@ -1,7 +1,7 @@
 import torch
 import numpy as np
 from PIL import Image
-from AbnormityModels import abnormityModel
+from ODADS.Code.Abnormity_Models import abnormity_models
 from Utils import utils
 import os
 import matplotlib.pyplot as plt
@@ -163,7 +163,7 @@ def camShow(img, cam, title = ""):
     
 
 def highlight(imgPath, numClasses, device, featureExtract, modelName, wtsName):
-    model, _ = abnormityModel.initializeAbnormityModel(modelName, numClasses, featureExtract)
+    model = abnormity_models.initialize_abnormity_model(modelName, numClasses, featureExtract)
     model = model.to(device)
     trainedModel = torch.load(f"ODADS/Data/Weights/{wtsName}/{wtsName}.pth")
     model.load_state_dict(trainedModel["state_dict"])

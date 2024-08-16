@@ -4,8 +4,8 @@ import csv
 import numpy as np
 from torchvision import transforms, datasets
 from PIL import Image
-from Utils import utils
-from AbnormityModels import abnormityModel, classify
+from ODADS.Code.Abnormity_Models import abnormity_models, classify_abnormity
+from ODADS.Code.Utils import utils
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 
 def test_acc(device, name, filename):
@@ -18,7 +18,7 @@ def test_acc(device, name, filename):
     num_classes = setting.get_num_abnormities(name)
     wt_file_name = os.path.join(setting.get_wt_file_name(name), filename)
     
-    model, _ = abnormityModel.initializeAbnormityModel(net_name, num_classes, feature_extract)
+    model = abnormity_models.initialize_abnormity_model(net_name, num_classes, feature_extract)
     model = model.to(device)
     trained_model = torch.load(os.path.join(folder_path, wt_file_name + ".pth"))
     model.load_state_dict(trained_model["state_dict"])
@@ -31,7 +31,7 @@ def test_acc(device, name, filename):
         abnormity_folder = os.path.join(img_folder, abnormity)
         for img_name in os.listdir(abnormity_folder):
             img = Image.open(os.path.join(abnormity_folder, img_name))
-            output = classify.get_abnormities_probs(img, model, device)
+            output = classify_abnormity.get_abnormities_probs(img, model, device)
             if use_top_probs:
                 top_indices = utils.get_top_prob_indices(output, 4, 0.9)
                 corrects += class_to_idx[abnormity] in top_indices
@@ -69,7 +69,7 @@ def get_model_results(device, name):
     num_classes = setting.get_num_abnormities(name)
     wt_file_name = setting.get_wt_file_name(name)
     
-    model, _ = abnormityModel.initializeAbnormityModel(net_name, num_classes, feature_extract)
+    model = abnormity_models.initialize_abnormity_model(net_name, num_classes, feature_extract)
     model = model.to(device)
     trained_model = torch.load(os.path.join(folder_path, wt_file_name + ".pth"))
     model.load_state_dict(trained_model["state_dict"])

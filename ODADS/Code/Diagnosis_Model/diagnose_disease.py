@@ -1,13 +1,14 @@
 import os
 import torch
-from AbnormityModels import classify
-from DiagnosisModel import trainDiagnose
+from ODADS.Code.Abnormity_Models import classify_abnormity
+from ODADS.Code.Diagnosis_Model import diagnosis_model
+from ODADS.Code.Utils import utils
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 
 ### OUTDATED!!!!!
 
 def diagnose(oImgs, fImgs, diseaseName, device, modelName, dWtsTime, oWts, fWts):
-    criteria = trainDiagnose.utils.get_criteria()
+    criteria = utils.get_criteria()
     oNumClasses = len(criteria["All"]["OCT"])
     fNumClasses = len(criteria["All"]["Fundus"])
     oAbnormityNum = len(criteria[diseaseName]["OCT"])
@@ -20,7 +21,7 @@ def diagnose(oImgs, fImgs, diseaseName, device, modelName, dWtsTime, oWts, fWts)
         oOutputs = torch.empty([lenO, oNumClasses])
         for i in range(lenO):
             img = oImgs[i]
-            output = classify.get_abnormity_probs_from_img(img, oNumClasses, device, True, modelName, oWts)
+            output = classify_abnormity.get_abnormity_probs_from_img(img, oNumClasses, device, True, modelName, oWts)
             oOutputs[i] = output
         oOutput, _ = torch.max(oOutputs, dim = 0)
     if oAbnormityNum != 0:
@@ -28,12 +29,12 @@ def diagnose(oImgs, fImgs, diseaseName, device, modelName, dWtsTime, oWts, fWts)
         fOutputs = torch.empty([lenF, fNumClasses])
         for i in range(lenF):
             img = fImgs[i]
-            output = classify.get_abnormity_probs_from_img(img, fNumClasses, device, True, modelName, fWts)
+            output = classify_abnormity.get_abnormity_probs_from_img(img, fNumClasses, device, True, modelName, fWts)
             fOutputs[i] = output
         fOutput, _ = torch.max(fOutputs, dim = 0)
     dInput = torch.concat((oOutput, fOutput), dim = 0)
     
-    dModel, _ = trainDiagnose.diagnosisModel.SimpleNet(abnormityNum, gradeLevels)
+    dModel, _ = diagnosis_model.Simple_Net(abnormityNum, gradeLevels)
     dModel = dModel.to(device)
     trainedModel = torch.load(f"ODADS/Data/Weights/D {dWtsTime}/D {diseaseName} {dWtsTime}.pth")
     dModel.load_state_dict(trainedModel["state_dict"])

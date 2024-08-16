@@ -1,10 +1,8 @@
 import os
 import torch
-from torchvision import transforms, datasets
-from PIL import Image
-import numpy as np
-from AbnormityModels import abnormityModel
-from Utils import utils
+from torchvision import transforms
+from ODADS.Code.Abnormity_Models import abnormity_models
+from ODADS.Code.Utils import utils
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 
 # small utilities. refactor later!
@@ -20,7 +18,7 @@ def get_abnormities_probs(img, model, device):
     return output
 
 def get_abnormity_probs_from_img(img, numClasses, device, featureExtract, modelName, foldername, wtsName):
-    model, _ = abnormityModel.initializeAbnormityModel(modelName, numClasses, featureExtract)
+    model = abnormity_models.initialize_abnormity_model(modelName, numClasses, featureExtract)
     model = model.to(device)
     trainedModel = torch.load(f"ODADS/Data/Weights/{foldername}/{wtsName}")
     model.load_state_dict(trainedModel["state_dict"])

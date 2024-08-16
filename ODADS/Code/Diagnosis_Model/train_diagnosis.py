@@ -8,9 +8,9 @@ import copy
 from PIL import Image
 import csv
 import numpy as np
-from AbnormityModels import abnormityModel
-from Utils import utils
-from DiagnosisModel import diagnosisModel
+from ODADS.Code.Abnormity_Models import abnormity_models
+from ODADS.Code.Utils import utils
+from ODADS.Code.Diagnosis_Model import diagnosis_model
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 
 def getOutputs(device, diseaseName, oAbnormityNum, fAbnormityNum, grade, dbName, oModel, fModel):
@@ -89,7 +89,7 @@ def trainAbnormityNumModel(device, diseaseName, oFoldername, oName, oClassSize, 
     validData = torch.zeros(gradeLevels * gradeValidSize, allAbnormityNum)
     validLabel = torch.zeros(gradeLevels * gradeValidSize, dtype=torch.long)
     
-    dModel = diagnosisModel.SimpleNet(allAbnormityNum, gradeLevels)
+    dModel = diagnosis_model.Simple_Net(allAbnormityNum, gradeLevels)
     if dWtsDTime:
         trainedModel = torch.load(os.path.join("ODADS/Data/Weights", os.path.join(dWtsDTime, f"{diseaseName} {dWtsDTime}.pth")))
         dModel.load_state_dict(trainedModel["state_dict"])
@@ -233,7 +233,7 @@ def trainDiseaseProbModel(device, oFoldername, oName, oClassSize, fFoldername, f
     outputPathF = os.path.join("ODADS/Data/Results", os.path.join(fFoldername, fName + ".bin"))
     outputsF = np.fromfile(outputPathF, dtype = np.float64).reshape((allFAbnormityNum, fClassSize, allFAbnormityNum))
     
-    ddModel = diagnosisModel.SimpleNet(abnormityVectorSize, diseaseNum).to(device)
+    ddModel = diagnosis_model.Simple_Net(abnormityVectorSize, diseaseNum).to(device)
     if ddWtsDTime:
         trainedModel = torch.load(os.path.join("ODADS/Data/Weights", os.path.join(ddWtsDTime, f"D{ddWtsDTime}.pth")))
         ddModel.load_state_dict(trainedModel["state_dict"])
@@ -241,7 +241,7 @@ def trainDiseaseProbModel(device, oFoldername, oName, oClassSize, fFoldername, f
     optimizer = optim.Adam(ddModel.parameters(), lr = LR)
     scheduler = optim.lr_scheduler.StepLR(optimizer, step_size = 7, gamma = 0.1)
     
-    dModels = {disease: diagnosisModel.SimpleNet(allAbnormityNum, len(criteria[disease]["OCT"]) + len(criteria[disease]["Fundus"]) + 1).to(device) \
+    dModels = {disease: diagnosis_model.Simple_Net(allAbnormityNum, len(criteria[disease]["OCT"]) + len(criteria[disease]["Fundus"]) + 1).to(device) \
          for disease in criteria.keys() if disease not in ["Normal", "All"]}
     for disease in dModels.keys():
          trainedModel = torch.load(os.path.join("ODADS/Data/Weights", os.path.join(dWtsDTime, f"{dWtsDTime} {disease}.pth")))

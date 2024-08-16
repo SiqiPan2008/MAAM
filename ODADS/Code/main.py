@@ -1,7 +1,6 @@
-from AbnormityModels import classify, gradcam
-from DiagnosisModel import diagnose, trainDiagnose, testDiagnose
-from ODADS.Code.AbnormityModels import test_abnormity, train_abnormity
-from Utils import utils
+from ODADS.Code.Diagnosis_Model import diagnose_disease, train_diagnose, test_diagnose
+from ODADS.Code.Abnormity_Models import test_abnormity, train_abnormity, classify_abnormity, gradcam
+from ODADS.Code.Utils import utils
 import torch
 import numpy as np
 from PIL import Image
@@ -25,16 +24,16 @@ if task == "train":
     if setting.is_abnormity(name):
         train_abnormity.train(device, name)
     elif setting.is_diagnosis1(name):
-        trainDiagnose.trainAbnormityNumModel(device, name)
+        train_diagnose.trainAbnormityNumModel(device, name)
     elif setting.is_diagnosis2(name):
-        trainDiagnose.trainDiseaseProbModel(device, name)
+        train_diagnose.trainDiseaseProbModel(device, name)
 elif task == "test":
     if setting.is_abnormity(name):
         test_abnormity.test_multiple_acc(device, name)
     elif setting.is_diagnosis1(name):
-        testDiagnose.testAbnormityNumModel(device, name)
+        train_diagnose.testAbnormityNumModel(device, name)
     elif setting.is_diagnosis2(name):
-        testDiagnose.testDiseaseProbModel(device, name)
+        train_diagnose.testDiseaseProbModel(device, name)
 elif task == "get MR":
     if setting.is_abnormity(name):
         test_abnormity.get_model_results(device, name)

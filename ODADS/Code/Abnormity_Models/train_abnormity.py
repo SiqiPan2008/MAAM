@@ -5,13 +5,10 @@ import torch.optim as optim
 from torchvision import transforms, datasets
 from torch.utils.data import Subset
 import time
-import copy
 import csv
-from datetime import datetime
 import numpy as np
-from ODADS.Code.AbnormityModels import test_abnormity
-from Utils import utils
-from AbnormityModels import abnormityModel
+from ODADS.Code.Utils import utils
+from ODADS.Code.Abnormity_Models import abnormity_models
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 
 def train(device, name):
@@ -32,7 +29,7 @@ def train(device, name):
     use_pretrained = setting.is_transfer_learning(name)
     is_transfer_learning = setting.is_transfer_learning(name)
     
-    model, _ = abnormityModel.initializeAbnormityModel(net_name, num_classes, feature_extract, use_pretrained)
+    model = abnormity_models.initialize_abnormity_model(net_name, num_classes, feature_extract, use_pretrained)
     model = model.to(device)
     if not is_transfer_learning:
         trained_model = torch.load(os.path.join(folder_path, setting.get_transfer_learning_wt(name) + ".pth"))
