@@ -360,18 +360,6 @@ def train(device, diseaseName, oFoldername, oName, oClassSize, fFoldername, fNam
     os.makedirs(f"ODADS/Data/Results/D {dTime}/", exist_ok=True)
     with open(f"ODADS/Data/Results/D {dTime}/{filename}.csv", "w", newline="") as file:  
         writer = csv.writer(file)  
-        writer.writerow([
-            "Trained from scratch" if dWtsDTime == "" else f"Trained from {dWtsDTime}", 
-            f"oFolder: {oFoldername}", 
-            f"oName : {oName}", 
-            f"fFolder: {fFoldername}", 
-            f"fName : {fName}", 
-            f"batchSize = {batchSize}", 
-            f"LR = {LRs[0]}", 
-            f"epochNum = {len(trainLosses)}", 
-            f"classSize = {classSize}", 
-            f"timeElapsed = {timeElapsed // 60 :.0f}m {timeElapsed % 60: .2f}s"
-        ])
         for i in range(len(trainLosses)):  
             writer.writerow([i + 1, validAccHistory[i], trainAccHistory[i], validLosses[i], trainLosses[i], LRs[i]])
     print(f"Data successfully written into {filename}.csv")

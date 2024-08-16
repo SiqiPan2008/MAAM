@@ -9,7 +9,7 @@ TT: RS - acc/... result; WT - weight; MR - model results
 
 TODO:
 * test trained models and read training results (csv files) to determine continuing points
-* add models
+* run models in sequence
 * delete old training result data before training abnormity models
 
 * convert images in TO_Original to TO
