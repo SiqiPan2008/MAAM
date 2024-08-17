@@ -12,6 +12,8 @@ def test(device, name, filename):
     setting = utils.get_setting()
     use_top_probs = setting.use_top_probs
     feature_extract = setting.feature_extract
+    A_top_probs_max_num = setting.A_top_probs_max_num
+    A_top_probs_min_prob = setting.A_top_probs_min_prob
     net_name = setting.get_net(name)
     img_folder = setting.get_img_folder(name)
     folder_path = setting.get_folder_path(name)
@@ -34,7 +36,7 @@ def test(device, name, filename):
             img = Image.open(os.path.join(abnormity_folder, img_name))
             output = classify_abnormity.get_abnormities_probs(img, model, device)
             if use_top_probs:
-                top_indices = utils.get_top_prob_indices(output, 4, 0.9)
+                top_indices = utils.get_top_prob_indices(output, A_top_probs_max_num, A_top_probs_min_prob)
                 corrects += class_to_idx[abnormity] in top_indices
             else:
                 _, pred = torch.max(output, dim=0)
@@ -107,6 +109,7 @@ def get_final_abnormity_model(name, t_acc, f_acc):
     
 def get_model_results(device, name):
     setting = utils.get_setting()
+    batch_size = setting.test_batch_size
     feature_extract = setting.feature_extract
     net_name = setting.get_net(name)
     img_folder = setting.get_img_folder(name)
@@ -124,7 +127,7 @@ def get_model_results(device, name):
                     transforms.ToTensor()
                 ])
     image_dataset = datasets.ImageFolder(img_folder, transform)
-    dataloader = torch.utils.data.DataLoader(image_dataset, batch_size = 1, shuffle=True)
+    dataloader = torch.utils.data.DataLoader(image_dataset, batch_size = batch_size, shuffle=True)
     
     outputs = [[] for _ in range(num_classes)]
     for inputs, labels in dataloader:

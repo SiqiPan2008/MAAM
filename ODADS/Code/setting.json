@@ -9,6 +9,11 @@
     "D1_folder": "Diagnosis1",
     "D2_folder": "Diagnosis2",
 
+    "A_top_probs_max_num": "4",
+    "A_top_probs_min_prob": "0.9",
+    "D2_top_probs_max_num": "3",
+    "D2_top_probs_min_prob": "0.9",
+
     "feature_extract": "True",
     "batch_size": "16",
     "test_batch_size": "1",

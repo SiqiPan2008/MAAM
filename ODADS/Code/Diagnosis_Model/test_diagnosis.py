@@ -63,11 +63,14 @@ def test_abnormity_num_model(device, name):
 def test_disease_prob_model(device, name):
     setting = utils.get_setting()
     d1_folder = setting.D1_folder
-    batch_size = setting.batch_size
+    batch_size = setting.test_batch_size
+    use_top_probs = setting.use_top_probs
     class_size = setting.D2_train_class_size
     abnormity_folder_path = setting.A_folder
     o_class_size = setting.O_train_class_size
     f_class_size = setting.F_train_class_size
+    D2_top_probs_max_num = setting.D2_top_probs_max_num
+    D2_top_probs_min_prob = setting.D2_top_probs_min_prob
     wt_name = setting.get_wt_file_name(name)
     o_mr_name = setting.get_o_mr_name(name)
     f_mr_name = setting.get_f_mr_name(name)
@@ -120,8 +123,14 @@ def test_disease_prob_model(device, name):
     with torch.no_grad():
         for inputs, labels in test_loader:
             outputs = model(inputs.to(device))
-            _, predicted = torch.max(outputs, 1)
-            corrects += (predicted.cpu() == labels).sum().item()
+            if use_top_probs:
+                outputs = torch.nn.functional.softmax(outputs.squeeze(0), 0).cpu()
+                top_indices = utils.get_top_prob_indices(outputs, D2_top_probs_max_num, D2_top_probs_min_prob)
+                corrects += labels[0] in top_indices
+            else:
+                _, predicted = torch.max(outputs, 1)
+                corrects += predicted.cpu()[0] == labels[0]
+            
     acc = corrects / total
     time_elapsed = time.time() - start_time
     print(f"Time elapsed {time_elapsed // 60 :.0f}m {time_elapsed % 60 :.2f}s")

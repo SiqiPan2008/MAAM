@@ -24,6 +24,11 @@ class Setting:
     save_model_frequency: int
     use_top_probs: bool
 
+    A_top_probs_max_num: int
+    A_top_probs_min_prob: float
+    D2_top_probs_max_num: int
+    D2_top_probs_min_prob: float
+    
     A_T_num_epochs: int
     A_F_num_epochs: int
     D1_num_epochs: int
@@ -55,12 +60,14 @@ class Setting:
     def from_dict(data: Dict) -> 'Setting':
         setting = Setting(**data)
         setting.use_small = bool(setting.use_small)
+        
         setting.data_folder = setting.data_folder_s if setting.use_small else setting.data_folder 
         data_folder_with_root = os.path.join(setting.root, setting.data_folder)
         setting.images_folder = os.path.join(data_folder_with_root, setting.images_folder)
         setting.A_folder = os.path.join(data_folder_with_root, setting.A_folder)
         setting.D1_folder = os.path.join(data_folder_with_root, setting.D1_folder)
         setting.D2_folder = os.path.join(data_folder_with_root, setting.D2_folder)
+        
         setting.feature_extract = bool(setting.feature_extract)
         setting.batch_size = int(setting.batch_size)
         setting.test_batch_size = int(setting.test_batch_size)
@@ -69,6 +76,11 @@ class Setting:
         setting.save_model_frequency = int(setting.save_model_frequency)
         setting.use_top_probs = bool(setting.use_top_probs)
 
+        setting.A_top_probs_max_num = int(setting.A_top_probs_max_num)
+        setting.A_top_probs_min_prob = float(setting.A_top_probs_min_prob)
+        setting.D2_top_probs_max_num = int(setting.D2_top_probs_max_num)
+        setting.D2_top_probs_min_prob = float(setting.D2_top_probs_min_prob)
+        
         setting.A_T_num_epochs = int(setting.A_T_num_epochs_s \
             if setting.use_small else setting.A_T_num_epochs)
         setting.A_F_num_epochs = int(setting.A_F_num_epochs_s \
