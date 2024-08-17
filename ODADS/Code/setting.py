@@ -14,6 +14,7 @@ class Setting:
 
     feature_extract: str
     batch_size: int
+    test_batch_size: int
     A_T_num_epochs: int
     A_F_num_epochs: int
     D1_num_epochs: int
@@ -37,6 +38,7 @@ class Setting:
         setting = Setting(**data)
         setting.feature_extract = bool(setting.feature_extract)
         setting.batch_size = int(setting.batch_size)
+        setting.test_batch_size = int(setting.test_batch_size)
         setting.A_T_num_epochs = int(setting.A_T_num_epochs)
         setting.A_F_num_epochs = int(setting.A_F_num_epochs)
         setting.D1_num_epochs = int(setting.D1_num_epochs)
@@ -79,7 +81,7 @@ class Setting:
     
     def get_disease_name(self, name: str) -> str:
         match = re.search(r" - (\w*)", name)
-        disease_name = ""
+        disease_name = name
         if match:
             disease_name = match.group(1)[0]
         return disease_name
@@ -93,12 +95,12 @@ class Setting:
         else:
             return len(criteria["All"]["Fundus"])
         
-    def get_disease_abnormity_num(self, name: str = "All Abnormities") -> int:
+    def get_disease_abnormity_num(self, name, type: str = "All Abnormities") -> int:
         criteria = utils.get_criteria()
         disease_name = self.get_disease_name(name)
-        if name == "All Abnormities":
+        if type == "All Abnormities":
             return len(criteria[disease_name]["OCT"] + criteria[disease_name]["Fundus"])
-        elif self.is_OCT(name) or name == "OCT Abnormities":
+        elif type == "OCT Abnormities":
             return len(criteria[disease_name]["OCT"])
         else:
             return len(criteria[disease_name]["Fundus"])
@@ -149,7 +151,7 @@ class Setting:
         elif self.is_diagnosis2(name):
             return self.D2_folder
         
-    def get_wt_file_name(self, name: str) -> str:
+    def get_wt_name(self, name: str) -> str:
         return name[:6] + "TRWT" + name[10:]
     
     def get_o_mr_name(self, name: str) -> str:
@@ -158,7 +160,7 @@ class Setting:
     def get_f_mr_name(self, name: str) -> str:
         return name[:4] + "AFTRMR"
     
-    def get_rs_file_name(self, name: str) -> str:
+    def get_rs_name(self, name: str) -> str:
         return name[:8] + "RS" + name[10:]
     
     def get_transfer_learning_wt(self, name: str) -> str:

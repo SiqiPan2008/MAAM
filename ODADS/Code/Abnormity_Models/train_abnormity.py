@@ -22,9 +22,9 @@ def train(device, name):
     num_epochs = setting.get_num_epochs(name)
     img_folder = setting.get_img_folder(name)
     folder_path = setting.get_folder_path(name)
-    temp_wts_folder = os.path.join(folder_path, wt_file_name)
-    wt_file_name = setting.get_wt_file_name(name)
-    rs_file_name = setting.get_rs_file_name(name)
+    temp_wts_folder = os.path.join(folder_path, wt_name)
+    wt_name = setting.get_wt_name(name)
+    rs_name = setting.get_rs_name(name)
     num_classes = setting.get_abnormity_num(name)
     use_pretrained = setting.is_transfer_learning(name)
     is_transfer_learning = setting.is_transfer_learning(name)
@@ -130,8 +130,8 @@ def train(device, name):
                     "optimizer": optimizer.state_dict()
                 }
                 epoch_range_beginning = int(epoch / save_model_frequency) * save_model_frequency
-                torch.save(state, os.path.join(temp_wts_folder, wt_file_name + f"{epoch_range_beginning: 3d}.pth"))
-                print(f"Data successfully written into {wt_file_name}.pth")
+                torch.save(state, os.path.join(temp_wts_folder, wt_name + f"{epoch_range_beginning: 3d}.pth"))
+                print(f"Data successfully written into {wt_name}.pth")
             if phase == "valid" and (epoch + 1) % save_model_frequency == 0:
                 best_acc.append(0)
                 
@@ -151,10 +151,10 @@ def train(device, name):
     print(f"training complete in {total_time_elapsed // 60 :.0f}m {total_time_elapsed % 60 :.2f}s")
     print(f"best valid acc: {best_acc}")
 
-    with open(os.path.join(folder_path, rs_file_name + ".csv"), "w", newline="") as file:  
+    with open(os.path.join(folder_path, rs_name + ".csv"), "w", newline="") as file:  
         writer = csv.writer(file)  
         for i in range(len(train_losses)):  
             writer.writerow([i + 1, valid_acc_history[i].item(), train_acc_history[i].item(), valid_losses[i], train_losses[i], LRs[i]])
-    print(f"Data successfully written into {rs_file_name}.csv")
+    print(f"Data successfully written into {rs_name}.csv")
     
-    utils.curve(valid_acc_history, train_acc_history, valid_losses, train_losses, os.path.join(folder_path, rs_file_name + ".pdf"))
+    utils.curve(valid_acc_history, train_acc_history, valid_losses, train_losses, os.path.join(folder_path, rs_name + ".pdf"))

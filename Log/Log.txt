@@ -14,4 +14,4 @@ TODO:
 
 * convert images in TO_Original to TO
 
-* refactor gradcam.py and classify.py
+* refactor gradcam.py, classify_abnormity.py, diagnose_disease.py

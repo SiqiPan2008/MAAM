@@ -5,7 +5,8 @@ from ODADS.Code.Diagnosis_Model import diagnosis_model
 from ODADS.Code.Utils import utils
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 
-### OUTDATED!!!!!
+# small utilities. refactor later!
+# OUTDATED! rewrite
 
 def diagnose(oImgs, fImgs, diseaseName, device, modelName, dWtsTime, oWts, fWts):
     criteria = utils.get_criteria()

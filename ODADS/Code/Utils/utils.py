@@ -5,6 +5,7 @@ import numpy as np
 import os
 from PIL import Image
 import json
+import random
 import setting
 from typing import Dict
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
@@ -97,4 +98,47 @@ def get_top_prob_indices(output, allow_num, min_score):
         sum += sorted_output[i]
         top_indices.append(indices[i])
     return top_indices
-        
+
+# read from model results and return the result of a random image of a certain disease
+def get_mr(device, name, label, o_mr, f_mr):
+    setting = get_setting()
+    o_abnormities = setting.get_abnormities("OCT Abnormities")
+    f_abnormities = setting.get_abnormities("Fundus Abnormities")
+    o_abnormity_num = setting.get_abnormity_num("OCT Abnormities")
+    f_abnormity_num = setting.get_abnormity_num("Fundus Abnormities")
+    correct_abnormities = setting.get_correct_abnormities(name)
+    incorrect_abnormities = setting.get_correct_abnormities(name)
+     
+    selCorrectAbnormities = random.sample(correct_abnormities, label)
+    selIncorrectAbnormities = random.sample(incorrect_abnormities, o_abnormity_num + f_abnormity_num - label)
+    selAbnormities = selCorrectAbnormities + selIncorrectAbnormities
+    
+    oOutput = torch.zeros([o_abnormity_num])
+    fOutput = torch.zeros([f_abnormity_num])
+    for abnormity in selAbnormities:
+        abnormityType, abnormityName = abnormity[0], abnormity[1]
+        if abnormityType == "OCT":
+            output = random.choice(o_mr[o_abnormities.index(abnormityName)])
+            oOutput = torch.max(torch.tensor(output), oOutput)
+        elif abnormityType == "Fundus":
+            output = random.choice(f_mr[f_abnormities.index(abnormityName)])
+            fOutput = torch.max(torch.tensor(output), fOutput)
+    output = torch.concat([fOutput, oOutput]).to(device)
+    return output
+
+# randomly choose an image from a certain disease
+# pass the image through all D1 models and return the concatenated result
+def get_abnormity_nums_vector(device, name, o_mr, f_mr, abnormity_num_models):
+    setting = get_setting()
+    disease_abnormity_num = setting.get_disease_abnormity_num(name, "All Abnormities") + 1
+    
+    abnormity_output = get_mr(device, name, disease_abnormity_num, o_mr, f_mr)
+    abnormity_output = abnormity_output.unsqueeze(0).type(torch.float32).to(device)
+    abnormity_nums_vector = torch.empty([0]).to(device)
+    for disease in abnormity_num_models.keys():
+        temp_model = abnormity_num_models[disease]
+        temp_model.eval()
+        abnormity_num_output = temp_model(abnormity_output)[0]
+        abnormity_num_output = torch.nn.functional.softmax(abnormity_num_output, 0)
+        abnormity_nums_vector = torch.cat([abnormity_nums_vector, abnormity_num_output])
+    return abnormity_nums_vector

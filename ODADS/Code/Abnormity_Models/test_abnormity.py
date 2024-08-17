@@ -16,7 +16,7 @@ def test_acc(device, name, filename):
     img_folder = setting.get_img_folder(name)
     folder_path = setting.get_folder_path(name)
     num_classes = setting.get_abnormity_num(name)
-    wt_file_name = os.path.join(setting.get_wt_file_name(name), filename)
+    wt_file_name = os.path.join(setting.get_wt_name(name), filename)
     
     model = abnormity_models.initialize_abnormity_model(net_name, num_classes, feature_extract)
     model = model.to(device)
@@ -48,7 +48,7 @@ def test_acc(device, name, filename):
 def test_multiple_acc(device, name):
     setting = utils.get_setting()
     folder_path = setting.get_folder_path(name)
-    temp_wts_folder = os.path.join(folder_path, setting.get_wt_file_name(name))
+    temp_wts_folder = os.path.join(folder_path, setting.get_wt_name(name))
     
     with open(os.path.join(folder_path, name + ".csv"), "w", newline="") as file:  
         writer = csv.writer(file)
@@ -67,7 +67,7 @@ def get_model_results(device, name):
     img_folder = setting.get_img_folder(name)
     folder_path = setting.get_folder_path(name)
     num_classes = setting.get_abnormity_num(name)
-    wt_file_name = setting.get_wt_file_name(name)
+    wt_file_name = setting.get_wt_name(name)
     
     model = abnormity_models.initialize_abnormity_model(net_name, num_classes, feature_extract)
     model = model.to(device)
