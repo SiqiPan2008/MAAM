@@ -84,7 +84,7 @@ class Setting:
             disease_name = match.group(1)[0]
         return disease_name
     
-    def get_abnormities_num(self, name: str = "All Abnormities") -> int:
+    def get_abnormity_num(self, name: str = "All Abnormities") -> int:
         criteria = utils.get_criteria()
         if name == "All Abnormities":
             return len(criteria["All"]["OCT"] + criteria["All"]["Fundus"])
@@ -92,6 +92,16 @@ class Setting:
             return len(criteria["All"]["OCT"])
         else:
             return len(criteria["All"]["Fundus"])
+        
+    def get_disease_abnormity_num(self, name: str = "All Abnormities") -> int:
+        criteria = utils.get_criteria()
+        disease_name = self.get_disease_name(name)
+        if name == "All Abnormities":
+            return len(criteria[disease_name]["OCT"] + criteria[disease_name]["Fundus"])
+        elif self.is_OCT(name) or name == "OCT Abnormities":
+            return len(criteria[disease_name]["OCT"])
+        else:
+            return len(criteria[disease_name]["Fundus"])
         
     def get_abnormities(self, name: str = "All Abnormities") -> list:
         criteria = utils.get_criteria()
@@ -154,5 +164,28 @@ class Setting:
     def get_transfer_learning_wt(self, name: str) -> str:
         return name[:13] + "T"
     
-    def get_d1_single_disease_cmd(self, name: str, disease: str) -> str:
+    def get_d1_single_disease_rs(self, name: str, disease: str) -> str:
         return name + " - " + disease
+    
+    def get_d1_single_disease_wt(self, name: str, disease: str) -> str:
+        return name[:6] + "TRWT - " + disease
+    
+    def get_d2_input_length(self) -> int:
+        criteria = utils.get_criteria()
+        return sum([
+            (len(criteria[disease]["OCT"]) + len(criteria[disease]["Fundus"]) + 1) \
+            for disease in criteria.keys() \
+            if disease not in ["Normal", "All"]
+        ])
+        
+    def get_disease_num(self, include_normal: bool = True) -> int:
+        criteria = utils.get_criteria()
+        return len(criteria) - 1 if include_normal else len(criteria) - 2
+    
+    def get_diseases(self, include_normal: bool = True) -> list:
+        criteria = utils.get_criteria()
+        if include_normal:
+            diseases = [disease for disease in criteria.keys() if disease != "All"]
+        else:
+            diseases = [disease for disease in criteria.keys() if disease != "All" and disease != "Normal"]
+        return diseases

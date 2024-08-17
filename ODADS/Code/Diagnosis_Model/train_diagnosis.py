@@ -17,8 +17,8 @@ def get_mr(device, name, label, o_mr, f_mr):
     setting = utils.get_setting()
     o_abnormities = setting.get_abnormities("OCT Abnormities")
     f_abnormities = setting.get_abnormities("Fundus Abnormities")
-    o_abnormity_num = setting.get_abnormities_num("OCT Abnormities")
-    f_abnormity_num = setting.get_abnormities_num("Fundus Abnormities")
+    o_abnormity_num = setting.get_abnormity_num("OCT Abnormities")
+    f_abnormity_num = setting.get_abnormity_num("Fundus Abnormities")
     correct_abnormities = setting.get_correct_abnormities(name)
     incorrect_abnormities = setting.get_correct_abnormities(name)
      
@@ -53,16 +53,16 @@ def train_abnormity_num_model(device, name):
     folder_path = setting.get_folder_path(name)
     disease_name = setting.get_disease_name(name)
     allAbnormities = setting.get_abnormities("All Abnormities")
-    o_abnormity_num = setting.get_abnormities_num("OCT Abnormities")
-    f_abnormity_num = setting.get_abnormities_num("Fundus Abnormities")
-    all_abnormity_num = setting.get_abnormities_num("All Abnormities")
+    o_abnormity_num = setting.get_abnormity_num("OCT Abnormities")
+    f_abnormity_num = setting.get_abnormity_num("Fundus Abnormities")
+    all_abnormity_num = setting.get_abnormity_num("All Abnormities")
     
     label_levels = o_abnormity_num + f_abnormity_num + 1
     
     o_mr_path = os.path.join(abnormity_folder_path, o_mr_name + ".bin")
-    outputsO = np.fromfile(o_mr_path, dtype = np.float64).reshape((o_abnormity_num, o_class_size, o_abnormity_num))
+    o_mr = np.fromfile(o_mr_path, dtype = np.float64).reshape((o_abnormity_num, o_class_size, o_abnormity_num))
     f_mr_path = os.path.join(abnormity_folder_path, f_mr_name + ".bin")
-    outputsF = np.fromfile(f_mr_path, dtype = np.float64).reshape((f_abnormity_num, f_class_size, f_abnormity_num))
+    f_mr = np.fromfile(f_mr_path, dtype = np.float64).reshape((f_abnormity_num, f_class_size, f_abnormity_num))
     
     train_size = int(0.8 * class_size)
     valid_size = class_size - train_size
@@ -87,12 +87,12 @@ def train_abnormity_num_model(device, name):
     for epoch in range(num_epochs):
         for grade in range(label_levels):
             for i in range(train_size):
-                output = get_mr(allAbnormities, disease_name, o_abnormity_num, f_abnormity_num, grade, outputsO, outputsF)
+                output = get_mr(allAbnormities, disease_name, o_abnormity_num, f_abnormity_num, grade, o_mr, f_mr)
                 train_data[grade * train_size + i] = output
                 train_label[grade * train_size + i] = grade
         for grade in range(label_levels):
             for i in range(valid_size):
-                output = get_mr(allAbnormities, disease_name, o_abnormity_num, f_abnormity_num, grade, outputsO, outputsF)
+                output = get_mr(allAbnormities, disease_name, o_abnormity_num, f_abnormity_num, grade, o_mr, f_mr)
                 valid_data[grade * valid_size + i] = output
                 valid_label[grade * valid_size + i] = grade
         train_dataset = torch.utils.data.TensorDataset(train_data, train_label)
@@ -170,97 +170,109 @@ def train_abnormity_num_model(device, name):
 
 
 
-def getAbnormityNumsVectorFromFile(device, diseaseName, outputsO, outputsF, allAbnormities, dModels):
-    criteria = utils.get_criteria()
-    oAbnormityNum = len(criteria[diseaseName]["OCT"])
-    fAbnormityNum = len(criteria[diseaseName]["Fundus"])
-    abnormityOutput = get_mr(allAbnormities, diseaseName, oAbnormityNum, fAbnormityNum, oAbnormityNum + fAbnormityNum, outputsO, outputsF)
-    abnormityOutput = abnormityOutput.unsqueeze(0).type(torch.float32).to(device)
-    abnormityNumsVector = torch.empty([0]).to(device)
-    for disease in dModels.keys():
-        tmpModel = dModels[disease]
-        tmpModel.eval()
-        abnormityNumOutput = tmpModel(abnormityOutput)[0]
-        abnormityNumOutput = torch.nn.functional.softmax(abnormityNumOutput, 0)
-        abnormityNumsVector = torch.cat([abnormityNumsVector, abnormityNumOutput])
-    return abnormityNumsVector
+def get_abnormity_nums_vector(device, name, o_mr, f_mr, abnormity_num_models):
+    setting = utils.get_setting()
+    disease_abnormity_num = setting.get_disease_abnormity_num("All Abnormities")
+    
+    abnormity_output = get_mr(device, name, disease_abnormity_num, o_mr, f_mr)
+    abnormity_output = abnormity_output.unsqueeze(0).type(torch.float32).to(device)
+    abnormity_nums_vector = torch.empty([0]).to(device)
+    for disease in abnormity_num_models.keys():
+        temp_model = abnormity_num_models[disease]
+        temp_model.eval()
+        abnormity_num_output = temp_model(abnormity_output)[0]
+        abnormity_num_output = torch.nn.functional.softmax(abnormity_num_output, 0)
+        abnormity_nums_vector = torch.cat([abnormity_nums_vector, abnormity_num_output])
+    return abnormity_nums_vector
         
-def trainDiseaseProbModel(device, oFoldername, oName, oClassSize, fFoldername, fName, fClassSize, dWtsDTime, ddWtsDTime, batchSize, LR, numEpochs, diseaseSize):
-    criteria = utils.get_criteria()
-    diseaseIncludingNormal = [disease for disease in criteria.keys() if disease != "All"]
-    diseaseNum = len(diseaseIncludingNormal)
-    abnormityVectorSize = sum([(len(criteria[disease]["OCT"]) + len(criteria[disease]["Fundus"]) + 1) \
-        for disease in criteria.keys() if disease not in ["Normal", "All"]])
-    diseaseTrainSize = int(0.8 * diseaseSize)
-    diseaseValidSize = diseaseSize - diseaseTrainSize
-    trainData = torch.zeros(diseaseNum * diseaseTrainSize, abnormityVectorSize)
-    trainLabel = torch.zeros(diseaseNum * diseaseTrainSize, dtype=torch.long)
-    validData = torch.zeros(diseaseNum * diseaseValidSize, abnormityVectorSize)
-    validLabel = torch.zeros(diseaseNum * diseaseValidSize, dtype=torch.long)
+def train_disease_prob_model(device, name):
+    setting = utils.get_setting()
+    LR = setting.LR
+    d1_folder = setting.D1_folder
+    batch_size = setting.batch_size
+    class_size = setting.D2_train_class_size
+    abnormity_folder_path = setting.A_folder
+    o_class_size = setting.O_train_class_size
+    f_class_size = setting.F_train_class_size
+    o_mr_name = setting.get_o_mr_name(name)
+    f_mr_name = setting.get_f_mr_name(name)
+    num_epochs = setting.get_num_epochs(name)
+    folder_path = setting.get_folder_path(name)
+    d2_input_length = setting.get_d2_input_length()
+    diseases = setting.get_diseases(include_normal = False)
+    allAbnormities = setting.get_abnormities("All Abnormities")
+    o_abnormity_num = setting.get_abnormity_num("OCT Abnormities")
+    f_abnormity_num = setting.get_abnormity_num("Fundus Abnormities")
+    all_abnormity_num = setting.get_abnormity_num("All Abnormities")
+    diseases_including_normal = setting.get_diseases(include_normal = True)
+    disease_num_including_normal= setting.get_disease_num(include_normal = True)
+
+    train_size = int(0.8 * class_size)
+    valid_size = class_size - train_size
+    train_data = torch.zeros(disease_num_including_normal * train_size, d2_input_length)
+    train_label = torch.zeros(disease_num_including_normal * train_size, dtype=torch.long)
+    valid_data = torch.zeros(disease_num_including_normal * valid_size, d2_input_length)
+    valid_label = torch.zeros(disease_num_including_normal * valid_size, dtype=torch.long)
     
-    allAbnormities = [("Fundus", abnormity) for abnormity in criteria["All"]["Fundus"]] + \
-                    [("OCT", abnormity) for abnormity in criteria["All"]["OCT"]]
-    allOAbnormityNum = len(criteria["All"]["OCT"])
-    allFAbnormityNum = len(criteria["All"]["Fundus"])
-    allAbnormityNum = len(allAbnormities)
-    outputPathO = os.path.join("ODADS/Data/Results", os.path.join(oFoldername, oName + ".bin"))
-    outputsO = np.fromfile(outputPathO, dtype = np.float64).reshape((allOAbnormityNum, oClassSize, allOAbnormityNum))
-    outputPathF = os.path.join("ODADS/Data/Results", os.path.join(fFoldername, fName + ".bin"))
-    outputsF = np.fromfile(outputPathF, dtype = np.float64).reshape((allFAbnormityNum, fClassSize, allFAbnormityNum))
+    o_mr_path = os.path.join(abnormity_folder_path, o_mr_name + ".bin")
+    o_mr = np.fromfile(o_mr_path, dtype = np.float64).reshape((o_abnormity_num, o_class_size, o_abnormity_num))
+    f_mr_path = os.path.join(abnormity_folder_path, f_mr_name + ".bin")
+    f_mr = np.fromfile(f_mr_path, dtype = np.float64).reshape((f_abnormity_num, f_class_size, f_abnormity_num))
     
-    ddModel = diagnosis_model.Simple_Net(abnormityVectorSize, diseaseNum).to(device)
-    if ddWtsDTime:
-        trainedModel = torch.load(os.path.join("ODADS/Data/Weights", os.path.join(ddWtsDTime, f"D{ddWtsDTime}.pth")))
-        ddModel.load_state_dict(trainedModel["state_dict"])
+    model = diagnosis_model.Simple_Net(d2_input_length, disease_num_including_normal).to(device)
     criterion = nn.CrossEntropyLoss()
-    optimizer = optim.Adam(ddModel.parameters(), lr = LR)
+    optimizer = optim.Adam(model.parameters(), lr = LR)
     scheduler = optim.lr_scheduler.StepLR(optimizer, step_size = 7, gamma = 0.1)
     
-    dModels = {disease: diagnosis_model.Simple_Net(allAbnormityNum, len(criteria[disease]["OCT"]) + len(criteria[disease]["Fundus"]) + 1).to(device) \
-         for disease in criteria.keys() if disease not in ["Normal", "All"]}
-    for disease in dModels.keys():
-         trainedModel = torch.load(os.path.join("ODADS/Data/Weights", os.path.join(dWtsDTime, f"{dWtsDTime} {disease}.pth")))
-         dModels[disease].load_state_dict(trainedModel["state_dict"])
+    abnormity_num_models = {
+        disease: diagnosis_model.Simple_Net(
+            all_abnormity_num, 
+            setting.get_disease_abnormity_num("All Abnormities")
+        ).to(device)
+        for disease in diseases
+    }
+    for disease in abnormity_num_models.keys():
+         trained_model = torch.load(os.path.join(d1_folder, setting.get_d1_single_disease_wt(name, disease)))
+         abnormity_num_models[disease].load_state_dict(trained_model["state_dict"])
     
     startTime = time.time()
     bestAcc = 0.0
-    bestModelWts = copy.deepcopy(ddModel.state_dict())
     LRs = [optimizer.param_groups[0]["lr"]]
     
     trainAccHistory = []
     validAccHistory = []
     trainLosses = []
     validLosses = []
-    for epoch in range(numEpochs):
-        for i in range(diseaseNum):
-            disease = diseaseIncludingNormal[i]
-            for j in range(diseaseTrainSize):
-                output = getAbnormityNumsVectorFromFile(device, disease, outputsO, outputsF, allAbnormities, dModels)
+    for epoch in range(num_epochs):
+        for i in range(disease_num_including_normal):
+            disease = diseases_including_normal[i]
+            for j in range(train_size):
+                output = get_abnormity_nums_vector(device, disease, o_mr, f_mr, allAbnormities, abnormity_num_models)
                 output = output.detach()
-                trainData[i * diseaseTrainSize + j] = output
-                trainLabel[i * diseaseTrainSize + j] = i
-        for i in range(len(diseaseIncludingNormal)):
-            disease = diseaseIncludingNormal[i]
-            for j in range(diseaseValidSize):
-                output = getAbnormityNumsVectorFromFile(device, disease, outputsO, outputsF, allAbnormities, dModels)
+                train_data[i * train_size + j] = output
+                train_label[i * train_size + j] = i
+        for i in range(disease_num_including_normal):
+            disease = diseases_including_normal[i]
+            for j in range(valid_size):
+                output = get_abnormity_nums_vector(device, disease, o_mr, f_mr, allAbnormities, abnormity_num_models)
                 output = output.detach()
-                validData[i * diseaseValidSize + j] = output
-                validLabel[i * diseaseValidSize + j] = i
-        trainDataset = torch.utils.data.TensorDataset(trainData, trainLabel)
-        validDataset = torch.utils.data.TensorDataset(validData, validLabel)
-        trainLoader = torch.utils.data.DataLoader(trainDataset, batch_size = batchSize, shuffle = True)
-        validLoader = torch.utils.data.DataLoader(validDataset, batch_size = batchSize, shuffle = True)
+                valid_data[i * valid_size + j] = output
+                valid_label[i * valid_size + j] = i
+        trainDataset = torch.utils.data.TensorDataset(train_data, train_label)
+        validDataset = torch.utils.data.TensorDataset(valid_data, valid_label)
+        trainLoader = torch.utils.data.DataLoader(trainDataset, batch_size = batch_size, shuffle = True)
+        validLoader = torch.utils.data.DataLoader(validDataset, batch_size = batch_size, shuffle = True)
         
-        print(f"Epoch {epoch + 1}/{numEpochs}")
+        print(f"Epoch {epoch + 1}/{num_epochs}")
         print("-" * 10)
 
-        ddModel.train()
+        model.train()
         runningLoss = 0.0
         corrects = 0
         total = len(trainLoader.dataset)
         for inputs, labels in trainLoader:
             optimizer.zero_grad()
-            outputs = ddModel(inputs.to(device))
+            outputs = model(inputs.to(device))
             loss = criterion(outputs, labels.to(device))
             loss.backward()
             optimizer.step()
@@ -276,13 +288,13 @@ def trainDiseaseProbModel(device, oFoldername, oName, oClassSize, fFoldername, f
         print(f"Time elapsed {timeElapsed // 60 :.0f}m {timeElapsed % 60 :.2f}s")
         print(f"Train loss: {runningLoss :.4f}, acc: {acc :.4f}")
         
-        ddModel.eval()
+        model.eval()
         corrects = 0
         total = len(validLoader.dataset)
         valRunningLoss = 0.0
         with torch.no_grad():
             for inputs, labels in validLoader:
-                outputs = ddModel(inputs.to(device))
+                outputs = model(inputs.to(device))
                 loss = criterion(outputs, labels.to(device))
                 valRunningLoss += loss.item() * inputs.size(0)
                 _, predicted = torch.max(outputs, 1)
@@ -297,15 +309,13 @@ def trainDiseaseProbModel(device, oFoldername, oName, oClassSize, fFoldername, f
         
         if acc >= bestAcc:
             bestAcc = acc
-            bestModelWts = copy.deepcopy(ddModel.state_dict())
             state = {
-                "state_dict": ddModel.state_dict(),
+                "state_dict": model.state_dict(),
                 "best_acc": bestAcc,
                 "optimizer": optimizer.state_dict()
             }
-            os.makedirs(f"ODADS/Data/Weights/D{dWtsDTime}/", exist_ok=True)
-            torch.save(state, os.path.join(f"ODADS/Data/Weights/D{dWtsDTime}/D{dWtsDTime}.pth"))
-            print(f"Data successfully written into ODADS/Data/Weights/D{dWtsDTime}/D{dWtsDTime}.pth")
+            torch.save(state, os.path.join(folder_path, name + ".pth"))
+            print(f"Data successfully written into {name}.pth")
         
         scheduler.step()
         LRs.append(optimizer.param_groups[0]["lr"])
@@ -315,7 +325,6 @@ def trainDiseaseProbModel(device, oFoldername, oName, oClassSize, fFoldername, f
     timeElapsed = time.time() - startTime
     print(f"training complete in {timeElapsed // 60 :.0f}m {timeElapsed % 60 :.2f}s")
     print(f"best valid acc: {bestAcc :.4f}")
-    ddModel.load_state_dict(bestModelWts)
     
     return trainAccHistory, validAccHistory, trainLosses, validLosses, LRs
 
@@ -324,20 +333,21 @@ def trainDiseaseProbModel(device, oFoldername, oName, oClassSize, fFoldername, f
 
 
 
-def train(device, diseaseName, oFoldername, oName, oClassSize, fFoldername, fName, fClassSize, batchSize, classSize, numEpochs, LR, dWtsDTime, dTime, ddWtsDTime = None):
-    filename = f"D{dTime}" if diseaseName == "all disease prob" else f"D {dTime} {diseaseName}"
+def train(device, name):
+    setting = utils.get_setting()
+    disease_name = setting.get_disease_name(name)
+    folder_path = setting.get_folder_path(name)
     
-    if diseaseName == "all disease prob":
-        trainAccHistory, validAccHistory, trainLosses, validLosses, LRs = trainDiseaseProbModel(device, oFoldername, oName, oClassSize, fFoldername, fName, fClassSize, dWtsDTime, ddWtsDTime, batchSize, LR, numEpochs, classSize)
+    if disease_name:
+        trainAccHistory, validAccHistory, trainLosses, validLosses, LRs = train_abnormity_num_model(device, name)
     else:
-        trainAccHistory, validAccHistory, trainLosses, validLosses, LRs = train_abnormity_num_model(device, diseaseName, oFoldername, oName, oClassSize, fFoldername, fName, fClassSize, dWtsDTime, dTime, batchSize, LR, numEpochs, classSize)
-
-    os.makedirs(f"ODADS/Data/Results/D {dTime}/", exist_ok=True)
-    with open(f"ODADS/Data/Results/D {dTime}/{filename}.csv", "w", newline="") as file:  
+        trainAccHistory, validAccHistory, trainLosses, validLosses, LRs = train_disease_prob_model(device, name)
+        
+    with open(os.path.join(folder_path, name + ".csv"), "w", newline="") as file:  
         writer = csv.writer(file)  
         for i in range(len(trainLosses)):  
             writer.writerow([i + 1, validAccHistory[i], trainAccHistory[i], validLosses[i], trainLosses[i], LRs[i]])
-    print(f"Data successfully written into {filename}.csv")
+    print(f"Data successfully written into {name}.csv")
     print("\n" for _ in range(3))
     
-    utils.curve(validAccHistory, trainAccHistory, validLosses, trainLosses, f"ODADS/Data/Results/D {dTime}/{filename}.pdf")
+    utils.curve(validAccHistory, trainAccHistory, validLosses, trainLosses, os.path.join(folder_path, name + ".pdf"))

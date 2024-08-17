@@ -15,7 +15,7 @@ def test_acc(device, name, filename):
     net_name = setting.get_net(name)
     img_folder = setting.get_img_folder(name)
     folder_path = setting.get_folder_path(name)
-    num_classes = setting.get_abnormities_num(name)
+    num_classes = setting.get_abnormity_num(name)
     wt_file_name = os.path.join(setting.get_wt_file_name(name), filename)
     
     model = abnormity_models.initialize_abnormity_model(net_name, num_classes, feature_extract)
@@ -66,7 +66,7 @@ def get_model_results(device, name):
     net_name = setting.get_net(name)
     img_folder = setting.get_img_folder(name)
     folder_path = setting.get_folder_path(name)
-    num_classes = setting.get_abnormities_num(name)
+    num_classes = setting.get_abnormity_num(name)
     wt_file_name = setting.get_wt_file_name(name)
     
     model = abnormity_models.initialize_abnormity_model(net_name, num_classes, feature_extract)

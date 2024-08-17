@@ -90,7 +90,7 @@ def testDiseaseProbModel(device, oFoldername, oName, oClassSize, fFoldername, fN
     for i in range(len(diseaseIncludingNormal)):
         disease = diseaseIncludingNormal[i]
         for j in range(diseaseSize):
-            output = train_diagnosis.getAbnormityNumsVectorFromFile(device, disease, outputsO, outputsF, allAbnormities, dModels)
+            output = train_diagnosis.get_abnormity_nums_vector(device, disease, outputsO, outputsF, allAbnormities, dModels)
             output = output.detach()
             testData[i * diseaseSize + j] = output
             testLabel[i * diseaseSize + j] = i
