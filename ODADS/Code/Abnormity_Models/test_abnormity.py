@@ -70,7 +70,7 @@ def test_multiple(device, name):
             csv_reader = csv.reader(file)
             for row in csv_reader:
                 if int(row[0]) in epoch_nums:
-                    valid_acc.append(float(row[3]))
+                    valid_acc.append(float(row[1]))
         
         test_acc = np.array(test_acc)
         valid_acc = np.array(valid_acc)

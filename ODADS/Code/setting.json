@@ -15,7 +15,7 @@
     "D2_top_probs_min_prob": "0.9",
 
     "feature_extract": "True",
-    "batch_size": "16",
+    "batch_size": "32",
     "test_batch_size": "1",
     "LR": "1e-3",
     "use_cross_valid": "True",
