@@ -142,3 +142,12 @@ def get_abnormity_nums_vector(device, disease, o_mr, f_mr, abnormity_num_models)
         abnormity_num_output = torch.nn.functional.softmax(abnormity_num_output, 0)
         abnormity_nums_vector = torch.cat([abnormity_nums_vector, abnormity_num_output])
     return abnormity_nums_vector
+
+# find file with old name in directory and rename it to new name
+def rename_file(old_name, new_name, directory):
+    for filename in os.listdir(directory):
+        if filename == old_name:
+            old_file_path = os.path.join(directory, filename)
+            new_file_path = os.path.join(directory, new_name)
+            os.rename(old_file_path, new_file_path)
+            break

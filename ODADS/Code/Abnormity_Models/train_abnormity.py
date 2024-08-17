@@ -52,6 +52,7 @@ def train(device, name):
     start_time = time.time()
     last_time = start_time
     best_acc = [0]
+    best_epoch_in_range = 0
     valid_acc_history = []
     train_acc_history = []
     valid_losses = []
@@ -132,8 +133,14 @@ def train(device, name):
                 epoch_range_beginning = int(epoch / save_model_frequency) * save_model_frequency
                 torch.save(state, os.path.join(temp_wts_folder, wt_name + f"{epoch_range_beginning: 3d}.pth"))
                 print(f"Data successfully written into {wt_name}.pth")
+                best_epoch_in_range = epoch + 1
             if phase == "valid" and (epoch + 1) % save_model_frequency == 0:
                 best_acc.append(0)
+                os.rename(
+                    os.path.join(temp_wts_folder, wt_name + f"{epoch_range_beginning: 3d}.pth"),
+                    os.path.join(temp_wts_folder, wt_name + f"{best_epoch_in_range: 3d}.pth")
+                )
+                
                 
             if phase == "valid":
                 valid_acc_history.append(epoch_acc.item())

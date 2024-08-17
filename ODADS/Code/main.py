@@ -20,7 +20,15 @@ use_gpu = torch.cuda.is_available()
 device = torch.device(cuda_device if use_gpu else "cpu")
 print(device)
 
-if task == "train":
+if task == "train all":
+    train_abnormity.train(device, name + "TRRS - T")
+    t_acc = test_abnormity.test_multiple(device, name + "TORS - T")
+    train_abnormity.train(device, name + "TRRS - F")
+    f_acc = test_abnormity.test_multiple(device, name + "TORS - F")
+    test_abnormity.get_final_abnormity_model(name + "TRRS", t_acc, f_acc)
+    test_abnormity.get_model_results(device, name + "TRMR")
+    
+elif task == "train":
     if setting.is_abnormity(name):
         train_abnormity.train(device, name)
     elif setting.is_diagnosis1(name):
@@ -37,6 +45,3 @@ elif task == "test":
 elif task == "get MR":
     if setting.is_abnormity(name):
         test_abnormity.get_model_results(device, name)
-        
-elif task == "":
-    pass

@@ -130,8 +130,6 @@ def test_disease_prob_model(device, name):
     return acc
 
 
-
-
 def test(device, name):
     setting = utils.get_setting()
     disease_name = setting.get_disease_name(name)

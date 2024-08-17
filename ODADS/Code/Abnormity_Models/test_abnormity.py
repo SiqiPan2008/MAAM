@@ -51,15 +51,54 @@ def test_multiple(device, name):
     folder_path = setting.get_folder_path(name)
     temp_wts_folder = os.path.join(folder_path, setting.get_wt_name(name))
     
+    test_acc = []
+    epoch_nums = []
     with open(os.path.join(folder_path, name + ".csv"), "w", newline="") as file:  
         writer = csv.writer(file)
         for filename in os.listdir(temp_wts_folder):
             if os.path.splitext(filename)[1] == ".pth":
                 corrects, total, accuracy = test(device, name, filename)
+                test_acc.append(accuracy)
+                epoch_nums.append(setting.get_epoch_num(filename))
             writer.writerow([filename, corrects, total, accuracy])
     print(f"Data successfully written into {name}.csv")
     
+    valid_acc = []
+    with open(os.path.join(folder_path, setting.get_), mode='r') as file:
+        csv_reader = csv.reader(file)
+        for row in csv_reader:
+            if row[0] in epoch_nums:
+                valid_acc.append(row[1])
+                
+    test_acc = np.array(test_acc)
+    valid_acc = np.array(valid_acc)
+    train_size, test_size = setting.get_abnormity_model_datasizes(name)
+    valid_size = train_size - int(train_size * 0.8)
+    combined_acc = test_acc * (test_size / (test_size + valid_size)) + \
+        valid_acc * (valid_size / (test_size + valid_size))
+    best_combined_acc = np.max(combined_acc)
+    best_index = np.argmax(combined_acc)
+    best_epoch = epoch_nums[best_index]
     
+    print(f"best epoch: {best_epoch}, combined acc = {best_combined_acc}")
+    os.rename(
+        os.path.join(temp_wts_folder, setting.get_wt_name(name) + f"{best_epoch: 3d}.pth"),
+        os.path.join(folder_path, setting.get_wt_name(name) + ".pth")
+    )
+    os.rmdir(temp_wts_folder)
+    
+    return best_combined_acc
+
+def get_final_abnormity_model(name, t_acc, f_acc):
+    setting = utils.get_setting()
+    folder_path = setting.get_folder_path(name)
+    delete_ver = "F" if t_acc > t_acc else "T"
+    rename_ver = "T" if t_acc > f_acc else "F"
+    os.remove(os.path.join(folder_path, name + f" - {delete_ver}.pth"))
+    os.rename(
+        os.path.join(folder_path, name + f" - {rename_ver}.pth"),
+        os.path.join(folder_path, name + ".pth")
+    )
     
 def get_model_results(device, name):
     setting = utils.get_setting()

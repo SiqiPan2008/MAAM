@@ -228,3 +228,12 @@ class Setting:
         else:
             diseases = [disease for disease in criteria.keys() if disease != "All" and disease != "Normal"]
         return diseases
+    
+    def get_epoch_num(self, filename: str) -> int:
+        return filename[-7:-4]
+    
+    def get_abnormity_model_datasizes(self, name: str) -> tuple:
+        if self.is_OCT(name):
+            return (self.O_train_class_size, self.O_test_class_size)
+        else:
+            return (self.F_train_class_size, self.F_test_class_size)

@@ -2,6 +2,23 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "AO train all",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "ODADS/Code/main.py",
+            "console": "integratedTerminal",
+            "args": ["train all", "152AO", "cuda:0"]
+        },
+        {
+            "name": "AF train all",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "ODADS/Code/main.py",
+            "console": "integratedTerminal",
+            "args": ["train all", "152AF", "cuda:0"]
+        },
+
+        {
             "name": "AO transfer learning",
             "type": "debugpy",
             "request": "launch",
