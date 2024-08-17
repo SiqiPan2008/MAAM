@@ -7,6 +7,8 @@ from ODADS.Code.Diagnosis_Model import diagnosis_model, train_diagnosis
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
     
 def testAbnormityNumModel(device, diseaseName, oFoldername, oName, oClassSize, fFoldername, fName, fClassSize, dWtsDTime, batchSize, gradeSize):
+    
+    
     criteria = utils.get_criteria()
     oAbnormityNum = len(criteria[diseaseName]["OCT"])
     fAbnormityNum = len(criteria[diseaseName]["Fundus"])
@@ -33,7 +35,7 @@ def testAbnormityNumModel(device, diseaseName, oFoldername, oName, oClassSize, f
     
     for grade in range(gradeLevels):
         for i in range(gradeSize):
-            output = train_diagnosis.getOutputsFromFile(allAbnormities, diseaseName, oAbnormityNum, fAbnormityNum, grade, outputsO, outputsF)
+            output = train_diagnosis.get_mr(allAbnormities, diseaseName, oAbnormityNum, fAbnormityNum, grade, outputsO, outputsF)
             testData[grade * gradeSize + i] = output
             testLabel[grade * gradeSize + i] = grade
     testDataset = torch.utils.data.TensorDataset(testData, testLabel)

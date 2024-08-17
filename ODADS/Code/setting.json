@@ -14,5 +14,14 @@
     "LR": "1e-3",
     "use_cross_valid": "True",
     "save_model_frequency": "10",
-    "use_top_probs": "True"
+    "use_top_probs": "True",
+
+    "O_train_class_size": "5000",
+    "O_test_class_size": "500",
+    "F_train_class_size": "3000",
+    "F_test_class_size": "300",
+    "D1_train_class_size": "10000",
+    "D1_test_class_size": "10000",
+    "D2_train_class_size": "10000",
+    "D2_test_class_size": "10000"
 }

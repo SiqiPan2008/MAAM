@@ -25,7 +25,7 @@ def train(device, name):
     temp_wts_folder = os.path.join(folder_path, wt_file_name)
     wt_file_name = setting.get_wt_file_name(name)
     rs_file_name = setting.get_rs_file_name(name)
-    num_classes = setting.get_num_abnormities(name)
+    num_classes = setting.get_abnormities_num(name)
     use_pretrained = setting.is_transfer_learning(name)
     is_transfer_learning = setting.is_transfer_learning(name)
     

@@ -3,7 +3,6 @@ import numpy as np
 from PIL import Image
 from ODADS.Code.Abnormity_Models import abnormity_models
 from Utils import utils
-import os
 import matplotlib.pyplot as plt
 from matplotlib.colors import LinearSegmentedColormap
 
