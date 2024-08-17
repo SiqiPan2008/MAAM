@@ -59,7 +59,7 @@ class Setting:
     @staticmethod
     def from_dict(data: Dict) -> 'Setting':
         setting = Setting(**data)
-        setting.use_small = bool(setting.use_small)
+        setting.use_small = setting.use_small == "True"
         
         setting.data_folder = setting.data_folder_s if setting.use_small else setting.data_folder 
         data_folder_with_root = os.path.join(setting.root, setting.data_folder)
@@ -68,13 +68,13 @@ class Setting:
         setting.D1_folder = os.path.join(data_folder_with_root, setting.D1_folder)
         setting.D2_folder = os.path.join(data_folder_with_root, setting.D2_folder)
         
-        setting.feature_extract = bool(setting.feature_extract)
+        setting.feature_extract = setting.feature_extract == "True"
         setting.batch_size = int(setting.batch_size)
         setting.test_batch_size = int(setting.test_batch_size)
         setting.LR = float(setting.LR)
-        setting.use_cross_valid = bool(setting.use_cross_valid)
+        setting.use_cross_valid = setting.use_cross_valid == "True"
         setting.save_model_frequency = int(setting.save_model_frequency)
-        setting.use_top_probs = bool(setting.use_top_probs)
+        setting.use_top_probs = setting.use_top_probs == "True"
 
         setting.A_top_probs_max_num = int(setting.A_top_probs_max_num)
         setting.A_top_probs_min_prob = float(setting.A_top_probs_min_prob)
