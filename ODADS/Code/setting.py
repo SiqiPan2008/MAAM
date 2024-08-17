@@ -6,24 +6,28 @@ import os
 
 @dataclass
 class Setting:
+    use_small: bool
+
     root: str
+    data_folder: str
+    data_folder_s: str
     images_folder: str
     A_folder: str
     D1_folder: str
     D2_folder: str
 
-    feature_extract: str
+    feature_extract: bool
     batch_size: int
     test_batch_size: int
-    A_T_num_epochs: int
-    A_F_num_epochs: int
-    D1_num_epochs: int
-    D2_num_epochs: int
     LR: float
     use_cross_valid: bool
     save_model_frequency: int
     use_top_probs: bool
-    
+
+    A_T_num_epochs: int
+    A_F_num_epochs: int
+    D1_num_epochs: int
+    D2_num_epochs: int
     O_train_class_size: int
     O_test_class_size: int
     F_train_class_size: int
@@ -33,32 +37,67 @@ class Setting:
     D2_train_class_size: int
     D2_test_class_size: int
 
+    test_batch_size_s: int
+    A_T_num_epochs_s: int
+    A_F_num_epochs_s: int
+    D1_num_epochs_s: int
+    D2_num_epochs_s: int
+    O_train_class_size_s: int
+    O_test_class_size_s: int
+    F_train_class_size_s: int
+    F_test_class_size_s: int
+    D1_train_class_size_s: int
+    D1_test_class_size_s: int
+    D2_train_class_size_s: int
+    D2_test_class_size_s: int
+
     @staticmethod
     def from_dict(data: Dict) -> 'Setting':
         setting = Setting(**data)
+        setting.use_small = bool(setting.use_small)
+        setting.data_folder = setting.data_folder_s if setting.use_small else setting.data_folder 
+        data_folder_with_root = os.path.join(setting.root, setting.data_folder)
+        setting.images_folder = os.path.join(data_folder_with_root, setting.images_folder)
+        setting.A_folder = os.path.join(data_folder_with_root, setting.A_folder)
+        setting.D1_folder = os.path.join(data_folder_with_root, setting.D1_folder)
+        setting.D2_folder = os.path.join(data_folder_with_root, setting.D2_folder)
         setting.feature_extract = bool(setting.feature_extract)
         setting.batch_size = int(setting.batch_size)
         setting.test_batch_size = int(setting.test_batch_size)
-        setting.A_T_num_epochs = int(setting.A_T_num_epochs)
-        setting.A_F_num_epochs = int(setting.A_F_num_epochs)
-        setting.D1_num_epochs = int(setting.D1_num_epochs)
-        setting.D2_num_epochs = int(setting.D2_num_epochs)
         setting.LR = float(setting.LR)
         setting.use_cross_valid = bool(setting.use_cross_valid)
         setting.save_model_frequency = int(setting.save_model_frequency)
         setting.use_top_probs = bool(setting.use_top_probs)
-        setting.O_train_class_size = int(setting.O_train_class_size)
-        setting.O_test_class_size = int(setting.O_test_class_size)
-        setting.F_train_class_size = int(setting.F_train_class_size)
-        setting.F_test_class_size = int(setting.F_test_class_size)
-        setting.D1_train_class_size = int(setting.D1_train_class_size)
-        setting.D1_test_class_size = int(setting.D1_test_class_size)
-        setting.D2_train_class_size = int(setting.D2_train_class_size)
-        setting.D2_test_class_size = int(setting.D2_test_class_size)
+
+        setting.A_T_num_epochs = int(setting.A_T_num_epochs_s \
+            if setting.use_small else setting.A_T_num_epochs)
+        setting.A_F_num_epochs = int(setting.A_F_num_epochs_s \
+            if setting.use_small else setting.A_F_num_epochs)
+        setting.D1_num_epochs = int(setting.D1_num_epochs_s \
+            if setting.use_small else setting.D1_num_epochs)
+        setting.D2_num_epochs = int(setting.D2_num_epochs_s \
+            if setting.use_small else setting.D2_num_epochs)
+        
+        setting.O_train_class_size = int(setting.O_train_class_size_s \
+            if setting.use_small else setting.O_train_class_size)
+        setting.O_test_class_size = int(setting.O_test_class_size_s \
+            if setting.use_small else setting.O_test_class_size)
+        setting.F_train_class_size = int(setting.F_train_class_size_s \
+            if setting.use_small else setting.F_train_class_size)
+        setting.F_test_class_size = int(setting.F_test_class_size_s \
+            if setting.use_small else setting.F_test_class_size)
+        setting.D1_train_class_size = int(setting.D1_train_class_size_s \
+            if setting.use_small else setting.D1_train_class_size)
+        setting.D1_test_class_size = int(setting.D1_test_class_size_s \
+            if setting.use_small else setting.D1_test_class_size)
+        setting.D2_train_class_size = int(setting.D2_train_class_size_s \
+            if setting.use_small else setting.D2_train_class_size)
+        setting.D2_test_class_size = int(setting.D2_test_class_size_s \
+            if setting.use_small else setting.D2_test_class_size)
         return setting
     
     def get_net(self, name: str) -> bool:
-        return name[0:3]
+        return name[:3]
     
     def is_abnormity(self, name: str) -> bool:
         return name[3] == 'A'
@@ -80,11 +119,7 @@ class Setting:
         return name[3:5] == "D2"
     
     def get_disease_name(self, name: str) -> str:
-        match = re.search(r" - (\w*)", name)
-        disease_name = name
-        if match:
-            disease_name = match.group(1)[0]
-        return disease_name
+        return name[12:]
     
     def get_abnormity_num(self, name: str = "All Abnormities") -> int:
         criteria = utils.get_criteria()
@@ -98,6 +133,7 @@ class Setting:
     def get_disease_abnormity_num(self, name, type: str = "All Abnormities") -> int:
         criteria = utils.get_criteria()
         disease_name = self.get_disease_name(name)
+        disease_name = disease_name if disease_name else name
         if type == "All Abnormities":
             return len(criteria[disease_name]["OCT"] + criteria[disease_name]["Fundus"])
         elif type == "OCT Abnormities":
@@ -119,6 +155,7 @@ class Setting:
     def get_correct_abnormities(self, name: str) -> list:
         criteria = utils.get_criteria()
         disease_name = self.get_disease_name(name)
+        disease_name = disease_name if disease_name else name
         return [("OCT", abnormity) for abnormity in criteria[disease_name]["OCT"]] + \
             [("Fundus", abnormity) for abnormity in criteria[disease_name]["Fundus"]]
             
@@ -152,25 +189,25 @@ class Setting:
             return self.D2_folder
         
     def get_wt_name(self, name: str) -> str:
-        return name[:6] + "TRWT" + name[10:]
+        return name[:5] + "TRWT" + name[9:]
     
     def get_o_mr_name(self, name: str) -> str:
-        return name[:4] + "AOTRMR"
+        return name[:3] + "AOTRMR"
     
     def get_f_mr_name(self, name: str) -> str:
-        return name[:4] + "AFTRMR"
+        return name[:3] + "AFTRMR"
     
     def get_rs_name(self, name: str) -> str:
-        return name[:8] + "RS" + name[10:]
+        return name[:7] + "RS" + name[9:]
     
     def get_transfer_learning_wt(self, name: str) -> str:
-        return name[:13] + "T"
+        return name[:7] + "WT - T"
     
     def get_d1_single_disease_rs(self, name: str, disease: str) -> str:
         return name + " - " + disease
     
     def get_d1_single_disease_wt(self, name: str, disease: str) -> str:
-        return name[:6] + "TRWT - " + disease
+        return name[:3] + "D1TRWT - " + disease
     
     def get_d2_input_length(self) -> int:
         criteria = utils.get_criteria()

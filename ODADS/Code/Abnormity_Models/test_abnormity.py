@@ -4,11 +4,11 @@ import csv
 import numpy as np
 from torchvision import transforms, datasets
 from PIL import Image
-from ODADS.Code.Abnormity_Models import abnormity_models, classify_abnormity
-from ODADS.Code.Utils import utils
+from Abnormity_Models import abnormity_models, classify_abnormity
+from Utils import utils
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 
-def test_acc(device, name, filename):
+def test(device, name, filename):
     setting = utils.get_setting()
     use_top_probs = setting.use_top_probs
     feature_extract = setting.feature_extract
@@ -20,14 +20,15 @@ def test_acc(device, name, filename):
     
     model = abnormity_models.initialize_abnormity_model(net_name, num_classes, feature_extract)
     model = model.to(device)
-    trained_model = torch.load(os.path.join(folder_path, wt_file_name + ".pth"))
+    trained_model = torch.load(os.path.join(folder_path, wt_file_name))
     model.load_state_dict(trained_model["state_dict"])
     abnormities = setting.get_abnormities(name)
-    class_to_idx = {abnormities[i]: i for i in range(len(abnormities))}
+    class_to_idx = {abnormities[i][1]: i for i in range(len(abnormities))}
     
     corrects = 0
     total = 0
     for abnormity in abnormities:
+        abnormity = abnormity[1]
         abnormity_folder = os.path.join(img_folder, abnormity)
         for img_name in os.listdir(abnormity_folder):
             img = Image.open(os.path.join(abnormity_folder, img_name))
@@ -45,7 +46,7 @@ def test_acc(device, name, filename):
     print(f"accuracy: {accuracy}")
     return corrects, total, accuracy
 
-def test_multiple_acc(device, name):
+def test_multiple(device, name):
     setting = utils.get_setting()
     folder_path = setting.get_folder_path(name)
     temp_wts_folder = os.path.join(folder_path, setting.get_wt_name(name))
@@ -54,9 +55,9 @@ def test_multiple_acc(device, name):
         writer = csv.writer(file)
         for filename in os.listdir(temp_wts_folder):
             if os.path.splitext(filename)[1] == ".pth":
-                corrects, total, accuracy = test_acc(device, name, filename)
+                corrects, total, accuracy = test(device, name, filename)
             writer.writerow([filename, corrects, total, accuracy])
-    print(f"Data successfully written into {filename}.csv")
+    print(f"Data successfully written into {name}.csv")
     
     
     

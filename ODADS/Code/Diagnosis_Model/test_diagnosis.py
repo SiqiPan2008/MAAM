@@ -2,11 +2,11 @@ import os
 import torch
 import time
 import numpy as np
-from ODADS.Code.Utils import utils
-from ODADS.Code.Diagnosis_Model import diagnosis_model, train_diagnosis
+from Utils import utils
+from Diagnosis_Model import diagnosis_model, train_diagnosis
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
     
-def testAbnormityNumModel(device, name):
+def test_abnormity_num_model(device, name):
     setting = utils.get_setting()
     batch_size = setting.test_batch_size
     class_size = setting.D1_train_class_size
@@ -20,7 +20,7 @@ def testAbnormityNumModel(device, name):
     o_abnormity_num = setting.get_abnormity_num("OCT Abnormities")
     f_abnormity_num = setting.get_abnormity_num("Fundus Abnormities")
     all_abnormity_num = setting.get_abnormity_num("All Abnormities")
-    label_levels = setting.get_disease_abnormity_num(name, "All Abnormities")
+    label_levels = setting.get_disease_abnormity_num(name, "All Abnormities") + 1
     
     o_mr_path = os.path.join(abnormity_folder_path, o_mr_name + ".bin")
     o_mr = np.fromfile(o_mr_path, dtype = np.float64).reshape((o_abnormity_num, o_class_size, o_abnormity_num))
@@ -30,7 +30,7 @@ def testAbnormityNumModel(device, name):
     test_data = torch.zeros(label_levels * class_size, all_abnormity_num)
     test_label = torch.zeros(label_levels * class_size, dtype=torch.long)
     
-    model = diagnosis_model.Simple_Net(all_abnormity_num, label_levels)
+    model = diagnosis_model.Simple_Net(all_abnormity_num, label_levels).to(device)
     trained_model = torch.load(os.path.join(folder_path, wt_name + ".pth"))
     model.load_state_dict(trained_model["state_dict"])
     
@@ -60,7 +60,7 @@ def testAbnormityNumModel(device, name):
     return acc
 
         
-def testDiseaseProbModel(device, name):
+def test_disease_prob_model(device, name):
     setting = utils.get_setting()
     d1_folder = setting.D1_folder
     batch_size = setting.batch_size
@@ -74,7 +74,6 @@ def testDiseaseProbModel(device, name):
     folder_path = setting.get_folder_path(name)
     d2_input_length = setting.get_d2_input_length()
     diseases = setting.get_diseases(include_normal = False)
-    all_abnormities = setting.get_abnormities("All Abnormities")
     o_abnormity_num = setting.get_abnormity_num("OCT Abnormities")
     f_abnormity_num = setting.get_abnormity_num("Fundus Abnormities")
     all_abnormity_num = setting.get_abnormity_num("All Abnormities")
@@ -89,26 +88,26 @@ def testDiseaseProbModel(device, name):
     f_mr_path = os.path.join(abnormity_folder_path, f_mr_name + ".bin")
     f_mr = np.fromfile(f_mr_path, dtype = np.float64).reshape((f_abnormity_num, f_class_size, f_abnormity_num))
     
-    model = diagnosis_model.SimpleNet(d2_input_length, disease_num_including_normal).to(device)
+    model = diagnosis_model.Simple_Net(d2_input_length, disease_num_including_normal).to(device)
     trained_model = torch.load(os.path.join(folder_path, wt_name + ".pth"))
     model.load_state_dict(trained_model["state_dict"])
     
     abnormity_num_models = {
         disease: diagnosis_model.Simple_Net(
             all_abnormity_num, 
-            setting.get_disease_abnormity_num(disease, "All Abnormities")
+            setting.get_disease_abnormity_num(disease, "All Abnormities") + 1
         ).to(device)
         for disease in diseases
     }
     for disease in abnormity_num_models.keys():
-         trained_model = torch.load(os.path.join(d1_folder, setting.get_d1_single_disease_wt(name, disease)))
+         trained_model = torch.load(os.path.join(d1_folder, setting.get_d1_single_disease_wt(name, disease) + ".pth"))
          abnormity_num_models[disease].load_state_dict(trained_model["state_dict"])
     
     start_time = time.time()
     for i in range(len(diseases_including_normal)):
         disease = diseases_including_normal[i]
         for j in range(class_size):
-            output = utils.get_abnormity_nums_vector(device, disease, o_mr, f_mr, all_abnormities, abnormity_num_models)
+            output = utils.get_abnormity_nums_vector(device, disease, o_mr, f_mr, abnormity_num_models)
             output = output.detach()
             test_data[i * class_size + j] = output
             test_label[i * class_size + j] = i
@@ -133,10 +132,18 @@ def testDiseaseProbModel(device, name):
 
 
 
-def test(device, diseaseName, oFoldername, oName, oClassSize, fFoldername, fName, fClassSize, batchSize, classSize, dWtsDTime, ddWtsDTime = None):
-    if diseaseName == "all disease prob":
-        acc = testDiseaseProbModel(device, oFoldername, oName, oClassSize, fFoldername, fName, fClassSize, dWtsDTime, ddWtsDTime, batchSize, classSize)
+def test(device, name):
+    setting = utils.get_setting()
+    disease_name = setting.get_disease_name(name)
+    if setting.is_diagnosis1(name):
+        if disease_name:
+            acc = test_abnormity_num_model(device, name)
+        else:
+            acc = []
+            diseases = setting.get_diseases(include_normal = False)
+            for disease in diseases:
+                acc.append(test_abnormity_num_model(device, setting.get_d1_single_disease_rs(name, disease)))
     else:
-        acc = testAbnormityNumModel(device, diseaseName, oFoldername, oName, oClassSize, fFoldername, fName, fClassSize, dWtsDTime, batchSize, classSize)
-    
-    return acc
+        acc = test_disease_prob_model(device, name)
+        
+    print(acc)

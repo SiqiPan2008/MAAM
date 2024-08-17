@@ -7,8 +7,8 @@ from torch.utils.data import Subset
 import time
 import csv
 import numpy as np
-from ODADS.Code.Utils import utils
-from ODADS.Code.Abnormity_Models import abnormity_models
+from Utils import utils
+from Abnormity_Models import abnormity_models
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 
 def train(device, name):
@@ -19,15 +19,16 @@ def train(device, name):
     feature_extract = setting.feature_extract
     save_model_frequency = setting.save_model_frequency
     net_name = setting.get_net(name)
+    wt_name = setting.get_wt_name(name)
+    rs_name = setting.get_rs_name(name)
     num_epochs = setting.get_num_epochs(name)
     img_folder = setting.get_img_folder(name)
     folder_path = setting.get_folder_path(name)
-    temp_wts_folder = os.path.join(folder_path, wt_name)
-    wt_name = setting.get_wt_name(name)
-    rs_name = setting.get_rs_name(name)
     num_classes = setting.get_abnormity_num(name)
     use_pretrained = setting.is_transfer_learning(name)
+    temp_wts_folder = os.path.join(folder_path, wt_name)
     is_transfer_learning = setting.is_transfer_learning(name)
+    os.makedirs(temp_wts_folder, exist_ok = True)
     
     model = abnormity_models.initialize_abnormity_model(net_name, num_classes, feature_extract, use_pretrained)
     model = model.to(device)
@@ -51,7 +52,6 @@ def train(device, name):
     start_time = time.time()
     last_time = start_time
     best_acc = [0]
-    model.to(device)
     valid_acc_history = []
     train_acc_history = []
     valid_losses = []
@@ -136,12 +136,12 @@ def train(device, name):
                 best_acc.append(0)
                 
             if phase == "valid":
-                valid_acc_history.append(epoch_acc)
-                valid_losses.append(epoch_loss)
+                valid_acc_history.append(epoch_acc.item())
+                valid_losses.append(epoch_loss.item())
                 scheduler.step(epoch_loss)
             elif phase == "train":
-                train_acc_history.append(epoch_acc)
-                train_losses.append(epoch_loss)
+                train_acc_history.append(epoch_acc.item())
+                train_losses.append(epoch_loss.item())
         
         print(f"optimizer learning rate: {optimizer.param_groups[0]['lr'] :.7f}")
         LRs.append(optimizer.param_groups[0]["lr"])

@@ -10,8 +10,7 @@ def set_parameters_do_not_require_grad(model, featureExtract):
 
 def initialize_abnormity_model(net_name, num_classes, feature_extract, use_pretrained = True):
     model = None
-    input_size = 0
-    
+
     if net_name == "152":
         model = models.resnet152(weights = models.ResNet152_Weights.DEFAULT if use_pretrained else None)
     elif net_name == "101":

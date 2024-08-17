@@ -8,6 +8,7 @@ TT: RS - acc/... result; WT - weight; MR - model results
 [Additional]: T001100[TI] = Transfer learning from epoch 1~100, tested in TI; F101110 = Fine tuning from epoch 101~110
 
 TODO:
+* record max acc model epoch in filename
 * test trained models and read training results (csv files) to determine continuing points
 * run models in sequence
 * delete old training result data before training abnormity models

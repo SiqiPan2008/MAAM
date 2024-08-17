@@ -1,6 +1,6 @@
-from ODADS.Code.Diagnosis_Model import diagnose_disease, train_diagnose, test_diagnose
-from ODADS.Code.Abnormity_Models import test_abnormity, train_abnormity, classify_abnormity, gradcam
-from ODADS.Code.Utils import utils
+from Diagnosis_Model import diagnose_disease, train_diagnosis, test_diagnosis
+from Abnormity_Models import test_abnormity, train_abnormity, classify_abnormity, gradcam
+from Utils import utils
 import torch
 import numpy as np
 from PIL import Image
@@ -17,23 +17,23 @@ name = sys.argv[2]
 cuda_device = sys.argv[3]
 
 use_gpu = torch.cuda.is_available()
-device = torch.device(cuda_device if use_gpu else "cpu") # get to know how to use both GPUs
+device = torch.device(cuda_device if use_gpu else "cpu")
 print(device)
 
 if task == "train":
     if setting.is_abnormity(name):
         train_abnormity.train(device, name)
     elif setting.is_diagnosis1(name):
-        train_diagnose.trainAbnormityNumModel(device, name)
+        train_diagnosis.train(device, name)
     elif setting.is_diagnosis2(name):
-        train_diagnose.trainDiseaseProbModel(device, name)
+        train_diagnosis.train(device, name)
 elif task == "test":
     if setting.is_abnormity(name):
-        test_abnormity.test_multiple_acc(device, name)
+        test_abnormity.test_multiple(device, name)
     elif setting.is_diagnosis1(name):
-        train_diagnose.testAbnormityNumModel(device, name)
+        test_diagnosis.test(device, name)
     elif setting.is_diagnosis2(name):
-        train_diagnose.testDiseaseProbModel(device, name)
+        test_diagnosis.test(device, name)
 elif task == "get MR":
     if setting.is_abnormity(name):
         test_abnormity.get_model_results(device, name)

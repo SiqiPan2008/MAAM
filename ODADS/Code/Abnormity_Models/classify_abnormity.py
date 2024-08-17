@@ -1,8 +1,8 @@
 import os
 import torch
 from torchvision import transforms
-from ODADS.Code.Abnormity_Models import abnormity_models
-from ODADS.Code.Utils import utils
+from Abnormity_Models import abnormity_models
+from Utils import utils
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 
 # small utilities. refactor later!
@@ -14,7 +14,7 @@ def get_abnormities_probs(img, model, device):
     img = img.unsqueeze(0)
     output = model(img.to(device))
     output = torch.nn.functional.softmax(output[0], dim=0)
-    print(output)
+    # print(output)
     return output
 
 def get_abnormity_probs_from_img(img, numClasses, device, featureExtract, modelName, foldername, wtsName):

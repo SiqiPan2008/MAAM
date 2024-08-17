@@ -106,33 +106,33 @@ def get_mr(device, name, label, o_mr, f_mr):
     f_abnormities = setting.get_abnormities("Fundus Abnormities")
     o_abnormity_num = setting.get_abnormity_num("OCT Abnormities")
     f_abnormity_num = setting.get_abnormity_num("Fundus Abnormities")
+    disease_total_abnormity_num = setting.get_disease_abnormity_num(name, "All Abnormities")
     correct_abnormities = setting.get_correct_abnormities(name)
-    incorrect_abnormities = setting.get_correct_abnormities(name)
+    incorrect_abnormities = setting.get_incorrect_abnormities(name)
      
     selCorrectAbnormities = random.sample(correct_abnormities, label)
-    selIncorrectAbnormities = random.sample(incorrect_abnormities, o_abnormity_num + f_abnormity_num - label)
+    selIncorrectAbnormities = random.sample(incorrect_abnormities, disease_total_abnormity_num - label)
     selAbnormities = selCorrectAbnormities + selIncorrectAbnormities
     
     oOutput = torch.zeros([o_abnormity_num])
     fOutput = torch.zeros([f_abnormity_num])
     for abnormity in selAbnormities:
-        abnormityType, abnormityName = abnormity[0], abnormity[1]
-        if abnormityType == "OCT":
-            output = random.choice(o_mr[o_abnormities.index(abnormityName)])
+        if abnormity[0] == "OCT":
+            output = random.choice(o_mr[o_abnormities.index(abnormity)])
             oOutput = torch.max(torch.tensor(output), oOutput)
-        elif abnormityType == "Fundus":
-            output = random.choice(f_mr[f_abnormities.index(abnormityName)])
+        elif abnormity[0] == "Fundus":
+            output = random.choice(f_mr[f_abnormities.index(abnormity)])
             fOutput = torch.max(torch.tensor(output), fOutput)
     output = torch.concat([fOutput, oOutput]).to(device)
     return output
 
 # randomly choose an image from a certain disease
 # pass the image through all D1 models and return the concatenated result
-def get_abnormity_nums_vector(device, name, o_mr, f_mr, abnormity_num_models):
+def get_abnormity_nums_vector(device, disease, o_mr, f_mr, abnormity_num_models):
     setting = get_setting()
-    disease_abnormity_num = setting.get_disease_abnormity_num(name, "All Abnormities") + 1
+    disease_abnormity_num = setting.get_disease_abnormity_num(disease, "All Abnormities")
     
-    abnormity_output = get_mr(device, name, disease_abnormity_num, o_mr, f_mr)
+    abnormity_output = get_mr(device, disease, disease_abnormity_num, o_mr, f_mr)
     abnormity_output = abnormity_output.unsqueeze(0).type(torch.float32).to(device)
     abnormity_nums_vector = torch.empty([0]).to(device)
     for disease in abnormity_num_models.keys():

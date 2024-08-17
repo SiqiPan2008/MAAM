@@ -1,8 +1,8 @@
 import os
 import torch
-from ODADS.Code.Abnormity_Models import classify_abnormity
-from ODADS.Code.Diagnosis_Model import diagnosis_model
-from ODADS.Code.Utils import utils
+from Abnormity_Models import classify_abnormity
+from Diagnosis_Model import diagnosis_model
+from Utils import utils
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 
 # small utilities. refactor later!
