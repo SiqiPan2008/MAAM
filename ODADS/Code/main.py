@@ -27,6 +27,7 @@ if task == "train all":
     f_acc = test_abnormity.test_multiple(device, name + "TORS - F")
     test_abnormity.get_final_abnormity_model(name + "TRRS", t_acc, f_acc)
     test_abnormity.get_model_results(device, name + "TRMR")
+    test_abnormity.get_model_results(device, name + "TOMR")
     
 elif task == "train":
     if setting.is_abnormity(name):

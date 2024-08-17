@@ -188,7 +188,7 @@ class Setting:
         elif self.is_diagnosis2(name):
             return self.D2_folder
         
-    def get_wt_name(self, name: str) -> str:
+    def get_wt_file_name(self, name: str) -> str:
         return name[:5] + "TRWT" + name[9:]
     
     def get_o_mr_name(self, name: str) -> str:
@@ -197,8 +197,11 @@ class Setting:
     def get_f_mr_name(self, name: str) -> str:
         return name[:3] + "AFTRMR"
     
-    def get_rs_name(self, name: str) -> str:
+    def get_rs_file_name(self, name: str) -> str:
         return name[:7] + "RS" + name[9:]
+    
+    def get_training_rs_name(self, name: str) -> str:
+        return name[:5] + "TRRS" + name[9:]
     
     def get_transfer_learning_wt(self, name: str) -> str:
         return name[:7] + "WT - T"
@@ -230,7 +233,7 @@ class Setting:
         return diseases
     
     def get_epoch_num(self, filename: str) -> int:
-        return filename[-7:-4]
+        return int(filename[-7:-4])
     
     def get_abnormity_model_datasizes(self, name: str) -> tuple:
         if self.is_OCT(name):

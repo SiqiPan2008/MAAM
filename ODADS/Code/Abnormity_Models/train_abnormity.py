@@ -19,8 +19,8 @@ def train(device, name):
     feature_extract = setting.feature_extract
     save_model_frequency = setting.save_model_frequency
     net_name = setting.get_net(name)
-    wt_name = setting.get_wt_name(name)
-    rs_name = setting.get_rs_name(name)
+    wt_name = setting.get_wt_file_name(name)
+    rs_name = setting.get_rs_file_name(name)
     num_epochs = setting.get_num_epochs(name)
     img_folder = setting.get_img_folder(name)
     folder_path = setting.get_folder_path(name)
@@ -29,6 +29,8 @@ def train(device, name):
     temp_wts_folder = os.path.join(folder_path, wt_name)
     is_transfer_learning = setting.is_transfer_learning(name)
     os.makedirs(temp_wts_folder, exist_ok = True)
+    for filename in os.listdir(temp_wts_folder):
+        os.remove(os.path.join(temp_wts_folder, filename))
     
     model = abnormity_models.initialize_abnormity_model(net_name, num_classes, feature_extract, use_pretrained)
     model = model.to(device)
@@ -44,7 +46,7 @@ def train(device, name):
             if feature_extract:
                 params_to_update.append(param)
             print("\t", name)
-            
+    
     optimizer = optim.Adam(params_to_update, lr = LR)
     scheduler = optim.lr_scheduler.StepLR(optimizer, step_size = 7, gamma = 0.1)
     criterion = nn.CrossEntropyLoss()
@@ -131,24 +133,24 @@ def train(device, name):
                     "optimizer": optimizer.state_dict()
                 }
                 epoch_range_beginning = int(epoch / save_model_frequency) * save_model_frequency
-                torch.save(state, os.path.join(temp_wts_folder, wt_name + f"{epoch_range_beginning: 3d}.pth"))
-                print(f"Data successfully written into {wt_name}.pth")
+                torch.save(state, os.path.join(temp_wts_folder, wt_name + f"{epoch_range_beginning + 1: 3d}{epoch_range_beginning + 10: 3d}.pth"))
+                print(f"Data successfully written into {wt_name}{epoch_range_beginning + 1: 3d}{epoch_range_beginning + 10: 3d}.pth")
                 best_epoch_in_range = epoch + 1
             if phase == "valid" and (epoch + 1) % save_model_frequency == 0:
                 best_acc.append(0)
-                os.rename(
-                    os.path.join(temp_wts_folder, wt_name + f"{epoch_range_beginning: 3d}.pth"),
+                utils.rename_file_by_path(
+                    os.path.join(temp_wts_folder, wt_name + f"{epoch_range_beginning + 1: 3d}{epoch_range_beginning + 10: 3d}.pth"),
                     os.path.join(temp_wts_folder, wt_name + f"{best_epoch_in_range: 3d}.pth")
                 )
                 
                 
             if phase == "valid":
                 valid_acc_history.append(epoch_acc.item())
-                valid_losses.append(epoch_loss.item())
+                valid_losses.append(epoch_loss)
                 scheduler.step(epoch_loss)
             elif phase == "train":
                 train_acc_history.append(epoch_acc.item())
-                train_losses.append(epoch_loss.item())
+                train_losses.append(epoch_loss)
         
         print(f"optimizer learning rate: {optimizer.param_groups[0]['lr'] :.7f}")
         LRs.append(optimizer.param_groups[0]["lr"])
@@ -161,7 +163,7 @@ def train(device, name):
     with open(os.path.join(folder_path, rs_name + ".csv"), "w", newline="") as file:  
         writer = csv.writer(file)  
         for i in range(len(train_losses)):  
-            writer.writerow([i + 1, valid_acc_history[i].item(), train_acc_history[i].item(), valid_losses[i], train_losses[i], LRs[i]])
+            writer.writerow([i + 1, valid_acc_history[i], train_acc_history[i], valid_losses[i], train_losses[i], LRs[i]])
     print(f"Data successfully written into {rs_name}.csv")
     
     utils.curve(valid_acc_history, train_acc_history, valid_losses, train_losses, os.path.join(folder_path, rs_name + ".pdf"))

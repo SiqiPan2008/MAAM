@@ -13,7 +13,7 @@ def test_abnormity_num_model(device, name):
     abnormity_folder_path = setting.A_folder
     o_class_size = setting.O_train_class_size
     f_class_size = setting.F_train_class_size
-    wt_name = setting.get_wt_name(name)
+    wt_name = setting.get_wt_file_name(name)
     o_mr_name = setting.get_o_mr_name(name)
     f_mr_name = setting.get_f_mr_name(name)
     folder_path = setting.get_folder_path(name)
@@ -68,7 +68,7 @@ def test_disease_prob_model(device, name):
     abnormity_folder_path = setting.A_folder
     o_class_size = setting.O_train_class_size
     f_class_size = setting.F_train_class_size
-    wt_name = setting.get_wt_name(name)
+    wt_name = setting.get_wt_file_name(name)
     o_mr_name = setting.get_o_mr_name(name)
     f_mr_name = setting.get_f_mr_name(name)
     folder_path = setting.get_folder_path(name)

@@ -31,8 +31,8 @@
     "D2_test_class_size": "10000",
 
     "test_batch_size_s": "1",
-    "A_T_num_epochs_s": "1",
-    "A_F_num_epochs_s": "1",
+    "A_T_num_epochs_s": "30",
+    "A_F_num_epochs_s": "30",
     "D1_num_epochs_s": "1",
     "D2_num_epochs_s": "1",
     "O_train_class_size_s": "5",

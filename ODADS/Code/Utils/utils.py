@@ -144,10 +144,15 @@ def get_abnormity_nums_vector(device, disease, o_mr, f_mr, abnormity_num_models)
     return abnormity_nums_vector
 
 # find file with old name in directory and rename it to new name
-def rename_file(old_name, new_name, directory):
+def rename_file_in_dir(old_name, new_name, directory):
     for filename in os.listdir(directory):
         if filename == old_name:
             old_file_path = os.path.join(directory, filename)
             new_file_path = os.path.join(directory, new_name)
             os.rename(old_file_path, new_file_path)
             break
+
+def rename_file_by_path(old_path, new_path):
+    if os.path.exists(new_path):
+        os.remove(new_path)
+    os.rename(old_path, new_path)

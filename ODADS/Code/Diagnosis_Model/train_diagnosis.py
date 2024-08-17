@@ -21,7 +21,7 @@ def train_abnormity_num_model(device, name):
     abnormity_folder_path = setting.A_folder
     o_class_size = setting.O_train_class_size
     f_class_size = setting.F_train_class_size
-    wt_name = setting.get_wt_name(name)
+    wt_name = setting.get_wt_file_name(name)
     o_mr_name = setting.get_o_mr_name(name)
     f_mr_name = setting.get_f_mr_name(name)
     num_epochs = setting.get_num_epochs(name)
@@ -152,7 +152,7 @@ def train_disease_prob_model(device, name):
     abnormity_folder_path = setting.A_folder
     o_class_size = setting.O_train_class_size
     f_class_size = setting.F_train_class_size
-    wt_name = setting.get_wt_name(name)
+    wt_name = setting.get_wt_file_name(name)
     o_mr_name = setting.get_o_mr_name(name)
     f_mr_name = setting.get_f_mr_name(name)
     num_epochs = setting.get_num_epochs(name)
@@ -293,7 +293,7 @@ def train_disease_prob_model(device, name):
 
 def train_d(device, name):
     setting = utils.get_setting()
-    rs_name = setting.get_rs_name(name)
+    rs_name = setting.get_rs_file_name(name)
     folder_path = setting.get_folder_path(name)
     
     if setting.is_diagnosis1(name):

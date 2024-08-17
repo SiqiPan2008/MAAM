@@ -16,7 +16,7 @@ def test(device, name, filename):
     img_folder = setting.get_img_folder(name)
     folder_path = setting.get_folder_path(name)
     num_classes = setting.get_abnormity_num(name)
-    wt_file_name = os.path.join(setting.get_wt_name(name), filename)
+    wt_file_name = os.path.join(setting.get_wt_file_name(name), filename)
     
     model = abnormity_models.initialize_abnormity_model(net_name, num_classes, feature_extract)
     model = model.to(device)
@@ -49,7 +49,7 @@ def test(device, name, filename):
 def test_multiple(device, name):
     setting = utils.get_setting()
     folder_path = setting.get_folder_path(name)
-    temp_wts_folder = os.path.join(folder_path, setting.get_wt_name(name))
+    temp_wts_folder = os.path.join(folder_path, setting.get_wt_file_name(name))
     
     test_acc = []
     epoch_nums = []
@@ -58,46 +58,51 @@ def test_multiple(device, name):
         for filename in os.listdir(temp_wts_folder):
             if os.path.splitext(filename)[1] == ".pth":
                 corrects, total, accuracy = test(device, name, filename)
+                epoch_num = setting.get_epoch_num(filename)
                 test_acc.append(accuracy)
-                epoch_nums.append(setting.get_epoch_num(filename))
-            writer.writerow([filename, corrects, total, accuracy])
-    print(f"Data successfully written into {name}.csv")
-    
-    valid_acc = []
-    with open(os.path.join(folder_path, setting.get_), mode='r') as file:
-        csv_reader = csv.reader(file)
-        for row in csv_reader:
-            if row[0] in epoch_nums:
-                valid_acc.append(row[1])
-                
-    test_acc = np.array(test_acc)
-    valid_acc = np.array(valid_acc)
-    train_size, test_size = setting.get_abnormity_model_datasizes(name)
-    valid_size = train_size - int(train_size * 0.8)
-    combined_acc = test_acc * (test_size / (test_size + valid_size)) + \
-        valid_acc * (valid_size / (test_size + valid_size))
-    best_combined_acc = np.max(combined_acc)
-    best_index = np.argmax(combined_acc)
-    best_epoch = epoch_nums[best_index]
-    
+                epoch_nums.append(epoch_num)
+            writer.writerow([epoch_num, corrects, total, accuracy])
+
+        valid_acc = []
+        with open(os.path.join(folder_path, setting.get_training_rs_name(name) + ".csv"), mode='r') as file:
+            csv_reader = csv.reader(file)
+            for row in csv_reader:
+                if int(row[0]) in epoch_nums:
+                    valid_acc.append(float(row[3]))
+        
+        test_acc = np.array(test_acc)
+        valid_acc = np.array(valid_acc)
+        train_size, test_size = setting.get_abnormity_model_datasizes(name)
+        valid_size = train_size - int(train_size * 0.8)
+        combined_acc = test_acc * (test_size / (test_size + valid_size)) + \
+            valid_acc * (valid_size / (test_size + valid_size))
+        best_combined_acc = np.max(combined_acc)
+        best_index = np.argmax(combined_acc)
+        best_epoch = epoch_nums[best_index]
+        writer.writerow([best_epoch])
+        
     print(f"best epoch: {best_epoch}, combined acc = {best_combined_acc}")
-    os.rename(
-        os.path.join(temp_wts_folder, setting.get_wt_name(name) + f"{best_epoch: 3d}.pth"),
-        os.path.join(folder_path, setting.get_wt_name(name) + ".pth")
+    utils.rename_file_by_path(
+        os.path.join(temp_wts_folder, setting.get_wt_file_name(name) + f"{best_epoch: 3d}.pth"),
+        os.path.join(folder_path, setting.get_wt_file_name(name) + ".pth")
     )
+    for filename in os.listdir(temp_wts_folder):
+        os.remove(os.path.join(temp_wts_folder, filename))
     os.rmdir(temp_wts_folder)
+    print(f"Data successfully written into {name}.csv")
     
     return best_combined_acc
 
 def get_final_abnormity_model(name, t_acc, f_acc):
     setting = utils.get_setting()
+    wt_name = setting.get_wt_file_name(name)
     folder_path = setting.get_folder_path(name)
-    delete_ver = "F" if t_acc > t_acc else "T"
+    delete_ver = "F" if t_acc > f_acc else "T"
     rename_ver = "T" if t_acc > f_acc else "F"
-    os.remove(os.path.join(folder_path, name + f" - {delete_ver}.pth"))
+    os.remove(os.path.join(folder_path, wt_name + f" - {delete_ver}.pth"))
     os.rename(
-        os.path.join(folder_path, name + f" - {rename_ver}.pth"),
-        os.path.join(folder_path, name + ".pth")
+        os.path.join(folder_path, wt_name + f" - {rename_ver}.pth"),
+        os.path.join(folder_path, wt_name + ".pth")
     )
     
 def get_model_results(device, name):
@@ -107,7 +112,7 @@ def get_model_results(device, name):
     img_folder = setting.get_img_folder(name)
     folder_path = setting.get_folder_path(name)
     num_classes = setting.get_abnormity_num(name)
-    wt_file_name = setting.get_wt_name(name)
+    wt_file_name = setting.get_wt_file_name(name)
     
     model = abnormity_models.initialize_abnormity_model(net_name, num_classes, feature_extract)
     model = model.to(device)
@@ -131,3 +136,4 @@ def get_model_results(device, name):
             outputs[labels[0]].append(output.cpu().detach().tolist())
             
     np.array(outputs).tofile(os.path.join(folder_path, name + ".bin"))
+    print(f"model results saved to {name}.bin")
