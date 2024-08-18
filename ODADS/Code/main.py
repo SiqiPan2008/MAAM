@@ -22,20 +22,18 @@ print(device)
 
 if task == "abnormity all":
     train_abnormity.train(device, name + "TRRS - T")
-    t_acc = test_abnormity.test_multiple(device, name + "TORS - T")
+    test_abnormity.test_multiple(device, name + "TORS - T")
+    test_abnormity.get_best_abnormity_model(name + "TORS - T")
     train_abnormity.train(device, name + "TRRS - F")
-    f_acc = test_abnormity.test_multiple(device, name + "TORS - F")
-    test_abnormity.get_final_abnormity_model(name + "TRRS", t_acc, f_acc)
+    test_abnormity.test_multiple(device, name + "TORS - F")
+    test_abnormity.get_best_abnormity_model(name + "TORS - F")
+    test_abnormity.choose_t_or_f_abnormity_model(name + "TRRS")
     test_abnormity.get_model_results(device, name + "TRMR")
     test_abnormity.get_model_results(device, name + "TOMR")
 elif task == "abnormity finetune":
     train_abnormity.train(device, name + "TRRS - F")
-    f_acc = test_abnormity.test_multiple(device, name + "TORS - F")
-    test_abnormity.get_final_abnormity_model(name + "TRRS", t_acc, f_acc)
-    test_abnormity.get_model_results(device, name + "TRMR")
-    test_abnormity.get_model_results(device, name + "TOMR")
+    test_abnormity.test_multiple(device, name + "TORS - F")
 elif task == "abnormity get mr":
-    test_abnormity.get_final_abnormity_model(name + "TRRS", t_acc, f_acc)
     test_abnormity.get_model_results(device, name + "TRMR")
     test_abnormity.get_model_results(device, name + "TOMR")
 elif task == "diagnosis all":

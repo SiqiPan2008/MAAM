@@ -215,6 +215,9 @@ class Setting:
     def get_training_rs_name(self, name: str) -> str:
         return name[:5] + "TRRS" + name[9:]
     
+    def get_testing_rs_file_name(self, name: str) -> str:
+        return name[:5] + "TORS" + name[9:]
+    
     def get_transfer_learning_wt(self, name: str) -> str:
         return name[:7] + "WT - T"
     

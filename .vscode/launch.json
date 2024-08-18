@@ -77,6 +77,30 @@
             "args": ["abnormity finetune", "016AF", "cuda:1"]
         },
 
+        {
+            "name": "018AO train all",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "ODADS/Code/main.py",
+            "console": "integratedTerminal",
+            "args": ["abnormity all", "018AO", "cuda:0"]
+        },
+        {
+            "name": "018AF train all",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "ODADS/Code/main.py",
+            "console": "integratedTerminal",
+            "args": ["abnormity all", "018AF", "cuda:1"]
+        },
+        {
+            "name": "018 diagnosis all",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "ODADS/Code/main.py",
+            "console": "integratedTerminal",
+            "args": ["diagnosis all", "018", "cuda:1"]
+        },
 
         /*
         {

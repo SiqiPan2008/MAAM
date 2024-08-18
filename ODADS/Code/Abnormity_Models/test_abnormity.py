@@ -53,50 +53,78 @@ def test_multiple(device, name):
     folder_path = setting.get_folder_path(name)
     temp_wts_folder = os.path.join(folder_path, setting.get_wt_file_name(name))
     
-    test_acc = []
-    epoch_nums = []
     with open(os.path.join(folder_path, name + ".csv"), "w", newline="") as file:  
         writer = csv.writer(file)
         for filename in os.listdir(temp_wts_folder):
             if os.path.splitext(filename)[1] == ".pth":
                 corrects, total, accuracy = test(device, name, filename)
                 epoch_num = setting.get_epoch_num(filename)
-                test_acc.append(accuracy)
-                epoch_nums.append(epoch_num)
             writer.writerow([epoch_num, corrects, total, accuracy])
 
-        valid_acc = []
-        with open(os.path.join(folder_path, setting.get_training_rs_name(name) + ".csv"), mode='r') as file:
-            csv_reader = csv.reader(file)
-            for row in csv_reader:
-                if int(row[0]) in epoch_nums:
-                    valid_acc.append(float(row[1]))
-        
-        test_acc = np.array(test_acc)
-        valid_acc = np.array(valid_acc)
-        train_size, test_size = setting.get_abnormity_model_datasizes(name)
-        valid_size = train_size - int(train_size * 0.8)
-        combined_acc = test_acc * (test_size / (test_size + valid_size)) + \
-            valid_acc * (valid_size / (test_size + valid_size))
-        best_combined_acc = np.max(combined_acc)
-        best_index = np.argmax(combined_acc)
-        best_epoch = epoch_nums[best_index]
-        writer.writerow([best_epoch])
+def get_best_abnormity_model(name):
+    setting = utils.get_setting()
+    folder_path = setting.get_folder_path(name)
+    temp_wts_folder = os.path.join(folder_path, setting.get_wt_file_name(name))
+    
+    epoch_nums = []
+    test_acc = []
+    with open(os.path.join(folder_path, name + ".csv"), mode='r') as file:
+        reader = csv.reader(file)
+        for row in reader:
+            epoch_nums.append(int(row[0]))
+            test_acc.append(float(row[3]))
+    
+    valid_acc = []
+    with open(os.path.join(folder_path, setting.get_training_rs_name(name) + ".csv"), mode='r') as file:
+        reader = csv.reader(file)
+        for row in reader:
+            if int(row[0]) in epoch_nums:
+                valid_acc.append(float(row[1]))
+    
+    test_acc = np.array(test_acc)
+    valid_acc = np.array(valid_acc)
+    train_size, test_size = setting.get_abnormity_model_datasizes(name)
+    valid_size = train_size - int(train_size * 0.8)
+    combined_acc = test_acc * (test_size / (test_size + valid_size)) + \
+        valid_acc * (valid_size / (test_size + valid_size))
+    best_combined_acc = np.max(combined_acc)
+    best_index = np.argmax(combined_acc)
+    best_epoch = epoch_nums[best_index]
+    
+    with open(os.path.join(folder_path, name + ".csv"), mode='a') as file:
+        writer = csv.writer(file)
+        writer.writerow([best_epoch, best_combined_acc])
         
     print(f"best epoch: {best_epoch}, combined acc = {best_combined_acc}")
-    utils.rename_file_by_path(
+    utils.copy_file_by_path(
         os.path.join(temp_wts_folder, setting.get_wt_file_name(name) + f"{best_epoch: 3d}.pth"),
         os.path.join(folder_path, setting.get_wt_file_name(name) + ".pth")
     )
     print(f"Data successfully written into {name}.csv")
+        
     
-    return best_combined_acc
 
-def get_final_abnormity_model(name, t_acc, f_acc):
+def choose_t_or_f_abnormity_model(name):
     setting = utils.get_setting()
     wt_name = setting.get_wt_file_name(name)
     folder_path = setting.get_folder_path(name)
-    retain_ver = "T" if t_acc > f_acc else "F"
+    testing_file = setting.get_testing_rs_file_name(name)
+    
+    t_best_combined_acc = 0
+    with open(os.path.join(folder_path, testing_file + " - T.csv"), "r", newline="") as file:
+        reader = csv.reader(file)
+        for row in reader:
+            if len(row):
+                t_best_combined_acc = row[1]
+    
+    f_best_combined_acc = 0
+    with open(os.path.join(folder_path, testing_file + " - F.csv"), 'r', newline="") as file:
+        reader = csv.reader(file)
+        for row in reader:
+            if len(row):
+                f_best_combined_acc = row[1]
+    
+    retain_ver = "T" if t_best_combined_acc > f_best_combined_acc else "F"
     utils.copy_file_by_path(
         os.path.join(folder_path, wt_name + f" - {retain_ver}.pth"),
         os.path.join(folder_path, wt_name + ".pth")

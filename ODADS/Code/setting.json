@@ -1,5 +1,5 @@
 {
-    "use_small": "False",
+    "use_small": "True",
 
     "root": "ODADS",
     "data_folder": "Data",
