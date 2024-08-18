@@ -20,7 +20,7 @@ use_gpu = torch.cuda.is_available()
 device = torch.device(cuda_device if use_gpu else "cpu")
 print(device)
 
-if task == "train all":
+if task == "abnormity all":
     train_abnormity.train(device, name + "TRRS - T")
     t_acc = test_abnormity.test_multiple(device, name + "TORS - T")
     train_abnormity.train(device, name + "TRRS - F")
@@ -28,7 +28,22 @@ if task == "train all":
     test_abnormity.get_final_abnormity_model(name + "TRRS", t_acc, f_acc)
     test_abnormity.get_model_results(device, name + "TRMR")
     test_abnormity.get_model_results(device, name + "TOMR")
-    
+elif task == "abnormity finetune":
+    train_abnormity.train(device, name + "TRRS - F")
+    f_acc = test_abnormity.test_multiple(device, name + "TORS - F")
+    test_abnormity.get_final_abnormity_model(name + "TRRS", t_acc, f_acc)
+    test_abnormity.get_model_results(device, name + "TRMR")
+    test_abnormity.get_model_results(device, name + "TOMR")
+elif task == "abnormity get mr":
+    test_abnormity.get_final_abnormity_model(name + "TRRS", t_acc, f_acc)
+    test_abnormity.get_model_results(device, name + "TRMR")
+    test_abnormity.get_model_results(device, name + "TOMR")
+elif task == "diagnosis all":
+    train_diagnosis.train(device, name + "D1TRRS")
+    test_diagnosis.test(device, name + "D1TORS")
+    train_diagnosis.train(device, name + "D2TRRS")
+    test_diagnosis.test(device, name + "D2TORS")
+  
 elif task == "train":
     if setting.is_abnormity(name):
         train_abnormity.train(device, name)

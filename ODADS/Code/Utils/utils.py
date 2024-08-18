@@ -5,6 +5,7 @@ import numpy as np
 import os
 from PIL import Image
 import json
+import shutil
 import random
 import setting
 from typing import Dict
@@ -152,7 +153,14 @@ def rename_file_in_dir(old_name, new_name, directory):
             os.rename(old_file_path, new_file_path)
             break
 
+# delete file with new name if it exists, and rename file with new name
 def rename_file_by_path(old_path, new_path):
     if os.path.exists(new_path):
         os.remove(new_path)
     os.rename(old_path, new_path)
+
+# delete file with new name if it exists, copy the old file, and give it the new name
+def copy_file_by_path(old_path, new_path):
+    if os.path.exists(new_path):
+        os.remove(new_path)
+    shutil.copy(old_path, new_path)

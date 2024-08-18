@@ -88,9 +88,6 @@ def test_multiple(device, name):
         os.path.join(temp_wts_folder, setting.get_wt_file_name(name) + f"{best_epoch: 3d}.pth"),
         os.path.join(folder_path, setting.get_wt_file_name(name) + ".pth")
     )
-    for filename in os.listdir(temp_wts_folder):
-        os.remove(os.path.join(temp_wts_folder, filename))
-    os.rmdir(temp_wts_folder)
     print(f"Data successfully written into {name}.csv")
     
     return best_combined_acc
@@ -99,11 +96,9 @@ def get_final_abnormity_model(name, t_acc, f_acc):
     setting = utils.get_setting()
     wt_name = setting.get_wt_file_name(name)
     folder_path = setting.get_folder_path(name)
-    delete_ver = "F" if t_acc > f_acc else "T"
-    rename_ver = "T" if t_acc > f_acc else "F"
-    os.remove(os.path.join(folder_path, wt_name + f" - {delete_ver}.pth"))
-    os.rename(
-        os.path.join(folder_path, wt_name + f" - {rename_ver}.pth"),
+    retain_ver = "T" if t_acc > f_acc else "F"
+    utils.copy_file_by_path(
+        os.path.join(folder_path, wt_name + f" - {retain_ver}.pth"),
         os.path.join(folder_path, wt_name + ".pth")
     )
     
