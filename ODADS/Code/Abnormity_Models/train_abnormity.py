@@ -127,7 +127,7 @@ def train(device, name):
             print(f"{phase} loss: {epoch_loss :.4f}, acc: {epoch_acc :.4f}")
             
             if phase == "valid" and epoch_acc >= best_acc[-1]:
-                best_acc[-1] = epoch_acc
+                best_acc[-1] = epoch_acc.item()
                 state = {
                     "state_dict": model.state_dict(),
                     "optimizer": optimizer.state_dict()

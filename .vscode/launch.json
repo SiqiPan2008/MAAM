@@ -2,114 +2,12 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "152AO get mr",
-            "type": "debugpy",
-            "request": "launch",
-            "program": "ODADS/Code/main.py",
-            "console": "integratedTerminal",
-            "args": ["abnormity get mr", "152AO", "cuda:0"]
-        },
-        {
-            "name": "152AF get mr",
-            "type": "debugpy",
-            "request": "launch",
-            "program": "ODADS/Code/main.py",
-            "console": "integratedTerminal",
-            "args": ["abnormity get mr", "152AF", "cuda:1"]
-        },
-        {
-            "name": "050AO get mr",
-            "type": "debugpy",
-            "request": "launch",
-            "program": "ODADS/Code/main.py",
-            "console": "integratedTerminal",
-            "args": ["abnormity get mr", "050AO", "cuda:1"]
-        },
-        {
-            "name": "050AF get mr",
-            "type": "debugpy",
-            "request": "launch",
-            "program": "ODADS/Code/main.py",
-            "console": "integratedTerminal",
-            "args": ["abnormity get mr", "050AF", "cuda:0"]
-        },
-        {
-            "name": "018AO get mr",
-            "type": "debugpy",
-            "request": "launch",
-            "program": "ODADS/Code/main.py",
-            "console": "integratedTerminal",
-            "args": ["abnormity get mr", "018AO", "cuda:0"]
-        },
-        {
-            "name": "018AF get mr",
-            "type": "debugpy",
-            "request": "launch",
-            "program": "ODADS/Code/main.py",
-            "console": "integratedTerminal",
-            "args": ["abnormity get mr", "018AF", "cuda:1"]
-        },
-        {
-            "name": "016AO get mr",
-            "type": "debugpy",
-            "request": "launch",
-            "program": "ODADS/Code/main.py",
-            "console": "integratedTerminal",
-            "args": ["abnormity get mr", "016AO", "cuda:1"]
-        },
-        {
-            "name": "016AF get mr",
-            "type": "debugpy",
-            "request": "launch",
-            "program": "ODADS/Code/main.py",
-            "console": "integratedTerminal",
-            "args": ["abnormity get mr", "016AF", "cuda:0"]
-        },
-
-
-
-        {
-            "name": "016AF finetune only",
-            "type": "debugpy",
-            "request": "launch",
-            "program": "ODADS/Code/main.py",
-            "console": "integratedTerminal",
-            "args": ["abnormity finetune", "016AF", "cuda:1"]
-        },
-
-        {
-            "name": "018AO train all",
-            "type": "debugpy",
-            "request": "launch",
-            "program": "ODADS/Code/main.py",
-            "console": "integratedTerminal",
-            "args": ["abnormity all", "018AO", "cuda:0"]
-        },
-        {
-            "name": "018AF train all",
-            "type": "debugpy",
-            "request": "launch",
-            "program": "ODADS/Code/main.py",
-            "console": "integratedTerminal",
-            "args": ["abnormity all", "018AF", "cuda:1"]
-        },
-        {
-            "name": "018 diagnosis all",
-            "type": "debugpy",
-            "request": "launch",
-            "program": "ODADS/Code/main.py",
-            "console": "integratedTerminal",
-            "args": ["diagnosis all", "018", "cuda:1"]
-        },
-
-        /*
-        {
             "name": "152AO train all",
             "type": "debugpy",
             "request": "launch",
             "program": "ODADS/Code/main.py",
             "console": "integratedTerminal",
-            "args": ["abnormity all", "152AO", "cuda:0"]
+            "args": ["abnormity all", "152AO", "cuda:1"]
         },
         {
             "name": "152AF train all",
@@ -117,7 +15,7 @@
             "request": "launch",
             "program": "ODADS/Code/main.py",
             "console": "integratedTerminal",
-            "args": ["abnormity all", "152AF", "cuda:1"]
+            "args": ["abnormity all", "152AF", "cuda:0"]
         },
         {
             "name": "050AO train all",
@@ -167,7 +65,6 @@
             "console": "integratedTerminal",
             "args": ["abnormity all", "016AF", "cuda:0"]
         },
-        */
         
         /*
         {
