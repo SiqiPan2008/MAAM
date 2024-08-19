@@ -23,7 +23,7 @@
     "use_top_probs": "True",
 
     "A_T_num_epochs": "100",
-    "A_F_num_epochs": "30",
+    "A_F_num_epochs": "70",
     "D1_num_epochs": "10",
     "D2_num_epochs": "30",
     "O_train_class_size": "5000",

@@ -32,6 +32,14 @@ if task == "abnormity all":
     test_abnormity.get_model_results(device, name + "TRMR")
     test_abnormity.get_model_results(device, name + "TOMR")
 
+if task == "abnormity finetune":
+    train_abnormity.train(device, name + "TRRS - F")
+    test_abnormity.test_multiple(device, name + "TORS - F")
+    test_abnormity.get_best_abnormity_model(name + "TORS - F")
+    #test_abnormity.choose_t_or_f_abnormity_model(name + "TRRS")
+    #test_abnormity.get_model_results(device, name + "TRMR")
+    #test_abnormity.get_model_results(device, name + "TOMR")
+
 elif task == "diagnosis all":
     train_diagnosis.train(device, name + "D1TRRS")
     test_diagnosis.test(device, name + "D1TORS")
