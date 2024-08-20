@@ -9,6 +9,5 @@ TT: RS - acc/... result; WT - weight; MR - model results
               Tddd = Best Transfer learning model in a certain epoch range
 
 TODO:
-* convert images in TO_Original to TO
-
 * refactor gradcam.py, classify_abnormity.py, diagnose_disease.py
+

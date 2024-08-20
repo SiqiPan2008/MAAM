@@ -32,35 +32,25 @@ if task == "abnormity all":
     test_abnormity.get_model_results(device, name + "TRMR")
     test_abnormity.get_model_results(device, name + "TOMR")
 
-if task == "abnormity finetune":
-    train_abnormity.train(device, name + "TRRS - F")
-    test_abnormity.test_multiple(device, name + "TORS - F")
-    test_abnormity.get_best_abnormity_model(name + "TORS - F")
-    #test_abnormity.choose_t_or_f_abnormity_model(name + "TRRS")
-    #test_abnormity.get_model_results(device, name + "TRMR")
-    #test_abnormity.get_model_results(device, name + "TOMR")
-
 elif task == "diagnosis all":
-    train_diagnosis.train(device, name + "D1TRRS")
-    test_diagnosis.test(device, name + "D1TORS")
-    train_diagnosis.train(device, name + "D2TRRS")
-    test_diagnosis.test(device, name + "D2TORS")
+    names = name.split(", ")
+    train_diagnosis.train(device, [name + "D1TRRS" for name in names])
+    train_diagnosis.train(device, [name + "D2TRRS" for name in names])
+    test_diagnosis.test(device, [name + "D1TORS" for name in names])
+    test_diagnosis.test(device,[name + "D2TORS" for name in names])
 
 # single-task commands
-elif task == "train":
-    if setting.is_abnormity(name):
+if setting.is_abnormity(name):
+    if task == "train":
         train_abnormity.train(device, name)
-    elif setting.is_diagnosis1(name):
-        train_diagnosis.train(device, name)
-    elif setting.is_diagnosis2(name):
-        train_diagnosis.train(device, name)
-elif task == "test":
-    if setting.is_abnormity(name):
+    elif task == "test":
         test_abnormity.test_multiple(device, name)
-    elif setting.is_diagnosis1(name):
-        test_diagnosis.test(device, name)
-    elif setting.is_diagnosis2(name):
-        test_diagnosis.test(device, name)
-elif task == "get MR":
-    if setting.is_abnormity(name):
+    elif task == "get MR":
         test_abnormity.get_model_results(device, name)
+elif setting.is_diagnosis1(name) or setting.is_diagnosis2(name):
+    # net_name_f
+    names = name.split(", ")
+    if task == "train":
+        train_diagnosis.train(device, names)
+    elif task == "test":
+        test_diagnosis.test(device, names)

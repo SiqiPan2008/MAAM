@@ -13,17 +13,18 @@ from Utils import utils
 from Diagnosis_Model import diagnosis_model
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 
-def train_abnormity_num_model(device, name):
+def train_abnormity_num_model(device, names):
     setting = utils.get_setting()
+    name = names[0]
     LR = setting.LR
     batch_size = setting.batch_size
     class_size = setting.D1_train_class_size
     abnormity_folder_path = setting.A_folder
     o_class_size = setting.O_train_class_size
     f_class_size = setting.F_train_class_size
-    wt_name = setting.get_wt_file_name(name)
-    o_mr_name = setting.get_o_mr_name(name)
-    f_mr_name = setting.get_f_mr_name(name)
+    wt_name = setting.get_d_wt_file_name(name)
+    o_mr_name = setting.get_o_mr_name(names[1])
+    f_mr_name = setting.get_f_mr_name(names[0])
     num_epochs = setting.get_num_epochs(name)
     folder_path = setting.get_folder_path(name)
     o_abnormity_num = setting.get_abnormity_num("OCT Abnormities")
@@ -143,8 +144,9 @@ def train_abnormity_num_model(device, name):
 
 
         
-def train_disease_prob_model(device, name):
+def train_disease_prob_model(device, names):
     setting = utils.get_setting()
+    name = names[0]
     LR = setting.LR
     d1_folder = setting.D1_folder
     batch_size = setting.batch_size
@@ -152,9 +154,9 @@ def train_disease_prob_model(device, name):
     abnormity_folder_path = setting.A_folder
     o_class_size = setting.O_train_class_size
     f_class_size = setting.F_train_class_size
-    wt_name = setting.get_wt_file_name(name)
-    o_mr_name = setting.get_o_mr_name(name)
-    f_mr_name = setting.get_f_mr_name(name)
+    wt_name = setting.get_d_wt_file_name(name)
+    o_mr_name = setting.get_o_mr_name(names[1])
+    f_mr_name = setting.get_f_mr_name(names[0])
     num_epochs = setting.get_num_epochs(name)
     folder_path = setting.get_folder_path(name)
     d2_input_length = setting.get_d2_input_length()
@@ -190,7 +192,7 @@ def train_disease_prob_model(device, name):
         for disease in diseases
     }
     for disease in abnormity_num_models.keys():
-         trained_model = torch.load(os.path.join(d1_folder, setting.get_d1_single_disease_wt(name, disease) + ".pth"))
+         trained_model = torch.load(os.path.join(d1_folder, setting.get_d1_single_disease_wt(disease) + ".pth"))
          abnormity_num_models[disease].load_state_dict(trained_model["state_dict"])
     
     start_time = time.time()
@@ -291,15 +293,16 @@ def train_disease_prob_model(device, name):
 
 
 
-def train_d(device, name):
+def train_d(device, names):
     setting = utils.get_setting()
-    rs_name = setting.get_rs_file_name(name)
+    name = names[0]
+    rs_name = setting.get_d_rs_file_name(name)
     folder_path = setting.get_folder_path(name)
     
     if setting.is_diagnosis1(name):
-        trainAccHistory, validAccHistory, trainLosses, validLosses, LRs = train_abnormity_num_model(device, name)
+        trainAccHistory, validAccHistory, trainLosses, validLosses, LRs = train_abnormity_num_model(device, names)
     else:
-        trainAccHistory, validAccHistory, trainLosses, validLosses, LRs = train_disease_prob_model(device, name)
+        trainAccHistory, validAccHistory, trainLosses, validLosses, LRs = train_disease_prob_model(device, names)
         
     with open(os.path.join(folder_path, rs_name + ".csv"), "w", newline="") as file:  
         writer = csv.writer(file)  
@@ -310,15 +313,18 @@ def train_d(device, name):
     
     utils.curve(validAccHistory, trainAccHistory, validLosses, trainLosses, os.path.join(folder_path, rs_name + ".pdf"))
     
-def train(device, name):
+def train(device, names):
     setting = utils.get_setting()
-    disease_name = setting.get_disease_name(name)
-    if setting.is_diagnosis1(name):
+    if setting.is_diagnosis1(names[0]):
+        disease_name = setting.get_disease_name(names[0])
         if disease_name:
-            train_d(device, name)
+            train_d(device, names)
         else:
             diseases = setting.get_diseases(include_normal = False)
             for disease in diseases:
-                train_d(device, setting.get_d1_single_disease_rs(name, disease))
+                train_d(
+                    device, 
+                    [setting.get_d1_single_disease_rs(name, disease) for name in names]
+                )
     else:
-        train_d(device, name)
+        train_d(device, names)

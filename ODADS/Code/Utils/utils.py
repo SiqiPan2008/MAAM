@@ -13,7 +13,7 @@ os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 
 # read Criteria.json and get criteria
 def get_criteria():
-    with open(r'ODADS\Code\Criteria.json', 'r', encoding='utf-8') as file:
+    with open('ODADS/Code/criteria.json', 'r', encoding='utf-8') as file:
         criteria = json.load(file)
     return criteria
 

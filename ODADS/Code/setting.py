@@ -203,6 +203,9 @@ class Setting:
     def get_wt_file_name(self, name: str) -> str:
         return name[:5] + "TRWT" + name[9:]
     
+    def get_d_wt_file_name(self, name: str) -> str:
+        return "000" + name[3:5] + "TRWT" + name[9:]
+    
     def get_o_mr_name(self, name: str) -> str:
         return name[:3] + "AOTRMR"
     
@@ -211,6 +214,9 @@ class Setting:
     
     def get_rs_file_name(self, name: str) -> str:
         return name[:7] + "RS" + name[9:]
+    
+    def get_d_rs_file_name(self, name: str) -> str:
+        return "000" + name[3:7] + "RS" + name[9:]
     
     def get_training_rs_name(self, name: str) -> str:
         return name[:5] + "TRRS" + name[9:]
@@ -224,8 +230,8 @@ class Setting:
     def get_d1_single_disease_rs(self, name: str, disease: str) -> str:
         return name + " - " + disease
     
-    def get_d1_single_disease_wt(self, name: str, disease: str) -> str:
-        return name[:3] + "D1TRWT - " + disease
+    def get_d1_single_disease_wt(self, disease: str) -> str:
+        return "000D1TRWT - " + disease
     
     def get_d2_input_length(self) -> int:
         criteria = utils.get_criteria()

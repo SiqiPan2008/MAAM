@@ -137,7 +137,8 @@ def train(device, name):
                 print(f"Data successfully written into {wt_name}{epoch_range_beginning + 1: 3d}{epoch_range_beginning + 10: 3d}.pth")
                 best_epoch_in_range = epoch + 1
             if phase == "valid" and (epoch + 1) % save_model_frequency == 0:
-                best_acc.append(0)
+                if epoch + 1 != num_epochs:
+                    best_acc.append(0)
                 utils.rename_file_by_path(
                     os.path.join(temp_wts_folder, wt_name + f"{epoch_range_beginning + 1: 3d}{epoch_range_beginning + 10: 3d}.pth"),
                     os.path.join(temp_wts_folder, wt_name + f"{best_epoch_in_range: 3d}.pth")

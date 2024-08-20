@@ -6,16 +6,17 @@ from Utils import utils
 from Diagnosis_Model import diagnosis_model, train_diagnosis
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
     
-def test_abnormity_num_model(device, name):
+def test_abnormity_num_model(device, names):
     setting = utils.get_setting()
+    name = names[0]
     batch_size = setting.test_batch_size
     class_size = setting.D1_train_class_size
     abnormity_folder_path = setting.A_folder
     o_class_size = setting.O_train_class_size
     f_class_size = setting.F_train_class_size
-    wt_name = setting.get_wt_file_name(name)
-    o_mr_name = setting.get_o_mr_name(name)
-    f_mr_name = setting.get_f_mr_name(name)
+    wt_name = setting.get_d_wt_file_name(name)
+    o_mr_name = setting.get_o_mr_name(names[1])
+    f_mr_name = setting.get_f_mr_name(names[0])
     folder_path = setting.get_folder_path(name)
     o_abnormity_num = setting.get_abnormity_num("OCT Abnormities")
     f_abnormity_num = setting.get_abnormity_num("Fundus Abnormities")
@@ -60,8 +61,9 @@ def test_abnormity_num_model(device, name):
     return acc
 
         
-def test_disease_prob_model(device, name):
+def test_disease_prob_model(device, names):
     setting = utils.get_setting()
+    name = names[0]
     d1_folder = setting.D1_folder
     batch_size = setting.test_batch_size
     use_top_probs = setting.use_top_probs
@@ -71,9 +73,9 @@ def test_disease_prob_model(device, name):
     f_class_size = setting.F_train_class_size
     D2_top_probs_max_num = setting.D2_top_probs_max_num
     D2_top_probs_min_prob = setting.D2_top_probs_min_prob
-    wt_name = setting.get_wt_file_name(name)
-    o_mr_name = setting.get_o_mr_name(name)
-    f_mr_name = setting.get_f_mr_name(name)
+    wt_name = setting.get_d_wt_file_name(name)
+    o_mr_name = setting.get_o_mr_name(names[1])
+    f_mr_name = setting.get_f_mr_name(names[0])
     folder_path = setting.get_folder_path(name)
     d2_input_length = setting.get_d2_input_length()
     diseases = setting.get_diseases(include_normal = False)
@@ -103,7 +105,7 @@ def test_disease_prob_model(device, name):
         for disease in diseases
     }
     for disease in abnormity_num_models.keys():
-         trained_model = torch.load(os.path.join(d1_folder, setting.get_d1_single_disease_wt(name, disease) + ".pth"))
+         trained_model = torch.load(os.path.join(d1_folder, setting.get_d1_single_disease_wt(disease) + ".pth"))
          abnormity_num_models[disease].load_state_dict(trained_model["state_dict"])
     
     start_time = time.time()
@@ -139,18 +141,21 @@ def test_disease_prob_model(device, name):
     return acc
 
 
-def test(device, name):
+def test(device, names):
     setting = utils.get_setting()
-    disease_name = setting.get_disease_name(name)
-    if setting.is_diagnosis1(name):
+    if setting.is_diagnosis1(names[0]):
+        disease_name = setting.get_disease_name(names[0])
         if disease_name:
-            acc = test_abnormity_num_model(device, name)
+            acc = test_abnormity_num_model(device, names)
         else:
             acc = []
             diseases = setting.get_diseases(include_normal = False)
             for disease in diseases:
-                acc.append(test_abnormity_num_model(device, setting.get_d1_single_disease_rs(name, disease)))
+                acc.append(test_abnormity_num_model(
+                    device, 
+                    [setting.get_d1_single_disease_rs(name, disease) for name in names]
+                ))
     else:
-        acc = test_disease_prob_model(device, name)
+        acc = test_disease_prob_model(device, names)
         
     print(acc)
