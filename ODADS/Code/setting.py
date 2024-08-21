@@ -206,11 +206,17 @@ class Setting:
     def get_d_wt_file_name(self, name: str) -> str:
         return "000" + name[3:5] + "TRWT" + name[9:]
     
-    def get_o_mr_name(self, name: str) -> str:
+    def get_o_trmr_name(self, name: str) -> str:
         return name[:3] + "AOTRMR"
     
-    def get_f_mr_name(self, name: str) -> str:
+    def get_f_trmr_name(self, name: str) -> str:
         return name[:3] + "AFTRMR"
+    
+    def get_o_tomr_name(self, name: str) -> str:
+        return name[:3] + "AOTOMR"
+    
+    def get_f_tomr_name(self, name: str) -> str:
+        return name[:3] + "AFTOMR"
     
     def get_rs_file_name(self, name: str) -> str:
         return name[:7] + "RS" + name[9:]

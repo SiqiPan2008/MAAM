@@ -3,20 +3,20 @@ import torch
 import time
 import numpy as np
 from Utils import utils
-from Diagnosis_Model import diagnosis_model, train_diagnosis
+from Diagnosis_Model import diagnosis_model
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
     
 def test_abnormity_num_model(device, names):
     setting = utils.get_setting()
     name = names[0]
     batch_size = setting.test_batch_size
-    class_size = setting.D1_train_class_size
+    class_size = setting.D1_test_class_size
     abnormity_folder_path = setting.A_folder
-    o_class_size = setting.O_train_class_size
-    f_class_size = setting.F_train_class_size
+    o_class_size = setting.O_test_class_size
+    f_class_size = setting.F_test_class_size
     wt_name = setting.get_d_wt_file_name(name)
-    o_mr_name = setting.get_o_mr_name(names[1])
-    f_mr_name = setting.get_f_mr_name(names[0])
+    o_mr_name = setting.get_o_tomr_name(names[1])
+    f_mr_name = setting.get_f_tomr_name(names[0])
     folder_path = setting.get_folder_path(name)
     o_abnormity_num = setting.get_abnormity_num("OCT Abnormities")
     f_abnormity_num = setting.get_abnormity_num("Fundus Abnormities")
@@ -67,15 +67,15 @@ def test_disease_prob_model(device, names):
     d1_folder = setting.D1_folder
     batch_size = setting.test_batch_size
     use_top_probs = setting.use_top_probs
-    class_size = setting.D2_train_class_size
+    class_size = setting.D2_test_class_size
     abnormity_folder_path = setting.A_folder
-    o_class_size = setting.O_train_class_size
-    f_class_size = setting.F_train_class_size
+    o_class_size = setting.O_test_class_size
+    f_class_size = setting.F_test_class_size
     D2_top_probs_max_num = setting.D2_top_probs_max_num
     D2_top_probs_min_prob = setting.D2_top_probs_min_prob
     wt_name = setting.get_d_wt_file_name(name)
-    o_mr_name = setting.get_o_mr_name(names[1])
-    f_mr_name = setting.get_f_mr_name(names[0])
+    o_mr_name = setting.get_o_tomr_name(names[1])
+    f_mr_name = setting.get_f_tomr_name(names[0])
     folder_path = setting.get_folder_path(name)
     d2_input_length = setting.get_d2_input_length()
     diseases = setting.get_diseases(include_normal = False)

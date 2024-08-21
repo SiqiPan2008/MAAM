@@ -158,7 +158,7 @@
             "request": "launch",
             "program": "ODADS/Code/main.py",
             "console": "integratedTerminal",
-            "args": ["diagnosis all", "152, 050", "cuda:0", "050"]
+            "args": ["diagnosis all", "152, 050", "cuda:0"]
         },
 
         {
@@ -167,7 +167,7 @@
             "request": "launch",
             "program": "ODADS/Code/main.py",
             "console": "integratedTerminal",
-            "args": ["train", "152D1TRRS - ERM, 050D1TRRS - ERM", "cuda:0", "050"]
+            "args": ["train", "152D1TRRS - ERM, 050D1TRRS - ERM", "cuda:0"]
         },
         {
             "name": "D1 train all",

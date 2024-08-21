@@ -23,8 +23,8 @@ def train_abnormity_num_model(device, names):
     o_class_size = setting.O_train_class_size
     f_class_size = setting.F_train_class_size
     wt_name = setting.get_d_wt_file_name(name)
-    o_mr_name = setting.get_o_mr_name(names[1])
-    f_mr_name = setting.get_f_mr_name(names[0])
+    o_mr_name = setting.get_o_trmr_name(names[1])
+    f_mr_name = setting.get_f_trmr_name(names[0])
     num_epochs = setting.get_num_epochs(name)
     folder_path = setting.get_folder_path(name)
     o_abnormity_num = setting.get_abnormity_num("OCT Abnormities")
@@ -155,8 +155,8 @@ def train_disease_prob_model(device, names):
     o_class_size = setting.O_train_class_size
     f_class_size = setting.F_train_class_size
     wt_name = setting.get_d_wt_file_name(name)
-    o_mr_name = setting.get_o_mr_name(names[1])
-    f_mr_name = setting.get_f_mr_name(names[0])
+    o_mr_name = setting.get_o_trmr_name(names[1])
+    f_mr_name = setting.get_f_trmr_name(names[0])
     num_epochs = setting.get_num_epochs(name)
     folder_path = setting.get_folder_path(name)
     d2_input_length = setting.get_d2_input_length()

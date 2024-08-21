@@ -34,8 +34,8 @@ if task == "abnormity all":
 
 elif task == "diagnosis all":
     names = name.split(", ")
-    train_diagnosis.train(device, [name + "D1TRRS" for name in names])
-    train_diagnosis.train(device, [name + "D2TRRS" for name in names])
+    #train_diagnosis.train(device, [name + "D1TRRS" for name in names])
+    #train_diagnosis.train(device, [name + "D2TRRS" for name in names])
     test_diagnosis.test(device, [name + "D1TORS" for name in names])
     test_diagnosis.test(device,[name + "D2TORS" for name in names])
 
