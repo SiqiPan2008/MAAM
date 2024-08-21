@@ -1,13 +1,11 @@
-from Diagnosis_Model import diagnose_disease, train_diagnosis, test_diagnosis
-from Abnormity_Models import test_abnormity, train_abnormity, classify_abnormity, gradcam
+from Diagnosis_Model import train_diagnosis, test_diagnosis
+from Abnormity_Models import test_abnormity, train_abnormity
+from Get_Results import abnormity_loss_and_acc, abnormity_gradCAM, abnormity_ROC, abnormity_tSNE, diagnosis1_loss_and_acc, diagnosis2_loss_and_acc, diagnosis2_tSNE, diagnosis_ROC
+# from Results import 
 from Utils import utils
 import torch
-import numpy as np
-from PIL import Image
-from datetime import datetime
 import os
 import sys
-import json
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 
 setting = utils.get_setting()
@@ -20,8 +18,27 @@ use_gpu = torch.cuda.is_available()
 device = torch.device(cuda_device if use_gpu else "cpu")
 print(device)
 
+# get results commands
+if task == "get results":
+    if name == "A: Loss and Acc":
+        abnormity_loss_and_acc.graph_alt()
+    elif name == "A: ROC":
+        pass
+    elif name == "A: tSNE":
+        pass
+    elif name == "A: gradCAM":
+        pass
+    elif name == "D1: Loss and Acc":
+        pass
+    elif name == "D2: Loss and Acc":
+        pass
+    elif name == "D1&D2: ROC":
+        pass
+    elif name == "D2: tSNE":
+        pass
+
 # multi-task commands
-if task == "abnormity all":
+elif task == "abnormity all":
     train_abnormity.train(device, name + "TRRS - T")
     test_abnormity.test_multiple(device, name + "TORS - T")
     test_abnormity.get_best_abnormity_model(name + "TORS - T")
@@ -40,17 +57,18 @@ elif task == "diagnosis all":
     test_diagnosis.test(device,[name + "D2TORS" for name in names])
 
 # single-task commands
-if setting.is_abnormity(name):
-    if task == "train":
-        train_abnormity.train(device, name)
-    elif task == "test":
-        test_abnormity.test_multiple(device, name)
-    elif task == "get MR":
-        test_abnormity.get_model_results(device, name)
-elif setting.is_diagnosis1(name) or setting.is_diagnosis2(name):
-    # net_name_f
-    names = name.split(", ")
-    if task == "train":
-        train_diagnosis.train(device, names)
-    elif task == "test":
-        test_diagnosis.test(device, names)
+else:
+    if setting.is_abnormity(name):
+        if task == "train":
+            train_abnormity.train(device, name)
+        elif task == "test":
+            test_abnormity.test_multiple(device, name)
+        elif task == "get MR":
+            test_abnormity.get_model_results(device, name)
+    elif setting.is_diagnosis1(name) or setting.is_diagnosis2(name):
+        # net_name_f
+        names = name.split(", ")
+        if task == "train":
+            train_diagnosis.train(device, names)
+        elif task == "test":
+            test_diagnosis.test(device, names)

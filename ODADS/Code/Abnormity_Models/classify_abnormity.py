@@ -5,8 +5,6 @@ from Abnormity_Models import abnormity_models
 from Utils import utils
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 
-# small utilities. refactor later!
-
 def get_abnormities_probs(img, model, device):
     model.eval()
     img = utils.resize_long_edge(img)

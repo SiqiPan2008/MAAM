@@ -4,7 +4,8 @@ import csv
 import numpy as np
 from torchvision import transforms, datasets
 from PIL import Image
-from Abnormity_Models import abnormity_models, classify_abnormity
+from Abnormity_Models import abnormity_models
+from Abnormity_Models import classify_abnormity
 from Utils import utils
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 
@@ -108,7 +109,7 @@ def choose_t_or_f_abnormity_model(name):
     setting = utils.get_setting()
     wt_name = setting.get_wt_file_name(name)
     folder_path = setting.get_folder_path(name)
-    testing_file = setting.get_testing_rs_file_name(name)
+    testing_file = setting.get_testing_rs_name(name)
     
     t_best_combined_acc = 0
     with open(os.path.join(folder_path, testing_file + " - T.csv"), "r", newline="") as file:
