@@ -21,9 +21,9 @@ print(device)
 # get results commands
 if task == "get results":
     if name == "A: Loss and Acc":
-        abnormity_loss_and_acc.graph_alt()
+        abnormity_loss_and_acc.plot_loss_and_acc()
     elif name == "A: ROC":
-        pass
+        abnormity_ROC.plot_roc()
     elif name == "A: tSNE":
         pass
     elif name == "A: gradCAM":

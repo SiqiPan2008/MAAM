@@ -8,7 +8,10 @@
     "A_folder": "Abnormity",
     "D1_folder": "Diagnosis1",
     "D2_folder": "Diagnosis2",
-    "fig_folder": "ODADS/Paper/Figs",
+    "fig_folder": "Paper/Figs",
+
+    "best_f_net": "152",
+    "best_o_net": "050",
 
     "A_top_probs_max_num": "4",
     "A_top_probs_min_prob": "0.9",

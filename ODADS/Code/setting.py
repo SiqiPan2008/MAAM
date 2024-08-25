@@ -17,6 +17,9 @@ class Setting:
     D2_folder: str
     fig_folder: str
 
+    best_f_net: str
+    best_o_net: str
+    
     feature_extract: bool
     batch_size: int
     test_batch_size: int

@@ -54,7 +54,7 @@ def get_loss_and_acc(net_name, type, starting_epoch = 0):
         "best acc": best_acc
     }
 
-def graph():
+def plot_loss_and_acc_alt(): # (2x1) x (2x2) x (2x1)
     setting = utils.get_setting()
     fig_folder = setting.fig_folder
     fig_file = "abnormity_loss_and_acc.pdf"
@@ -114,7 +114,7 @@ def graph():
             loss_ax.plot(rsf["epoch train"], rsf["valid losses"], color='red')
     
     plt.show()
-    #plt.save(fig_path)
+    plt.save(fig_path)
     
     
     
@@ -123,7 +123,7 @@ def graph():
     
     
     
-def graph_alt():
+def plot_loss_and_acc(): # 2 x (4x1) x (2x2)
     setting = utils.get_setting()
     fig_folder = setting.fig_folder
     fig_file = "abnormity_loss_and_acc.pdf"
@@ -176,5 +176,5 @@ def graph_alt():
         loss_ax.plot(rst["epoch train"], rst["valid losses"], color='red')
         loss_ax.plot(rsf["epoch train"], rsf["valid losses"], color='red')
     
+    plt.savefig(fig_path)
     plt.show()
-    #plt.save(fig_path)
