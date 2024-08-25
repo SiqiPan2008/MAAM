@@ -1,6 +1,8 @@
 from Diagnosis_Model import train_diagnosis, test_diagnosis
 from Abnormity_Models import test_abnormity, train_abnormity
-from Get_Results import abnormity_loss_and_acc, abnormity_gradCAM, abnormity_ROC, abnormity_tSNE, diagnosis1_loss_and_acc, diagnosis2_loss_and_acc, diagnosis2_tSNE, diagnosis_ROC
+from Get_Results import \
+    abnormity_loss_and_acc, abnormity_gradCAM, abnormity_ROC, abnormity_tSNE, abnormity_confusion_matrix, \
+    diagnosis1_loss_and_acc, diagnosis2_loss_and_acc, diagnosis2_tSNE, diagnosis_ROC
 # from Results import 
 from Utils import utils
 import torch
@@ -26,6 +28,8 @@ if task == "get results":
         abnormity_ROC.plot_roc()
     elif name == "A: tSNE":
         abnormity_tSNE.plot_tsne()
+    elif name == "A: confusion matrix":
+        abnormity_confusion_matrix.plot_all_conf_mat()
     elif name == "A: gradCAM":
         pass
     elif name == "D1: Loss and Acc":

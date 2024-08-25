@@ -27,6 +27,7 @@ class Setting:
     use_cross_valid: bool
     save_model_frequency: int
     use_top_probs: bool
+    tSNE_point_num: int
 
     A_top_probs_max_num: int
     A_top_probs_min_prob: float
@@ -79,6 +80,7 @@ class Setting:
         setting.use_cross_valid = setting.use_cross_valid == "True"
         setting.save_model_frequency = int(setting.save_model_frequency)
         setting.use_top_probs = setting.use_top_probs == "True"
+        setting.tSNE_point_num = int(setting.tSNE_point_num)
 
         setting.A_top_probs_max_num = int(setting.A_top_probs_max_num)
         setting.A_top_probs_min_prob = float(setting.A_top_probs_min_prob)
