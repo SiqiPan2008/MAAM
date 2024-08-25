@@ -25,7 +25,7 @@ if task == "get results":
     elif name == "A: ROC":
         abnormity_ROC.plot_roc()
     elif name == "A: tSNE":
-        pass
+        abnormity_tSNE.plot_tsne()
     elif name == "A: gradCAM":
         pass
     elif name == "D1: Loss and Acc":

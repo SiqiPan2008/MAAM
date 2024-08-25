@@ -2,11 +2,9 @@ import csv
 import os
 import numpy as np
 from Utils import utils
-import sklearn
 from sklearn.metrics import roc_curve, auc
 import matplotlib.pyplot as plt
 import matplotlib.pyplot as plt
-import matplotlib.gridspec as gridspec
 
 def plot_single_roc(type, abnormity, draw_roc = True, ax = None):
     colors = {"TR": "red", "TO": "green"}
@@ -83,4 +81,5 @@ def plot_roc():
         else:
             col += 1
     
+    plt.savefig(fig_path)
     plt.show()
