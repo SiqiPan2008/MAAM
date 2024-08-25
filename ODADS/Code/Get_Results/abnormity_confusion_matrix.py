@@ -8,7 +8,12 @@ import matplotlib.pyplot as plt
 
 
 def get_single_conf_mat(complete_conf_mat, index):
-    pass
+    conf_mat = np.zeros((2, 2), dtype=int)
+    num = complete_conf_mat.shape[0]
+    for i in range(num):
+        for j in range(num):
+            conf_mat[i == index][j == index] += 1
+    return conf_mat
 
 def get_complete_conf_mat(mr, abnormity_num):
     conf_mat = np.zeros((abnormity_num, abnormity_num), dtype=int)

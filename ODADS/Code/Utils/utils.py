@@ -164,3 +164,11 @@ def copy_file_by_path(old_path, new_path):
     if os.path.exists(new_path):
         os.remove(new_path)
     shutil.copy(old_path, new_path)
+
+# calculate the expected value of the number of abnormities (in D1)
+def calc_expected_abnormity_num(abnormity_num_vector):
+    sum = 0.0
+    for i in range(len(abnormity_num_vector)):
+        sum += i * abnormity_num_vector[i]
+    sum /= len(abnormity_num_vector)
+    return sum
