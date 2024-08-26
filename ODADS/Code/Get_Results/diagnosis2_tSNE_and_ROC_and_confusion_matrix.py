@@ -60,13 +60,26 @@ def plot_all_ROC(labels, probs, diseases, draw_roc = True):
     for col in range(1, 4):
         axs[3, col].set_axis_off()
     
-    if draw_roc
+    if draw_roc:
         plt.savefig(fig_path)
         plt.show()
     return aucs
 
 def plot_conf_mat(conf_mat, diseases):
-    pass
+    setting = utils.get_setting()
+    fig_folder = setting.fig_folder
+    fig_file = "diagnosis2_confusion_matrix.pdf"
+    fig_path = os.path.join(fig_folder, fig_file)
+    
+    mat = plt.matshow(conf_mat, cmap='Blues')
+    max = np.max(conf_mat)
+    for i in range(conf_mat.shape[0]):
+        for j in range(conf_mat.shape[1]):
+            plt.text(j, i, conf_mat[i, j], ha='center', va='center', color='black' if conf_mat[i, j] < max / 2 else 'white')
+    plt.colorbar(mat)
+    
+    plt.savefig(fig_path)
+    plt.show()
 
 def plot_disease_tSNE_and_ROC_and_conf_mat(device, plt_tSNE = True, plt_ROC = True, plt_conf_mat = True):
     setting = utils.get_setting()
@@ -128,7 +141,7 @@ def plot_disease_tSNE_and_ROC_and_conf_mat(device, plt_tSNE = True, plt_ROC = Tr
     roc_probs = {disease: [] for disease in diseases_including_normal}
     tSNE_features = [[] for _ in diseases_including_normal]
     tSNE_labels = [[] for _ in diseases_including_normal]
-    conf_mat = np.zeros((disease_num_including_normal, disease_num_including_normal))
+    conf_mat = np.zeros((disease_num_including_normal, disease_num_including_normal), dtype=int)
     
     model.eval()
     corrects = 0

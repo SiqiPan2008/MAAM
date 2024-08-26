@@ -2,7 +2,7 @@ from Diagnosis_Model import train_diagnosis, test_diagnosis
 from Abnormity_Models import test_abnormity, train_abnormity
 from Get_Results import \
     abnormity_loss_and_acc, abnormity_gradCAM, abnormity_ROC, abnormity_tSNE, abnormity_confusion_matrix, \
-    diagnosis2_tSNE_and_ROC_and_confusion_matrix, diagnosis_acc
+    diagnosis2_tSNE_and_ROC_and_confusion_matrix, diagnosis1_acc_barchart
 from Utils import utils
 import torch
 import os
@@ -33,8 +33,8 @@ if task == "get results":
         pass
     elif name == "D2: tSNE and ROC and confusion matrix":
         diagnosis2_tSNE_and_ROC_and_confusion_matrix.plot_disease_tSNE_and_ROC_and_conf_mat(device, plt_tSNE = True, plt_ROC = True, plt_conf_mat = True)
-    elif name == "D1&D2: ROC":
-        pass
+    elif name == "D1: Acc barchart":
+        diagnosis1_acc_barchart.plot_acc_barchart()
     elif name == "D2: tSNE":
         pass
 

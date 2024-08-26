@@ -42,6 +42,14 @@
             "args":["get results", "A: gradCAM", "cpu"]
         },
         {
+            "name": "D1: Acc barchart",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "ODADS/Code/main.py",
+            "console": "integratedTerminal",
+            "args": ["get results", "D1: Acc barchart", "cpu"]
+        },
+        {
             "name": "D2: tSNE and ROC and confusion matrix",
             "type": "debugpy",
             "request": "launch",
@@ -49,7 +57,7 @@
             "console": "integratedTerminal",
             "args": ["get results", "D2: tSNE and ROC and confusion matrix", "cuda:0"]
         },
-
+        
 
 
         /*
