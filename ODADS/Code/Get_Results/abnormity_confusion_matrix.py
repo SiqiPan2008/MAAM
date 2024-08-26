@@ -12,7 +12,7 @@ def get_single_conf_mat(complete_conf_mat, index):
     num = complete_conf_mat.shape[0]
     for i in range(num):
         for j in range(num):
-            conf_mat[i == index][j == index] += 1
+            conf_mat[1 if i == index else 0, 1 if j == index else 0] += complete_conf_mat[i, j]
     return conf_mat
 
 def get_complete_conf_mat(mr, abnormity_num):

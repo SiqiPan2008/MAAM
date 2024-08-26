@@ -16,6 +16,7 @@ class Setting:
     D1_folder: str
     D2_folder: str
     fig_folder: str
+    table_folder: str
 
     best_f_net: str
     best_o_net: str

@@ -4,6 +4,7 @@ import time
 import random
 import numpy as np
 from Utils import utils
+import csv
 from sklearn.manifold import TSNE
 from sklearn.metrics import roc_curve, auc
 import matplotlib.pyplot as plt
@@ -65,6 +66,14 @@ def plot_all_ROC(labels, probs, diseases, draw_roc = True):
         plt.show()
     return aucs
 
+def get_single_conf_mat(complete_conf_mat, index):
+    conf_mat = np.zeros((2, 2), dtype=int)
+    num = complete_conf_mat.shape[0]
+    for i in range(num):
+        for j in range(num):
+            conf_mat[1 if i == index else 0, 1 if j == index else 0] += complete_conf_mat[i, j]
+    return conf_mat
+
 def plot_conf_mat(conf_mat, diseases):
     setting = utils.get_setting()
     fig_folder = setting.fig_folder
@@ -81,7 +90,7 @@ def plot_conf_mat(conf_mat, diseases):
     plt.savefig(fig_path)
     plt.show()
 
-def plot_disease_tSNE_and_ROC_and_conf_mat(device, plt_tSNE = True, plt_ROC = True, plt_conf_mat = True):
+def test(device, plt_tSNE = True, plt_ROC = True, plt_conf_mat = True):
     setting = utils.get_setting()
     name = "000D2"
     d1_folder = setting.D1_folder
@@ -173,6 +182,31 @@ def plot_disease_tSNE_and_ROC_and_conf_mat(device, plt_tSNE = True, plt_ROC = Tr
     if plt_tSNE:
         plot_tSNE(tSNE_features, tSNE_labels, diseases_including_normal)
     if plt_ROC:
-        plot_all_ROC(roc_labels, roc_probs, diseases_including_normal)
+        aucs = plot_all_ROC(roc_labels, roc_probs, diseases_including_normal)
     if plt_conf_mat:
         plot_conf_mat(conf_mat, diseases_including_normal)
+    
+    with open(os.path.join(setting.D2_folder, "000D2TORS.csv"), "w", newline="") as file:
+        writer = csv.writer(file)
+        writer.writerow([corrects, total, acc])
+    
+    with open(os.path.join(setting.table_folder, "diagnosis2.csv"), "w", newline="") as file:
+        writer = csv.writer(file)
+        for i in range(len(diseases_including_normal)):
+            disease_conf_mat = get_single_conf_mat(conf_mat, i)
+            tp = disease_conf_mat[0][0]
+            fn = disease_conf_mat[0][1]
+            fp = disease_conf_mat[1][0]
+            tn = disease_conf_mat[1][1]
+            precision = tp / (tp + fp)
+            specificity = tn / (tn + fp)
+            sensitivity = tp / (tp + fn)
+            f1 = 2 * precision * sensitivity / (precision + sensitivity)
+            writer.writerow([
+                diseases_including_normal[i],
+                precision,
+                sensitivity,
+                specificity,
+                f1, 
+                aucs[i]
+            ])

@@ -1,5 +1,5 @@
 {
-    "use_small": "True",
+    "use_small": "False",
 
     "root": "ODADS",
     "data_folder": "Data",
@@ -9,6 +9,7 @@
     "D1_folder": "Diagnosis1",
     "D2_folder": "Diagnosis2",
     "fig_folder": "Paper/Figs",
+    "table_folder": "Paper/Tables",
 
     "best_f_net": "152",
     "best_o_net": "050",
