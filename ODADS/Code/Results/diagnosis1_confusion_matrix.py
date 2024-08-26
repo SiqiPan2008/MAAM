@@ -9,6 +9,21 @@ import torch
 import matplotlib.gridspec as gridspec
 from Diagnosis_Model import diagnosis_model
 
+def get_conf_mat(disease):
+    setting = utils.get_setting()
+    name = "000D1TOMR - " + disease
+    label_levels = setting.get_disease_abnormity_num(disease, "All Abnormities") + 1
+    mr_path = os.path.join(setting.D1_folder, name + ".bin")
+    mr = np.fromfile(mr_path, dtype = np.float64).reshape((label_levels, setting.D1_test_class_size, label_levels))
+    
+    conf_mat = np.zeros((label_levels, label_levels), dtype=int)
+    shape = mr.shape
+    for i in range(shape[0]):
+        for j in range(shape[1]):
+            probs = mr[i][j]
+            conf_mat[i][np.argmax(probs)] += 1
+    return conf_mat
+'''
 def get_conf_mat(device, disease):
     setting = utils.get_setting()
     name = "000D1---- - " + disease
@@ -66,9 +81,9 @@ def get_conf_mat(device, disease):
     print(f"Acc: {corrects}/{total} = {acc :.4f}")
     
     return conf_mat, corrects, total, acc
+'''
 
-# test D1 and plot confusion matrices
-def test(device):
+def plot_conf_mat():
     setting = utils.get_setting()
     diseases = setting.get_diseases(include_normal = False)
     folder_path = setting.D2_folder
@@ -83,9 +98,13 @@ def test(device):
     col = 0
     
     with open(os.path.join(folder_path, "00D1TORS.csv"), "w", newline="") as file:  
-        writer = csv.writer(file)  
-        for disease in diseases:
-            conf_mat, corrects, total, acc = get_conf_mat(device, disease)
+        writer = csv.writer(file)
+        for i in range(len(diseases)):
+            disease = diseases[i]
+            conf_mat = get_conf_mat(disease)
+            corrects = sum([conf_mat[j][j] for j in range(conf_mat.shape[0])])
+            total = sum([sum(conf_mat[j]) for j in range(conf_mat.shape[0])])
+            acc = corrects / total
             writer.writerow([disease, corrects, total, acc])
             mat = axs[row, col].matshow(conf_mat, cmap='Blues')
             max = np.max(conf_mat)

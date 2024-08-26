@@ -225,6 +225,12 @@ class Setting:
     def get_f_tomr_name(self, name: str) -> str:
         return name[:3] + "AFTOMR"
     
+    def get_d1_tomr_name(self, name: str) -> str:
+        return "000D1TOMR" + name[9:]
+    
+    def get_d2_tomr_name(self, name: str) -> str:
+        return "000D2TOMR" + name[9:]
+    
     def get_rs_file_name(self, name: str) -> str:
         return name[:7] + "RS" + name[9:]
     

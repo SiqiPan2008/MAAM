@@ -1,8 +1,8 @@
 from Diagnosis_Model import train_diagnosis, test_diagnosis
 from Abnormity_Models import test_abnormity, train_abnormity
-from Get_Results import \
+from Results import \
     abnormity_loss_and_acc, abnormity_gradCAM, abnormity_ROC, abnormity_tSNE, abnormity_confusion_matrix, \
-    diagnosis1_acc_barchart, diagnosis1_test, diagnosis2_test
+    diagnosis1_acc_barchart, diagnosis1_confusion_matrix, diagnosis2_tSNE_ROC_confusion_matrix
 from Utils import utils
 import torch
 import os
@@ -33,10 +33,10 @@ if task == "get results":
         pass
     elif name == "D1: Acc barchart":
         diagnosis1_acc_barchart.plot_acc_barchart()
-    elif name == "D1: test":
-        diagnosis1_test.test(device)
-    elif name == "D2: test":
-        diagnosis2_test.test(device, plt_tSNE = True, plt_ROC = True, plt_conf_mat = True)
+    elif name == "D1: confusion matrix":
+        diagnosis1_confusion_matrix.plot_conf_mat()
+    elif name == "D2: tSNE, ROC, confusion matrix":
+        diagnosis2_tSNE_ROC_confusion_matrix.plot_tSNE_ROC_conf_mat(plt_tSNE = True, plt_ROC = True, plt_conf_mat = True)
 
 # multi-task commands
 elif task == "abnormity all":

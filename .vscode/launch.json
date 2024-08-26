@@ -50,20 +50,20 @@
             "args": ["get results", "D1: Acc barchart", "cpu"]
         },
         {
-            "name": "D1: test",
+            "name": "D1: confusion matrix",
             "type": "debugpy",
             "request": "launch",
             "program": "ODADS/Code/main.py",
             "console": "integratedTerminal",
-            "args": ["get results", "D1: test", "cuda:0"]
+            "args": ["get results", "D1: confusion matrix", "cuda:0"]
         },
         {
-            "name": "D2: test",
+            "name": "D2: tSNE, ROC, confusion matrix",
             "type": "debugpy",
             "request": "launch",
             "program": "ODADS/Code/main.py",
             "console": "integratedTerminal",
-            "args": ["get results", "D2: test", "cuda:0"]
+            "args": ["get results", "D2: tSNE, ROC, confusion matrix", "cuda:0"]
         },
         
 
@@ -259,6 +259,7 @@
             "console": "integratedTerminal",
             "args": ["train", "152D1TRRS, 050D1TRRS", "cuda:0"]
         },
+        */
         {
             "name": "D1 test all",
             "type": "debugpy",
@@ -286,6 +287,6 @@
             "console": "integratedTerminal",
             "args": ["test", "152D2TORS, 050D2TORS", "cuda:1"]
         }
-        */
+        
     ]
 }

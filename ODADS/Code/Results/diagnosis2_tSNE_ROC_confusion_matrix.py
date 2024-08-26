@@ -90,91 +90,47 @@ def plot_conf_mat(conf_mat, diseases):
     plt.savefig(fig_path)
     plt.show()
 
-def test(device, plt_tSNE = True, plt_ROC = True, plt_conf_mat = True):
+# also calculates numerical results
+def plot_tSNE_ROC_conf_mat(plt_tSNE = True, plt_ROC = True, plt_conf_mat = True):
     setting = utils.get_setting()
-    name = "000D2"
-    d1_folder = setting.D1_folder
-    batch_size = setting.test_batch_size
-    class_size = setting.D2_test_class_size
-    abnormity_folder_path = setting.A_folder
-    o_class_size = setting.O_test_class_size
-    f_class_size = setting.F_test_class_size
+    name = "000D2TOMR"
     tSNE_point_num = setting.tSNE_point_num
-    wt_name = setting.get_d_wt_file_name(name)
-    o_mr_name = setting.get_o_tomr_name(setting.best_o_net)
-    f_mr_name = setting.get_f_tomr_name(setting.best_f_net)
-    folder_path = setting.get_folder_path(name)
-    d2_input_length = setting.get_d2_input_length()
-    diseases = setting.get_diseases(include_normal = False)
-    o_abnormity_num = setting.get_abnormity_num("OCT Abnormities")
-    f_abnormity_num = setting.get_abnormity_num("Fundus Abnormities")
-    all_abnormity_num = setting.get_abnormity_num("All Abnormities")
     diseases_including_normal = setting.get_diseases(include_normal = True)
     disease_num_including_normal = setting.get_disease_num(include_normal = True)
+    mr_path = os.path.join(setting.D2_folder, name + ".bin")
+    mr = np.fromfile(mr_path, dtype = np.float64).reshape((disease_num_including_normal, setting.D2_test_class_size, disease_num_including_normal))
     
-    test_data = torch.zeros(disease_num_including_normal * class_size, d2_input_length)
-    test_label = torch.zeros(disease_num_including_normal * class_size, dtype=torch.long)
-    
-    o_mr_path = os.path.join(abnormity_folder_path, o_mr_name + ".bin")
-    o_mr = np.fromfile(o_mr_path, dtype = np.float64).reshape((o_abnormity_num, o_class_size, o_abnormity_num))
-    f_mr_path = os.path.join(abnormity_folder_path, f_mr_name + ".bin")
-    f_mr = np.fromfile(f_mr_path, dtype = np.float64).reshape((f_abnormity_num, f_class_size, f_abnormity_num))
-    
-    model = diagnosis_model.Simple_Net(d2_input_length, disease_num_including_normal).to(device)
-    trained_model = torch.load(os.path.join(folder_path, wt_name + ".pth"))
-    model.load_state_dict(trained_model["state_dict"])
-    
-    abnormity_num_models = {
-        disease: diagnosis_model.Simple_Net(
-            all_abnormity_num, 
-            setting.get_disease_abnormity_num(disease, "All Abnormities") + 1
-        ).to(device)
-        for disease in diseases
-    }
-    for disease in abnormity_num_models.keys():
-         trained_model = torch.load(os.path.join(d1_folder, setting.get_d1_single_disease_wt(disease) + ".pth"))
-         abnormity_num_models[disease].load_state_dict(trained_model["state_dict"])
-    
-    start_time = time.time()
-    for i in range(len(diseases_including_normal)):
-        disease = diseases_including_normal[i]
-        for j in range(class_size):
-            output = utils.get_abnormity_nums_vector(device, disease, o_mr, f_mr, abnormity_num_models)
-            output = output.detach()
-            test_data[i * class_size + j] = output
-            test_label[i * class_size + j] = i
-    test_dataset = torch.utils.data.TensorDataset(test_data, test_label)
-    test_loader = torch.utils.data.DataLoader(test_dataset, batch_size = batch_size, shuffle = True)
-
     roc_labels = {disease: [] for disease in diseases_including_normal}
     roc_probs = {disease: [] for disease in diseases_including_normal}
-    tSNE_features = [[] for _ in diseases_including_normal]
     tSNE_labels = [[] for _ in diseases_including_normal]
     conf_mat = np.zeros((disease_num_including_normal, disease_num_including_normal), dtype=int)
     
-    model.eval()
+    start_time = time.time()
     corrects = 0
-    total = len(test_loader.dataset)
-    with torch.no_grad():
-        for inputs, labels in test_loader:
-            outputs = model(inputs.to(device))[0].cpu()
-            _, predicted = torch.max(outputs, 0)
-            corrects += predicted.cpu().item() == labels[0]
+    total = 0
+    shape = mr.shape
+    for i in range(shape[0]):
+        for j in range(shape[1]):
+            output = mr[i][j]
+            predicted = np.argmax(np.array(output))
+            corrects += (predicted == i).item()
+            total += 1
             
-            conf_mat[labels[0]][predicted.item()] += 1
-            tSNE_features[labels[0]].append(outputs)
-            for i in range(len(diseases_including_normal)):
+            conf_mat[i][predicted] += 1
+            for k in range(len(diseases_including_normal)):
                 disease = diseases_including_normal[i]
-                roc_labels[disease].append(i == labels[0])
-                roc_probs[disease].append(outputs[i])
+                roc_labels[disease].append(k == i)
+                roc_probs[disease].append(output[k])
             
     acc = corrects / total
     time_elapsed = time.time() - start_time
     print(f"Time elapsed {time_elapsed // 60 :.0f}m {time_elapsed % 60 :.2f}s")
     print(f"acc: {corrects}/{total} = {acc :.4f}")
     
+    tSNE_features = [[] for _ in range(disease_num_including_normal)]
     for i in range(len(tSNE_features)):
-        tSNE_features[i] = random.sample(tSNE_features[i], tSNE_point_num)
+        #tSNE_features[i] = np.random.choice(tSNE_features[i], tSNE_point_num)
+        tSNE_features[i] = mr[i][np.random.choice(mr[i].shape[0], size=tSNE_point_num, replace=False)]
         tSNE_labels[i] = [i for _ in range(tSNE_point_num)]
     tSNE_features = np.concatenate(tSNE_features)
     tSNE_labels = np.concatenate(tSNE_labels)

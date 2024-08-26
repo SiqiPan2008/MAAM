@@ -17,6 +17,7 @@ def test_abnormity_num_model(device, names):
     wt_name = setting.get_d_wt_file_name(name)
     o_mr_name = setting.get_o_tomr_name(names[1])
     f_mr_name = setting.get_f_tomr_name(names[0])
+    d1_mr_name = setting.get_d1_tomr_name(name)
     folder_path = setting.get_folder_path(name)
     o_abnormity_num = setting.get_abnormity_num("OCT Abnormities")
     f_abnormity_num = setting.get_abnormity_num("Fundus Abnormities")
@@ -45,6 +46,7 @@ def test_abnormity_num_model(device, names):
     test_dataset = torch.utils.data.TensorDataset(test_data, test_label)
     test_loader = torch.utils.data.DataLoader(test_dataset, batch_size = batch_size, shuffle = True)
     
+    mr = [[] for _ in range(label_levels)]
     model.eval()
     corrects = 0
     total = len(test_loader.dataset)
@@ -53,10 +55,14 @@ def test_abnormity_num_model(device, names):
             outputs = model(inputs.to(device))
             _, predicted = torch.max(outputs, 1)
             corrects += (predicted == labels.to(device)).sum().item()
+            mr[labels[0]].append(outputs.cpu().detach().tolist())
     acc = corrects / total
     time_elapsed = time.time() - start_time
     print(f"Time elapsed {time_elapsed // 60 :.0f}m {time_elapsed % 60 :.2f}s")
     print(f"Acc: {corrects}/{total} = {acc :.4f}")
+    
+    np.array(mr).tofile(os.path.join(folder_path, d1_mr_name + ".bin"))
+    print(f"model results saved to {d1_mr_name}.bin")
     
     return acc
 
@@ -74,6 +80,7 @@ def test_disease_prob_model(device, names):
     D2_top_probs_max_num = setting.D2_top_probs_max_num
     D2_top_probs_min_prob = setting.D2_top_probs_min_prob
     wt_name = setting.get_d_wt_file_name(name)
+    d2_mr_name = setting.get_d2_tomr_name(name)
     o_mr_name = setting.get_o_tomr_name(names[1])
     f_mr_name = setting.get_f_tomr_name(names[0])
     folder_path = setting.get_folder_path(name)
@@ -119,12 +126,14 @@ def test_disease_prob_model(device, names):
     test_dataset = torch.utils.data.TensorDataset(test_data, test_label)
     test_loader = torch.utils.data.DataLoader(test_dataset, batch_size = batch_size, shuffle = True)
 
+    mr = [[] for _ in range(disease_num_including_normal)]
     model.eval()
     corrects = 0
     total = len(test_loader.dataset)
     with torch.no_grad():
         for inputs, labels in test_loader:
             outputs = model(inputs.to(device))
+            mr[labels[0]].append(outputs.cpu().detach().tolist())
             if use_top_probs:
                 outputs = torch.nn.functional.softmax(outputs.squeeze(0), 0).cpu()
                 top_indices = utils.get_top_prob_indices(outputs, D2_top_probs_max_num, D2_top_probs_min_prob)
@@ -137,6 +146,9 @@ def test_disease_prob_model(device, names):
     time_elapsed = time.time() - start_time
     print(f"Time elapsed {time_elapsed // 60 :.0f}m {time_elapsed % 60 :.2f}s")
     print(f"acc: {corrects}/{total} = {acc :.4f}")
+    
+    np.array(mr).tofile(os.path.join(folder_path, d2_mr_name + ".bin"))
+    print(f"model results saved to {d2_mr_name}.bin")
     
     return acc
 
