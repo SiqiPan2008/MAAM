@@ -24,8 +24,8 @@
 	citecolor=blue,
 	urlcolor=black}
 \usepackage{tikz}
+\usepackage{pgfplotstable}
 \usepackage{pgfplots}
-\usepackage{mhchem}
 \pgfplotsset{compat=1.18}
 \captionsetup{justification=centering}
 \captionsetup[figure]{name={Fig.},labelsep=space,labelfont=bf}
@@ -142,6 +142,46 @@
 			
 				TEXT: accuracy; explain top-probs method
 				
+				
+				
+				\begin{table}[htbp]
+					\centering
+					\caption{OCT Test}
+					\label{tb:OCT_test}
+					\pgfplotstabletypeset[
+						multicolumn names,
+						col sep=comma,
+						columns = {Abnormity, Precision, Sensitivity, Specificity, FOne, AUC},
+						columns/Abnormity/.style={string type, column name=Abnormities},
+						columns/Precision/.style={string type, column name=Precision},
+						columns/Sensitivity/.style={string type, column name=Sensitivity},
+						columns/Specificity/.style={string type, column name=Specificity},
+						columns/FOne/.style={string type, column name={F1 Score}},
+						columns/AUC/.style={string type, column name=AUC},
+						every head row/.style={before row=\toprule, after row=\midrule},
+						every last row/.style={ after row=\bottomrule}
+					]{Tables/abnormity_o_test.csv}
+				\end{table}
+				
+				\begin{table}[htbp]
+					\centering
+					\caption{Fundus Test}
+					\label{tb:Fundus_test}
+					\pgfplotstabletypeset[
+					multicolumn names,
+					col sep=comma,
+					columns = {Abnormity, Precision, Sensitivity, Specificity, FOne, AUC},
+					columns/Abnormity/.style={string type, column name=Abnormities},
+					columns/Precision/.style={string type, column name=Precision},
+					columns/Sensitivity/.style={string type, column name=Sensitivity},
+					columns/Specificity/.style={string type, column name=Specificity},
+					columns/FOne/.style={string type, column name={F1 Score}},
+					columns/AUC/.style={string type, column name=AUC},
+					every head row/.style={before row=\toprule, after row=\midrule},
+					every last row/.style={after row=\bottomrule}
+					]{Tables/abnormity_f_test.csv}
+				\end{table}
+				
 				Table: for each abnormity:
 					precision
 					recall/sensitivity
@@ -183,12 +223,25 @@
 			
 			TEXT: top-probs method
 			
-			Table: for each disease:
-				precision
-				recall/sensitivity
-				specificity
-				F1
-				AUC
+			\begin{table}[htbp]
+				\centering
+				\caption{Diagnosis Test}
+				\label{tb:diagnosis_test}
+				\pgfplotstabletypeset[
+				multicolumn names,
+				col sep=comma,
+				columns = {Abnormity, Precision, Sensitivity, Specificity, FOne, AUC},
+				columns/Abnormity/.style={string type, column name=Abnormities},
+				columns/Precision/.style={string type, column name=Precision},
+				columns/Sensitivity/.style={string type, column name=Sensitivity},
+				columns/Specificity/.style={string type, column name=Specificity},
+				columns/FOne/.style={string type, column name={F1 Score}},
+				columns/AUC/.style={string type, column name=AUC},
+				every head row/.style={before row=\toprule, after row=\midrule},
+				every last row/.style={ after row=\bottomrule}
+				]{Tables/diagnosis2.csv}
+			\end{table}
+			
 			Graph: D1 acc bar chart (with D2 no use-top-probs and D2 use-top-probs)
 			Graph: D1 confusion matrix
 			TEXT: comments

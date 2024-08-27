@@ -148,6 +148,14 @@ def plot_tSNE_ROC_conf_mat(plt_tSNE = True, plt_ROC = True, plt_conf_mat = True)
     
     with open(os.path.join(setting.table_folder, "diagnosis2.csv"), "w", newline="") as file:
         writer = csv.writer(file)
+        writer.writerow([
+                "Abnormity",
+                "Precision",
+                "Sensitivity",
+                "Specificity",
+                "FOne", 
+                "AUC"
+            ])
         for i in range(len(diseases_including_normal)):
             disease_conf_mat = get_single_conf_mat(conf_mat, i)
             tp = disease_conf_mat[0][0]
@@ -160,9 +168,9 @@ def plot_tSNE_ROC_conf_mat(plt_tSNE = True, plt_ROC = True, plt_conf_mat = True)
             f1 = 2 * precision * sensitivity / (precision + sensitivity)
             writer.writerow([
                 diseases_including_normal[i],
-                precision,
-                sensitivity,
-                specificity,
-                f1, 
-                aucs[i]
+                f"{precision:.3f}",
+                f"{sensitivity:.3f}",
+                f"{specificity:.3f}",
+                f"{f1:.3f}", 
+                f"{aucs[i]:.3f}"
             ])

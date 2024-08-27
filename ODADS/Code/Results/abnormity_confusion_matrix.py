@@ -40,6 +40,14 @@ def calc_and_save_numerical_results(csv_filename, type, source, conf_mat):
     abnormities = setting.get_abnormities("OCT Abnormities") if type == "OCT" else setting.get_abnormities("Fundus Abnormities")
     with open(table_path, 'w', newline = "") as file:
         writer = csv.writer(file)
+        writer.writerow([
+                "Abnormity",
+                "Precision",
+                "Sensitivity",
+                "Specificity",
+                "FOne", 
+                "AUC"
+            ])
         for i in range(len(abnormities)):
             auc = abnormity_ROC.plot_single_roc(type, abnormities[i][1], draw_roc = False)[source]
             disease_conf_mat = get_single_conf_mat(conf_mat, i)
@@ -53,11 +61,11 @@ def calc_and_save_numerical_results(csv_filename, type, source, conf_mat):
             f1 = 2 * precision * sensitivity / (precision + sensitivity)
             writer.writerow([
                 abnormities[i][1],
-                precision,
-                sensitivity,
-                specificity,
-                f1, 
-                auc
+                f"{precision:.3f}",
+                f"{sensitivity:.3f}",
+                f"{specificity:.3f}",
+                f"{f1:.3f}", 
+                f"{auc:.3f}"
             ])
 
 def plot_all_conf_mat():
