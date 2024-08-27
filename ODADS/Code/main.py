@@ -19,7 +19,7 @@ use_gpu = torch.cuda.is_available()
 device = torch.device(cuda_device if use_gpu else "cpu")
 print(device)
 
-# get results commands
+
 if task == "get results":
     if name == "A: Loss and Acc":
         abnormity_loss_and_acc.plot_loss_and_acc()
@@ -37,8 +37,18 @@ if task == "get results":
         diagnosis1_confusion_matrix.plot_conf_mat()
     elif name == "D2: tSNE, ROC, confusion matrix":
         diagnosis2_tSNE_ROC_confusion_matrix.plot_tSNE_ROC_conf_mat(plt_tSNE = True, plt_ROC = True, plt_conf_mat = True)
+    elif task == "graph all":
+        abnormity_confusion_matrix.plot_all_conf_mat()
+        diagnosis1_confusion_matrix.plot_conf_mat()
+        
+        abnormity_loss_and_acc.plot_loss_and_acc()
+        abnormity_ROC.plot_roc()
+        abnormity_tSNE.plot_tsne()
+        diagnosis1_acc_barchart.plot_acc_barchart()
+        diagnosis1_confusion_matrix.plot_conf_mat()
 
-# multi-task commands
+
+
 elif task == "abnormity all":
     train_abnormity.train(device, name + "TRRS - T")
     test_abnormity.test_multiple(device, name + "TORS - T")
@@ -52,12 +62,12 @@ elif task == "abnormity all":
 
 elif task == "diagnosis all":
     names = name.split(", ")
-    #train_diagnosis.train(device, [name + "D1TRRS" for name in names])
-    #train_diagnosis.train(device, [name + "D2TRRS" for name in names])
+    train_diagnosis.train(device, [name + "D1TRRS" for name in names])
+    train_diagnosis.train(device, [name + "D2TRRS" for name in names])
     test_diagnosis.test(device, [name + "D1TORS" for name in names])
     test_diagnosis.test(device,[name + "D2TORS" for name in names])
 
-# single-task commands
+
 else:
     if setting.is_abnormity(name):
         if task == "train":
