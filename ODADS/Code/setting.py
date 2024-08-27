@@ -280,3 +280,10 @@ class Setting:
             return (self.O_train_class_size, self.O_test_class_size)
         else:
             return (self.F_train_class_size, self.F_test_class_size)
+        
+    def img_path_is_OCT(self, img_path: str) -> bool:
+        match = re.search(r"(OCT)", img_path)
+        if match:
+            return True
+        else:
+            return False

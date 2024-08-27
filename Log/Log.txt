@@ -1,13 +1,16 @@
 File Name Format:
 MMMNNIITT - [Additional]
 
-MMM: 016 = VGG16; 018 = ResNet18; 050 = ResNet50; 152 = ResNet152
+MMM: 016 = VGG16; 018 = ResNet18; 050 = ResNet50; 152 = ResNet152; 000 = Diagnosis model, not CNN
 NN: AO = OCT abnormity model; AF = Fundusabnormity model; D1 = first diagnosis model; D2 = second diagnosis model;
 II: TR: train data; TO: test other data; TI: test inside of train data
 TT: RS - acc/... result; WT - weight; MR - model results
 [Additional]: TdddDDD = Temporary transfer learning best model from epoch ddd to epoch DDD
-              Tddd = Best Transfer learning model in a certain epoch range
+              Tddd = model at epoch ddd; this is the best transfer learning model in a certain epoch range
 
 TODO:
-* refactor gradcam.py, classify_abnormity.py, diagnose_disease.py
-
+* make tables
+* write about model; compare to other studies; write abstract, background, and conclusion
+* refine graphs
+* write appendix
+* learn about cycleGAN, gradCAM, ResNet, VGG, tSNE, numerical results

@@ -30,7 +30,7 @@ if task == "get results":
     elif name == "A: confusion matrix":
         abnormity_confusion_matrix.plot_all_conf_mat()
     elif name == "A: gradCAM":
-        pass
+        abnormity_gradCAM.highlight(device, sys.argv[4], sys.argv[5])
     elif name == "D1: Acc barchart":
         diagnosis1_acc_barchart.plot_acc_barchart()
     elif name == "D1: confusion matrix":

@@ -41,17 +41,20 @@
 	\author{Jerry Pan}
 	\date{}
 	\maketitle
+	\vspace{0.5cm}
 	
 	\section*{Abstract}
 	
+	TEXT: abstract
 	
 	\pagebreak
-	\vspace{0.5cm}
 	\tableofcontents
 	\pagebreak
 	
 	\section{Background}
-	
+		
+		TEXT: Edit background
+		
 		Ocular diseases can be diagnosed through various methods, including using optical coherence tomography (OCT) and color fundus images. Ophthalmologists usually identify ocular abnormalities to deduce the disease.  Traditionally, the diagnosis primarily depends on the professional experience and knowledge of the ophthalmologists, which may result in high misdiagnosis rate and under-utilization of medical data.  With the widespread application of artificial intelligence (AI), deep learning (DL) has made great contributions in providing support to patients in remote areas by sharing expert knowledge \autocite{Ichhpujani_Thakur_2021}.  By leveraging DL, researchers have developed auxiliary diagnosis programs to help doctors in the process. Many studies use convolutional neural network (CNN) to analyze ocular images. Some commonly used CNNs are VGG16, ResNet50, and Inception \autocite{daich2023artificial}.  And for segmenting images and finding abnormalities, U-net is widely used \autocite{Ronneberger_Fischer_Brox_2015}. In training CNNs, most studies use transferred learning, which consists of three steps: learning, fine-tuning, and validation.
 		
 		Some studies directly predict the disease from OCT images.
@@ -79,44 +82,40 @@
 		The Optical Disease Auxiliary Diagnosis System (ODADS)
 		Model purpose: recognize abnormities, then diagnose disease; 
 			interpretable findings
+			
+		Fig: OCT abnormities and Fundus abnormities
 		
-		
-		
-		Fig: OCT abnormities
-		Fig: Fundus abnormities
-		
-		No real data. use the following criteria. source for criteria
+		TEXT: No real data. use the following criteria. source for criteria
 		
 		Fig: From Abnormity to Disease
 		
 		Fig: 3 parts
 		
-		Model consists of 3 parts: OCT-Model, Fundus-Model, and Diagnosis-Model. OCT-Model and Fundus-Model are collectively called the Abnormity-Models. They use the same architecture (ResNet152, flatten to 2048 features, and fc). Diagnosis Model consists of num submodels, one of which is for normal, and the other ones for each disease. each submodel first fuses output from both Abnormity-Models, then uses an fc to get final results for normal or for the disease. 
+		TEXT: Model consists of 3 parts: OCT-Model, Fundus-Model, and Diagnosis-Model. OCT-Model and Fundus-Model are collectively called the Abnormity-Models. They use the same architecture (ResNet152, flatten to 2048 features, and fc). Diagnosis Model consists of num submodels, one of which is for normal, and the other ones for each disease. each submodel first fuses output from both Abnormity-Models, then uses an fc to get final results for normal or for the disease. 
 		
-		fusion: max of OCT, max of fundus, concatenate
+		TEXT: max of OCT, max of fundus, concatenate; concatenate D1 outputs
 		
 		Fig: fusion
 		
-		output
+		TEXT: output
 		
 	\section{Abnormity Models}
 	
 		\subsection{Data Preparation}
 			
-			Fig: overall flowchart
+			Fig: preparation flowchart (include cycleGAN)
 			
 			Table: Data source for OCT and Fundus
 				numbered list of sources
 				columns for source number, final column = total number of imgs
 				rows for abnormities
 			
-			CycleGAN
-				Fig: Intro
+			TEXT: CycleGAN
 				Table: selection rates
 				selection criteria
 				Why I did not GAN Fundus
 				
-			transforms for OCT
+			TEXT: transforms for OCT
 				for train: copy, flip, randomcomb1
 				for test: copy, flip, randomcomb2 -> explain truthfulness
 				explain differences between train and test, OCT and fundus
@@ -125,191 +124,192 @@
 			
 		\subsection{Training}
 			
-			intro to five-fold train/valid (reason for using this?)
+			TEXT: intro to five-fold train/valid (reason for using this?)
 			
-			starting point of fine-tuning???????????????????????????????
+			TEXT: starting point of fine-tuning???????????????????????????????
 			prevent overfitting
 			
-			crossentropyloss, ADAM optimizer with LR 1e-3, batchSize 16, number of epochs...
-			running time
-			
-			Fig: accuracy and loss over epochs
-				trainAcc, validAcc, trainLosses, validLosses
-				testAcc for best weights - align below acc graph
-			
+			TEXT: crossentropyloss, ADAM optimizer with LR 1e-3, batchSize 16, number of epochs...
 			conda, PyTorch;
 			desktop computer with Intel® Xeon® Platinum 8352V Processor, 256G of RAM and 2 NVIDIA GPU (GeForce RTX 4090) with 48 VRAM
 			
-		\subsection{Results}
+			Graph: accuracy and loss over epochs
+			TEXT: comments
 			
-			time per image
+		\subsection{Results}
 			
 			For both OCT and Fundus:
 			
+				TEXT: accuracy; explain top-probs method
+				
 				Table: for each abnormity:
-					accuracy (only present accuracy for TOTAL)
 					precision
 					recall/sensitivity
 					specificity
 					F1
 					AUC
 					
-				Table: Confusion matrix
-					analyze which abnormities are commonly confused, and the effect on the numerical results
-				Fig: t-SNE
-					which abnormities are "close"
+				Graph: Confusion matrix
+				TEXT: analyze which abnormities are commonly confused, and the effect on the numerical results
+				Graph: t-SNE
+				TEXT: which abnormities are "close"
 				
-				Fig: ROC for each abnormity
+				Graph: ROC for each abnormity
 				
-				comparison to other studies
+				TEXT: comparison to other studies
 				
-			"co-dominance"??????????????????????????????
-				
-			Fig: GradCAM intro
 			Fig: GradCAM example
 		
 	\section{Diagnosis Model}
 	
 		\subsection{Data Preparation}
 		
-			how to choose data (with an example)
-			how to find grade (number of traits = grade for the disease as label during training)
+			TEXT: how to choose data (with an example)
+			how to find level (number of traits = level for the disease as label during training)
 			
 		
 		\subsection{Training}
 			
-			parameters used
-			running time
-			Fig: accuracy and loss over epochs
-				trainAcc, validAcc, trainLosses, validLosses
+			TEXT: hyperparameters, software, hardware
+			
+			Graph: accuracy and loss over epochs
+			TEXT: comments
 				
 				
 		\subsection{Results}
 			
-			output - calculate expected grade. in order to compare, divide by total number of traits for this disease so that normalized grade falls in [0, 1]. 
+			TEXT: D1 output - calculate expected grade. in order to compare, divide by total number of traits for this disease so that normalized grade falls in [0, 1]. 
+			used for checking number of abnormities associated to the disease
 			
-			
+			TEXT: top-probs method
 			
 			Table: for each disease:
-				accuracy (only present accuracy for TOTAL)
 				precision
 				recall/sensitivity
 				specificity
 				F1
 				AUC
-			Fig: confusion matrix (is it suitable?)
-			Fig: ROC for each disease
-	
-			"co-dominance"???????????????????????????????????
+			Graph: D1 acc bar chart (with D2 no use-top-probs and D2 use-top-probs)
+			Graph: D1 confusion matrix
+			TEXT: comments
+			
+			Graph: D2 confusion matrix
+			Graph: D2 tSNE
+			TEXT: comments
+			
+			Graph: D2 ROC for each disease
+			TEXT: comparison and comments
 	
 	\section{Discussion}
 		
-		Do two models increase accuracy?
-			how do I compare?????????????????????????????????
-			any math here?
+		TEXT: Do two models increase accuracy? How?
 		
-		Comparison
+		TEXT: Comparison to other studies
 		
-		Strengths and weaknesses
+		TEXT: Strengths and weaknesses
 		how to improve
 		
 	\section{Conclusion}
 	
-		
-	
-	\section{Appendix}
-	
-		Google Image source links
-		Add prevalence (1 out of how many people) for abnormities?
-		
-		{
-			\fontsize{9}{12}\selectfont
-			{
-				\begin{longtable}{lp{3.8in}}
-					\caption{OCT Abnormities}
-					\label{tb:oct-abnormites}\\
-					\toprule
-					Abnormality&Description\\
-					\toprule
-					
-					\multicolumn{1}{l}{Central serous chorioretinopathy (CSC)}
-					& \multicolumn{1}{l}{The accumulation of fluid underneath the retina.}\\
-					
-					\multicolumn{1}{l}{Epiretinal membrane (ERM)}
-					& A thin layer of fibrous tissue forms on the surface of the retina, particularly the macula.\\
-					
-					\multicolumn{1}{l}{Macular hole (MH)}
-					& Disruption or discontinuity in the normal retinal layers surrounding the macular hole.\\
-					
-					\multicolumn{1}{l}{Stargardt disease}
-					& Thinning and atrophy of the retina. Disruption of photoreceptor layers. Presence of subretinal deposits.\\
-					
-					\multicolumn{1}{l}{Retinitis pigmentosa (RP)}
-					& Thinning of the Retinal Layers. Disruption of Photoreceptor Layers. Attenuation of Retinal Vasculature.\\
-					
-					\multicolumn{1}{l}{Macular telangiectasia (Mactel)}
-					& Abnormalities in the macular blood vessels, leading to changes in the macular structure and function\\
-					
-					\multicolumn{1}{l}{Diabetic macular edema (DME)}
-					& The accumulation of fluid in the macula. \\
-					
-					\multicolumn{1}{l}{Choroidal neovascularization}
-					& The abnormal growth of new blood vessels in the choroid layer.\\
-					
-					\multicolumn{1}{l}{Subretinal fluid}
-					&  The accumulation of fluid between the neurosensory retina and the retinal pigment epithelium (RPE)\\
-					
-					\multicolumn{1}{l}{Intraretinal fluid}
-					& The accumulation of fluid within the layers of the retina.\\
-					
-					\multicolumn{1}{l}{Drusen}
-					& Small deposits of extracellular material that accumulate beneath the retinal pigment epithelium (RPE) or between the RPE and the photoreceptor layer in the macular region of the retina.\\
-					
-					\bottomrule
-				\end{longtable}
-			}
-		}
-		
-		{
-			\fontsize{9}{12}\selectfont
-			{
-				\begin{longtable}{lp{3.8in}}
-					\caption{Fundus Abnormalities}
-					\label{tb:fundus-ab}\\
-					\toprule
-					Abnormality&Description\\
-					\toprule
-					
-					\multicolumn{1}{l}{Retinitis pigmentosa (RP)}
-					& Description of RP\\
-					
-					\multicolumn{1}{l}{Microaneurysm}
-					& Description of microaneurysm\\
-					
-					\multicolumn{1}{l}{Macular hole (MH)} & Full-thickness macular hole showing a surrounding cuff of subretinal fluid.\\
-					
-					\multicolumn{1}{l}{Hard exudate} & Yellow or Yellow-White Deposits.  Hard Borders.  Distribution.  Clustering Around Blood Vessels\\
-					
-					\multicolumn{1}{l}{Hemorrhage} & Small dot-like to larger blot.  Fresh hemorrhages typically appear bright red or deep red in color, indicating the presence of oxygenated blood. Over time, as the blood undergoes degradation and clotting, the hemorrhage may change color to darker red, orange, or yellowish hues.\\
-					
-					\multicolumn{1}{l}{Cotton wool patch / soft exudate} & White or off-white lesions.  Irregular shapes and margins.\\
-					
-					\multicolumn{1}{l}{Vascular abnormality} & Retinal Vessel Tortuosity.  Retinal Vessel Caliber Changes.  \\
-					
-					\multicolumn{1}{l}{Drusen} & Small, round or oval-shaped yellow or white deposits.\\
-					
-					\bottomrule
-				\end{longtable}
-			}
-		}
-		
-		
-		APP/website description
-		GitHub repo
+		TEXT: conclusion
 
 	\phantomsection
 	\addcontentsline{toc}{section}{References}
 	\newrefcontext[sorting=nyt]
 	\printbibliography
+	
+	\pagebreak
+	\section*{Appendix}
+	
+	List: Google Image source links
+	
+	Table: abnormities with description (edit the two tables below)
+	
+	{
+		\fontsize{9}{12}\selectfont
+		{
+			\begin{longtable}{lp{3.8in}}
+				\caption{OCT Abnormities}
+				\label{tb:oct-abnormites}\\
+				\toprule
+				Abnormality&Description\\
+				\toprule
+				
+				\multicolumn{1}{l}{Central serous chorioretinopathy (CSC)}
+				& \multicolumn{1}{l}{The accumulation of fluid underneath the retina.}\\
+				
+				\multicolumn{1}{l}{Epiretinal membrane (ERM)}
+				& A thin layer of fibrous tissue forms on the surface of the retina, particularly the macula.\\
+				
+				\multicolumn{1}{l}{Macular hole (MH)}
+				& Disruption or discontinuity in the normal retinal layers surrounding the macular hole.\\
+				
+				\multicolumn{1}{l}{Stargardt disease}
+				& Thinning and atrophy of the retina. Disruption of photoreceptor layers. Presence of subretinal deposits.\\
+				
+				\multicolumn{1}{l}{Retinitis pigmentosa (RP)}
+				& Thinning of the Retinal Layers. Disruption of Photoreceptor Layers. Attenuation of Retinal Vasculature.\\
+				
+				\multicolumn{1}{l}{Macular telangiectasia (Mactel)}
+				& Abnormalities in the macular blood vessels, leading to changes in the macular structure and function\\
+				
+				\multicolumn{1}{l}{Diabetic macular edema (DME)}
+				& The accumulation of fluid in the macula. \\
+				
+				\multicolumn{1}{l}{Choroidal neovascularization}
+				& The abnormal growth of new blood vessels in the choroid layer.\\
+				
+				\multicolumn{1}{l}{Subretinal fluid}
+				&  The accumulation of fluid between the neurosensory retina and the retinal pigment epithelium (RPE)\\
+				
+				\multicolumn{1}{l}{Intraretinal fluid}
+				& The accumulation of fluid within the layers of the retina.\\
+				
+				\multicolumn{1}{l}{Drusen}
+				& Small deposits of extracellular material that accumulate beneath the retinal pigment epithelium (RPE) or between the RPE and the photoreceptor layer in the macular region of the retina.\\
+				
+				\bottomrule
+			\end{longtable}
+		}
+	}
+	
+	{
+		\fontsize{9}{12}\selectfont
+		{
+			\begin{longtable}{lp{3.8in}}
+				\caption{Fundus Abnormalities}
+				\label{tb:fundus-ab}\\
+				\toprule
+				Abnormality&Description\\
+				\toprule
+				
+				\multicolumn{1}{l}{Retinitis pigmentosa (RP)}
+				& Description of RP\\
+				
+				\multicolumn{1}{l}{Microaneurysm}
+				& Description of microaneurysm\\
+				
+				\multicolumn{1}{l}{Macular hole (MH)} & Full-thickness macular hole showing a surrounding cuff of subretinal fluid.\\
+				
+				\multicolumn{1}{l}{Hard exudate} & Yellow or Yellow-White Deposits.  Hard Borders.  Distribution.  Clustering Around Blood Vessels\\
+				
+				\multicolumn{1}{l}{Hemorrhage} & Small dot-like to larger blot.  Fresh hemorrhages typically appear bright red or deep red in color, indicating the presence of oxygenated blood. Over time, as the blood undergoes degradation and clotting, the hemorrhage may change color to darker red, orange, or yellowish hues.\\
+				
+				\multicolumn{1}{l}{Cotton wool patch / soft exudate} & White or off-white lesions.  Irregular shapes and margins.\\
+				
+				\multicolumn{1}{l}{Vascular abnormality} & Retinal Vessel Tortuosity.  Retinal Vessel Caliber Changes.  \\
+				
+				\multicolumn{1}{l}{Drusen} & Small, round or oval-shaped yellow or white deposits.\\
+				
+				\bottomrule
+			\end{longtable}
+		}
+	}
+	
+	
+	Fig: website
+	TEXT: APP/website description
+	
+	Link: GitHub repo
 	
 \end{document}

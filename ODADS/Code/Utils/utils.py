@@ -172,3 +172,18 @@ def calc_expected_abnormity_num(abnormity_num_vector):
         sum += i * abnormity_num_vector[i]
     sum /= len(abnormity_num_vector)
     return sum
+
+# turn array into img, then resize and crop it to fit img_shape
+def resize_array_to_img_size(array, img_shape):
+    long_edge = max(img_shape)
+    short_edge = min(img_shape)
+    x = (long_edge - short_edge) / 2
+    y = x + short_edge
+    img = Image.fromarray(array).resize((long_edge, long_edge), Image.LANCZOS)
+    
+    if img_shape[0] < img_shape[1]:
+        img = img.crop((0, x, img_shape[1], y))
+    elif img_shape[0] > img_shape[1]:
+        img = img.crop((x, 0, y, img_shape[0]))
+        
+    return img
