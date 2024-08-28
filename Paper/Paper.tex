@@ -154,7 +154,9 @@
 		\label{fig:A_data_prep}
 	\end{figure}
 	
-	The data preparation process is shown in Fig.~\ref{fig:A_data_prep}. First, 
+	The data preparation process is shown in Fig.~\ref{fig:A_data_prep}. 
+	
+	First, we acquire data from publicly available online datasets. For abnormities that we have no data of, we search for images on Google Image. The numbers of images acquired from each data source are shown in Tables \ref{tb:OCT_source} and \ref{tb:Fundus_source}. 
 	
 	\begin{minipage}[t]{0.4\linewidth}
 		{
@@ -167,18 +169,18 @@
 					\multirow{2}{*}{Abnormity}&\multicolumn{4}{c}{Source}&\multirow{2}{*}{Total}\\
 					&1&2&3&4&\\
 					\midrule
-					CNV               &2984&/  &/ &/ &2984\\
-					CSC               &/   &102&32&/ &134 \\
-					DME               &2500&/  &/ &/ &2500\\
-					Drusen            &2500&/  &/ &/ &2500\\
-					ERM               &/   &/  &/ &19&19  \\
-					Intraretinal&1097&/  &/ &/ &1097\\
-					MH                &/   &99 &31&/ &130 \\
-					Mactel            &/   &/  &29&/ &29  \\
-					Normal            &5000&/  &/ &/ &5000\\
-					RP                &/   &102&31&/ &133 \\
-					Stargardt         &/   &/  &23&/ &23  \\
-					Subretinal  &1083&/  &/ &/ &1083\\
+					CNV    &2984&/  &/ &/ &2984\\
+					CSC    &/   &102&32&/ &134 \\
+					DME    &2500&/  &/ &/ &2500\\
+					Drusen &2500&/  &/ &/ &2500\\
+					ERM    &/   &/  &/ &19&19  \\
+					IF     &1097&/  &/ &/ &1097\\
+					MH     &/   &99 &31&/ &130 \\
+					Mactel &/   &/  &29&/ &29  \\
+					Healthy&5000&/  &/ &/ &5000\\
+					RP     &/   &102&31&/ &133 \\
+					ST     &/   &/  &23&/ &23  \\
+					SF     &1083&/  &/ &/ &1083\\
 					\bottomrule
 				\end{longtable}
 				
@@ -212,15 +214,15 @@
 					\multirow{2}{*}{Abnormity}&\multicolumn{6}{c}{Source}&\multirow{2}{*}{Total}\\
 					&1&2&3&4&5&6&\\
 					\midrule
-					Cotton  &/  &/ &/ &33 &205&/ &238\\
-					Drusen            &/  &/ &/ &50 &/  &/ &50 \\     
-					Hard    &20 &/ &/ &75 &284&/ &379\\ 
-					Hemorrhage        &13 &66&/ &105&278&/ &462\\     
-					MH                &/  &/ &/ &/  &/  &34&34 \\        
-					Micro   &55 &/ &/ &1  &219&/ &275\\
-					Normal            &100&37&15&/  &/  &/ &152\\      
-					RP                &/  &22&/ &/  &/  &44&66 \\         
-					Vascular&/  &64&/ &14 &/  &/ &78 \\
+					CWP    &/  &/ &/ &33 &205&/ &238\\
+					Drusen &/  &/ &/ &50 &/  &/ &50 \\     
+					HE     &20 &/ &/ &75 &284&/ &379\\ 
+					HM     &13 &66&/ &105&278&/ &462\\     
+					MH     &/  &/ &/ &/  &/  &34&34 \\        
+					MA     &55 &/ &/ &1  &219&/ &275\\
+					Healthy&100&37&15&/  &/  &/ &152\\      
+					RP     &/  &22&/ &/  &/  &44&66 \\         
+					VA     &/  &64&/ &14 &/  &/ &78 \\
 					
 					\bottomrule
 				\end{longtable}
@@ -253,30 +255,27 @@
 		}
 	\end{minipage}
 	
+	Then, for OCT images that have less than 1000 images, we use Cycle-GAN to generate new images. We train a Cycle-GAN network to interconvert healthy and abnormity images, take out the generator that converts healthy images to abnormity images, and use it to generate new abnormity images. We manually eliminate generated images that look obviously wrong. The elimination rate is shown in Table~\ref{tb:cycleGAN_number}. We only used Cycle-GAN to generate OCT images because generated fundus images are too blurry and do not display the target abnormities.
 	
 	{
 		\fontsize{9}{12}\selectfont
 		{
 			\begin{longtable}{ccccc}
-				\caption{OCT images CycleGAN selection rate}
-				\label{tb:cycleGAN_selection_rate}\\
+				\caption{OCT images CycleGAN elimination rate}
+				\label{tb:cycleGAN_number}\\
 				\toprule
-				Abnormity&Original&Generated&Selected&Selection Rate\\
+				Abnormity&Original&Generated&Eliminated&Elimination Rate\\
 				\midrule
-				CSC      &134&1730&3000&57.667\% \\
-				ERM      &19 &1931&3000&64.367\% \\
-				MH       &130&1811&3000&60.367\% \\
-				Mactel   &29 &1900&3000&63.333\% \\
-				RP       &133&1923&3000&64.100\% \\
-				Stargardt&23 &2582&3000&86.067\% \\
+				CSC   &134&3000&1270&42.333\% \\
+				ERM   &19 &3000&1069&35.633\% \\
+				MH    &130&3000&1189&39.633\% \\
+				Mactel&29 &3000&1100&36.667\% \\
+				RP    &133&3000&1077&36.900\% \\
+				ST    &23 &3000&418 &13.933\% \\
 				\bottomrule
 			\end{longtable}
 		}
 	}
-	
-	TEXT: CycleGAN
-	selection criteria
-	Why I did not GAN Fundus
 	
 	TEXT: transforms for OCT
 	for train: copy, flip, randomcomb1
@@ -509,7 +508,7 @@
 	
 	List: Google Image source links
 	
-	Table: abnormities with description (edit the two tables below)
+	Table: abnormities with description (edit the two tables below; ALPHABETICAL ORDER!!!)
 	
 	{
 		\fontsize{9}{12}\selectfont
