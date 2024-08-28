@@ -47,8 +47,6 @@
 	TEXT: abstract
 	
 	\pagebreak
-	\tableofcontents
-	\pagebreak
 	
 	\section{Background}
 		
@@ -142,6 +140,27 @@
 				\vspace{0.3cm}
 				\label{fig:A_data_prep}
 			\end{figure}
+			
+			{
+				\fontsize{9}{12}\selectfont
+				1. Normal Disease Database
+				2. OpenICPSR
+				3. Few-shot
+				4. Google Image
+				
+				
+				\begin{longtable}{lp{3.8in}}
+					\caption{OCT and Fundus image sources}
+					\label{tb:source}
+					\toprule
+					Abnormality&Description\\
+					\midrule
+					
+					a & b\\
+					
+					\bottomrule
+				\end{longtable}
+			}
 			
 			Table: Data source for OCT and Fundus
 				numbered list of sources
@@ -390,83 +409,79 @@
 	
 	{
 		\fontsize{9}{12}\selectfont
-		{
-			\begin{longtable}{lp{3.8in}}
-				\caption{OCT Abnormities}
-				\label{tb:oct-abnormites}\\
-				\toprule
-				Abnormality&Description\\
-				\toprule
-				
-				\multicolumn{1}{l}{Central serous chorioretinopathy (CSC)}
-				& \multicolumn{1}{l}{The accumulation of fluid underneath the retina.}\\
-				
-				\multicolumn{1}{l}{Epiretinal membrane (ERM)}
-				& A thin layer of fibrous tissue forms on the surface of the retina, particularly the macula.\\
-				
-				\multicolumn{1}{l}{Macular hole (MH)}
-				& Disruption or discontinuity in the normal retinal layers surrounding the macular hole.\\
-				
-				\multicolumn{1}{l}{Stargardt disease}
-				& Thinning and atrophy of the retina. Disruption of photoreceptor layers. Presence of subretinal deposits.\\
-				
-				\multicolumn{1}{l}{Retinitis pigmentosa (RP)}
-				& Thinning of the Retinal Layers. Disruption of Photoreceptor Layers. Attenuation of Retinal Vasculature.\\
-				
-				\multicolumn{1}{l}{Macular telangiectasia (Mactel)}
-				& Abnormalities in the macular blood vessels, leading to changes in the macular structure and function\\
-				
-				\multicolumn{1}{l}{Diabetic macular edema (DME)}
-				& The accumulation of fluid in the macula. \\
-				
-				\multicolumn{1}{l}{Choroidal neovascularization}
-				& The abnormal growth of new blood vessels in the choroid layer.\\
-				
-				\multicolumn{1}{l}{Subretinal fluid}
-				&  The accumulation of fluid between the neurosensory retina and the retinal pigment epithelium (RPE)\\
-				
-				\multicolumn{1}{l}{Intraretinal fluid}
-				& The accumulation of fluid within the layers of the retina.\\
-				
-				\multicolumn{1}{l}{Drusen}
-				& Small deposits of extracellular material that accumulate beneath the retinal pigment epithelium (RPE) or between the RPE and the photoreceptor layer in the macular region of the retina.\\
-				
-				\bottomrule
-			\end{longtable}
-		}
+		\begin{longtable}{lp{3.8in}}
+			\caption{OCT Abnormities}
+			\label{tb:oct-abnormites}\\
+			\toprule
+			Abnormality&Description\\
+			\midrule
+			
+			\multicolumn{1}{l}{Central serous chorioretinopathy (CSC)}
+			& \multicolumn{1}{l}{The accumulation of fluid underneath the retina.}\\
+			
+			\multicolumn{1}{l}{Epiretinal membrane (ERM)}
+			& A thin layer of fibrous tissue forms on the surface of the retina, particularly the macula.\\
+			
+			\multicolumn{1}{l}{Macular hole (MH)}
+			& Disruption or discontinuity in the normal retinal layers surrounding the macular hole.\\
+			
+			\multicolumn{1}{l}{Stargardt disease}
+			& Thinning and atrophy of the retina. Disruption of photoreceptor layers. Presence of subretinal deposits.\\
+			
+			\multicolumn{1}{l}{Retinitis pigmentosa (RP)}
+			& Thinning of the Retinal Layers. Disruption of Photoreceptor Layers. Attenuation of Retinal Vasculature.\\
+			
+			\multicolumn{1}{l}{Macular telangiectasia (Mactel)}
+			& Abnormalities in the macular blood vessels, leading to changes in the macular structure and function\\
+			
+			\multicolumn{1}{l}{Diabetic macular edema (DME)}
+			& The accumulation of fluid in the macula. \\
+			
+			\multicolumn{1}{l}{Choroidal neovascularization}
+			& The abnormal growth of new blood vessels in the choroid layer.\\
+			
+			\multicolumn{1}{l}{Subretinal fluid}
+			&  The accumulation of fluid between the neurosensory retina and the retinal pigment epithelium (RPE)\\
+			
+			\multicolumn{1}{l}{Intraretinal fluid}
+			& The accumulation of fluid within the layers of the retina.\\
+			
+			\multicolumn{1}{l}{Drusen}
+			& Small deposits of extracellular material that accumulate beneath the retinal pigment epithelium (RPE) or between the RPE and the photoreceptor layer in the macular region of the retina.\\
+			
+			\bottomrule
+		\end{longtable}
 	}
 	
 	{
 		\fontsize{9}{12}\selectfont
-		{
-			\begin{longtable}{lp{3.8in}}
-				\caption{Fundus Abnormalities}
-				\label{tb:fundus-ab}\\
-				\toprule
-				Abnormality&Description\\
-				\toprule
-				
-				\multicolumn{1}{l}{Retinitis pigmentosa (RP)}
-				& Description of RP\\
-				
-				\multicolumn{1}{l}{Microaneurysm}
-				& Description of microaneurysm\\
-				
-				\multicolumn{1}{l}{Macular hole (MH)} & Full-thickness macular hole showing a surrounding cuff of subretinal fluid.\\
-				
-				\multicolumn{1}{l}{Hard exudate} & Yellow or Yellow-White Deposits.  Hard Borders.  Distribution.  Clustering Around Blood Vessels\\
-				
-				\multicolumn{1}{l}{Hemorrhage} & Small dot-like to larger blot.  Fresh hemorrhages typically appear bright red or deep red in color, indicating the presence of oxygenated blood. Over time, as the blood undergoes degradation and clotting, the hemorrhage may change color to darker red, orange, or yellowish hues.\\
-				
-				\multicolumn{1}{l}{Cotton wool patch / soft exudate} & White or off-white lesions.  Irregular shapes and margins.\\
-				
-				\multicolumn{1}{l}{Vascular abnormality} & Retinal Vessel Tortuosity.  Retinal Vessel Caliber Changes.  \\
-				
-				\multicolumn{1}{l}{Drusen} & Small, round or oval-shaped yellow or white deposits.\\
-				
-				\bottomrule
-			\end{longtable}
-		}
+		\begin{longtable}{lp{3.8in}}
+			\caption{Fundus Abnormalities}
+			\label{tb:fundus-ab}\\
+			\toprule
+			Abnormality&Description\\
+			\midrule
+			
+			\multicolumn{1}{l}{Retinitis pigmentosa (RP)}
+			& Description of RP\\
+			
+			\multicolumn{1}{l}{Microaneurysm}
+			& Description of microaneurysm\\
+			
+			\multicolumn{1}{l}{Macular hole (MH)} & Full-thickness macular hole showing a surrounding cuff of subretinal fluid.\\
+			
+			\multicolumn{1}{l}{Hard exudate} & Yellow or Yellow-White Deposits.  Hard Borders.  Distribution.  Clustering Around Blood Vessels\\
+			
+			\multicolumn{1}{l}{Hemorrhage} & Small dot-like to larger blot.  Fresh hemorrhages typically appear bright red or deep red in color, indicating the presence of oxygenated blood. Over time, as the blood undergoes degradation and clotting, the hemorrhage may change color to darker red, orange, or yellowish hues.\\
+			
+			\multicolumn{1}{l}{Cotton wool patch / soft exudate} & White or off-white lesions.  Irregular shapes and margins.\\
+			
+			\multicolumn{1}{l}{Vascular abnormality} & Retinal Vessel Tortuosity.  Retinal Vessel Caliber Changes.  \\
+			
+			\multicolumn{1}{l}{Drusen} & Small, round or oval-shaped yellow or white deposits.\\
+			
+			\bottomrule
+		\end{longtable}
 	}
 	
 	

@@ -30,7 +30,7 @@ Mactel
 
 MH
 	O Few-shot 31
-	O 99
+	O OpenICPSR 99
 	CYCLE_GAN generate 3000 select 1811
 
 Normal
