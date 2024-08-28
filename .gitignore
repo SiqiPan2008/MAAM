@@ -1,9 +1,6 @@
-*.jpeg
 *.pth
 *.pyc
 *.db
-*.jpg
-*.png
 *.gif
 *.ppm
 *.webp 
@@ -28,6 +25,9 @@ ODADS/Code/.vscode/
 ODADS/Data
 ODADS/Data_s
 CycleGAN/.vscode/
+Paper/Figs/GradCAM/*.png
+Paper/Figs/GradCAM/*.jpg
+Paper/Figs/GradCAM/*.jpeg
 
 .DS_Store
 debug*

@@ -37,11 +37,10 @@
 \newcommand{\toB}[1]{\color{blue}#1\color{black}}
 
 \begin{document}
-	\title{\vspace{-2.25cm} Development of Ocular Disease Auxiliary Diagnosis System}
-	\author{Jerry Pan}
+	\title{\vspace{-2.25cm} Multimodal Abnormity-Aware Model\\for Ocular Disease Diagnosis}
+	\author{Siqi Pan}
 	\date{}
 	\maketitle
-	\vspace{0.5cm}
 	
 	\section*{Abstract}
 	
@@ -55,7 +54,7 @@
 		
 		TEXT: Edit background
 		
-		Ocular diseases can be diagnosed through various methods, including using optical coherence tomography (OCT) and color fundus images. Ophthalmologists usually identify ocular abnormalities to deduce the disease.  Traditionally, the diagnosis primarily depends on the professional experience and knowledge of the ophthalmologists, which may result in high misdiagnosis rate and under-utilization of medical data.  With the widespread application of artificial intelligence (AI), deep learning (DL) has made great contributions in providing support to patients in remote areas by sharing expert knowledge \autocite{Ichhpujani_Thakur_2021}.  By leveraging DL, researchers have developed auxiliary diagnosis programs to help doctors in the process. Many studies use convolutional neural network (CNN) to analyze ocular images. Some commonly used CNNs are VGG16, ResNet50, and Inception \autocite{daich2023artificial}.  And for segmenting images and finding abnormalities, U-net is widely used \autocite{Ronneberger_Fischer_Brox_2015}. In training CNNs, most studies use transferred learning, which consists of three steps: learning, fine-tuning, and validation.
+		Ocular diseases can be diagnosed through various methods, including using optical coherence tomography (OCT) and color fundus images. Ophthalmologists usually identify ocular abnormalities to deduce the disease.  Traditionally, the diagnosis primarily depends on the professional experience and knowledge of the ophthalmologists, which may result in high misdiagnosis rate and under-utilization of medical data.  With the widespread application of artificial intelligence (AI), deep learning (DL) has made great contributions in providing support to patients in remote areas by sharing expert knowledge \autocite{Ichhpujani_Thakur_2021}.  By leveraging DL, researchers have developed auxiliary diagnosis programs to help doctors in the process. Many studies use convolutional neural network (CNN) to analyze ocular images. Some commonly used CNNs are VGG, ResNet, and Inception \autocite{daich2023artificial}.  And for segmenting images and finding abnormalities, U-net is widely used \autocite{Ronneberger_Fischer_Brox_2015}. In training CNNs, most studies use transferred learning, which consists of three steps: learning, fine-tuning, and validation.
 		
 		Some studies directly predict the disease from OCT images.
 		\authyear{li2019deep} used ResNet to analyze OCT images and distinguish between choroidal neovascularization (CNV), diabetic macular edema (DME), drusen, and normal eyes. In addition, they performed occlusion testing to find out the regions that are the most important in diagnosis \autocite{li2019deep}. 
@@ -79,7 +78,13 @@
 	
 	\section{Overview}
 		
-		The Optical Disease Auxiliary Diagnosis System (ODADS) is developed to aid doctors in diagnosing optical diseases. It simulates the decision-making process of doctors when they examine patients with optical diseases, i.e., first identifying the abnormities, and then deducing the disease. By doing so, the ODADS partly opens up the ``black box'' of DL and presents more interpretable conclusions. In addition, it is multi-modal and considers both OCT and color fundus image inputs. 
+		We develop a multimodal abnormity-aware model to aid doctors in diagnosing ocular diseases. It is a multimodal model and considers both OCT and color fundus image inputs. In addition, tt simulates the decision-making process of doctors when they examine patients with ocular diseases, i.e., first identifying the abnormities, and then deducing the disease. By doing so, it partly opens up the ``black box'' of DL and presents more interpretable conclusions. 
+		
+		The structure of the model is shown in Fig.~\ref{fig:3_parts}. The model constitutes of 2 parts: the Abnormity Models and the Diagnosis Model. 
+		
+		The Abnormity Models consists of the OCT Model and the Fundus Model, which identify OCT and Fundus abnormities, respectively. Both of the Abnormity Models are CNNs with modified final FC layer. All CNNs that are used for classification tasks can be used. In this study, we consider ResNet152, ResNet50, ResNet18, and VGG16, tried and the best is chosen for each of the Abnormity Models. The final FC layers are modified so that the size of their output vectors is equal to the number of OCT or Fundus abnormities, and a softmax layer is added. After an image is inputted into one of the Abnormity Models, the model returns a probability vector containing the probabilities of different abnormities.
+		
+		The Diagnosis Model consists of two stages: the Abnormity Number Stage (Stage D1) and the Disease Probability Stage (Stage D2). In Stage D1, there is a small NN for each of the diseases. Each NN takes input from the OCT and Fundus Models, passes the input through a FC layer and a softmax layer, and determines how many abnormities that are related to the specific disease (as in Fig.~\ref{fig:criteria}) are present in an image. Then, in Stage D2, an NN takes input from all the NNs in Stage D1, passes the input through a FC layer and a softmax layer, and returns the probability vector containing the probabilities of being normal and having different diseases.
 		
 		The ODADS is trained to identify 12 OCT abnormities (including normal) and 9 Fundus abnormities (including normal), as shown in Fig.~\ref{fig:abnormities}.
 		
@@ -91,7 +96,7 @@
 			\label{fig:abnormities}
 		\end{figure}
 		
-		Most of the data we acquire are only labeled with abnormities (sometimes called ``findings'' in other studies). Therefore, we compose the following abnormity-disease conversion criteria and use these criteria to generate data for training (see Fig.~\ref{fig:criteria}). 
+		Most of the data we acquire are only labeled with abnormities, which are symptoms that can be directly observed in the images. Therefore, we compose the following abnormity-disease conversion criteria and use these criteria to generate data for training (see Fig.~\ref{fig:criteria}). 
 		
 		\begin{figure}[htbp]
 			\centering
@@ -100,12 +105,6 @@
 			\vspace{0.3cm}
 			\label{fig:criteria}
 		\end{figure}
-		
-		The structure of the ODADS is shown in Fig.~\ref{fig:3_parts}. The ODADS constitutes of 2 parts: the Abnormity Models and the Diagnosis Model. 
-		
-		The Abnormity Models consists of the OCT Model and the Fundus Model, which identify OCT and Fundus abnormities, respectively. Both of the Abnormity Models are a CNN with a modified final FC layer. Four CNN structures (ResNet152, ResNet50, ResNet18, and VGG16) are tried and the best is chosen for each of the Abnormity Models. The final FC layers are modified so that the size of their output vectors is equal to the number of OCT or Fundus abnormities, and a softmax layer is added. After an image is inputted into one of the Abnormity Models, the model returns a probability vector containing the probabilities of different abnormities.
-		
-		The Diagnosis Model consists of two stages: the Abnormity Number Stage (Stage D1) and the Disease Probability Stage (Stage D2). In Stage D1, there is a small NN for each of the diseases. Each NN takes input from the OCT and Fundus Models, passes the input through a FC layer and a softmax layer, and determines how many abnormities that are related to the specific disease (as in Fig.~\ref{fig:criteria}) are present in an image. Then, in Stage D2, an NN takes input from all the NNs in Stage D1, passes the input through a FC layer and a softmax layer, and returns the probability vector containing the probabilities of being normal and having different diseases.
 		
 		\begin{figure}[htbp]
 			\centering
