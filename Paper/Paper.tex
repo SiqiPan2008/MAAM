@@ -52,31 +52,31 @@
 	
 	TEXT: Edit background
 	
-	Ocular diseases can be diagnosed through various methods, including using optical coherence tomography (OCT) and color fundus images. Ophthalmologists usually identify ocular abnormalities to deduce the disease.  Traditionally, the diagnosis primarily depends on the professional experience and knowledge of the ophthalmologists, which may result in high misdiagnosis rate and under-utilization of medical data.  With the widespread application of artificial intelligence (AI), deep learning (DL) has made great contributions in providing support to patients in remote areas by sharing expert knowledge \autocite{Ichhpujani_Thakur_2021}.  By leveraging DL, researchers have developed auxiliary diagnosis programs to help ophthalmologists in the process. Many studies use convolutional neural network (CNN) to analyze ocular images. Some commonly used CNNs are VGG, ResNet, and Inception \autocite{daich2023artificial}.  And for segmenting images and finding abnormalities, U-net is widely used \autocite{Ronneberger_Fischer_Brox_2015}. In training CNNs, most studies use transferred learning, which consists of three steps: learning, fine-tuning, and validation.
+	Ocular diseases can be diagnosed through various methods, including using optical coherence tomography (OCT) and color fundus images. Ophthalmologists usually identify ocular abnormalities to deduce the disease. Traditionally, the diagnosis primarily depends on the professional experience and knowledge of the ophthalmologists, which may result in high misdiagnosis rate and under-utilization of medical data. With the widespread application of artificial intelligence (AI), deep learning (DL) has made great contributions in providing support to patients in remote areas by sharing expert knowledge \autocite{Ichhpujani_Thakur_2021}. By leveraging DL, researchers have developed auxiliary diagnosis programs to help ophthalmologists in the process. Many studies use convolutional neural network (CNN) to analyze ocular images. Some commonly used CNNs are VGG, ResNet, and Inception \autocite{daich2023artificial}. And for segmenting images and finding abnormalities, U-net is widely used \autocite{Ronneberger_Fischer_Brox_2015}. In training CNNs, most studies use transferred learning, which consists of three steps: learning, fine-tuning, and validation.
 	
 	Some studies directly predict the disease from OCT images.
 	\authyear{li2019deep} used ResNet to analyze OCT images and distinguish between choroidal neovascularization (CNV), diabetic macular edema (DME), drusen, and normal eyes. In addition, they performed occlusion testing to find out the regions that are the most important in diagnosis \autocite{li2019deep}. 
-	\authyear{yoo2021feasibility} used generative adversarial network (GAN) and Inception-v3 together with a few-shot dataset to investigate the feasibility of improving OCT diagnosis of rare ocular diseases \autocite{yoo2021feasibility}.  They cleverly handled the issues of training image shortage and data imbalance by creating ocular disease OCT images from healthy OCT images. \authyear{Kermany2018} conducts medical diagnosis and identifies treatable diseases by image-based deep learning.  They also provided a widely used database including more than one hundred thousand OCT labeled images for 3 diseases \autocite{Kermany2018}.
+	\authyear{yoo2021feasibility} used generative adversarial network (GAN) and Inception-v3 together with a few-shot dataset to investigate the feasibility of improving OCT diagnosis of rare ocular diseases \autocite{yoo2021feasibility}. They cleverly handled the issues of training image shortage and data imbalance by creating ocular disease OCT images from healthy OCT images. \authyear{Kermany2018} conducts medical diagnosis and identifies treatable diseases by image-based deep learning. They also provided a widely used database including more than one hundred thousand OCT labeled images for 3 diseases \autocite{Kermany2018}.
 	
 	Some other studies can identify ocular abnormalities from annotated OCT images.
 	\authyear{camino2018deep} used DL to identify the region of preserved photoreceptors on \textit{en face} OCT in choroideremia and retinitis pigmentosa (RP) \autocite{camino2018deep}. 
 	\authyear{srinivasan2014fully} detected DME and dry age-related macular degeneration (dry AMD) from OCT images by flattening the image and using support vector machine (SVM) to extract the thickness information of the retinal layers \autocite{srinivasan2014fully}. 
-	\authyear{leandro2023oct} implemented VGG to identify up to 8 kinds of key abnormalities and hence detect multiple diseases by using central fovea cross-section OCT \autocite{leandro2023oct}.  \authyear{Fang_Wang2019} developed a novel lesion-aware CNN, called LACNN, to simulate the ophthalmologists' diagnosis that focuses on ocular abnormalities.  The LACNN is a U-net-like CNN which incorporates VGG16 as the baseline, and the result is impressive \autocite{Fang_Wang2019}.
+	\authyear{leandro2023oct} implemented VGG to identify up to 8 kinds of key abnormalities and hence detect multiple diseases by using central fovea cross-section OCT \autocite{leandro2023oct}. \authyear{Fang_Wang2019} developed a novel lesion-aware CNN, called LACNN, to simulate the ophthalmologists' diagnosis that focuses on ocular abnormalities. The LACNN is a U-net-like CNN which incorporates VGG16 as the baseline, and the result is impressive \autocite{Fang_Wang2019}.
 	
 	Other studies use fundus images to predict ocular diseases.
 	\authyear{masumoto2019accuracy} trained deep CNN with ultrawide-field fundus images to make the CNN capable of diagnosing RP \autocite{masumoto2019accuracy}. 
 	\authyear{chen2021artificial} uses color fundus photographs and multiple types of CNN (Inception V3, Inception Resnet V2, and Xception) to develop a method of early detection of RP \autocite{chen2021artificial}. 
-	\authyear{li2022development} uses CNN to detect up to 12 fundus diseases based on colour fundus photography \autocite{li2022development}.  \authyear{Son2023} presented a novel architectural and algorithmic design to comprehensively identify 15 abnormalities and diagnose 8 major ocular diseases from macula-centered fundus images.  They defined a notion of counterfactual attribution ratio (CAR) to interpret the system's diagnostic reason and disclose the relationship between abnormalities and diseases \autocite{Son2023}.
+	\authyear{li2022development} uses CNN to detect up to 12 fundus diseases based on colour fundus photography \autocite{li2022development}. \authyear{Son2023} presented a novel architectural and algorithmic design to comprehensively identify 15 abnormalities and diagnose 8 major ocular diseases from macula-centered fundus images. They defined a notion of counterfactual attribution ratio (CAR) to interpret the system's diagnostic reason and disclose the relationship between abnormalities and diseases \autocite{Son2023}.
 	
-	In recent years, more and more DL systems began to use multi-modal information to predict ocular diseases.  For automated detection system, retrieving features from both OCT images and fundus images can effectively keep the diagnosis away from bias and incompleteness.  It is not always necessary to yield a better automated diagnosis result, but it does help ophthalmologist to make more accurate and holistic clinical decisions.  For instance, \authyear{liu2023prediction} combined OCT and fundus images to evaluate visual impairment in RP in terms of best-corrected visual acuity(BCVA) \autocite{liu2023prediction}.  \authyear{Xu2021} leveraged a bi-modal CNN to diagnose AMD and polypoidal choroidal vasculopathy (PCV), where the architecture uses fundus and OCT images as input for transferred learning CNN and concatenates the retrieved features to classify 3 diseases including dry AMD, wet AMD and PCV \autocite{Xu2021}.  And \author{Andrearczyk2018} ingeniously combined medical images and biomedical textual information to discriminate different diseases, which is a novel method for the usage of multi-modal application \autocite{Andrearczyk2018}.
+	In recent years, more and more DL systems began to use multi-modal information to predict ocular diseases. For automated detection system, retrieving features from both OCT images and fundus images can effectively keep the diagnosis away from bias and incompleteness. It is not always necessary to yield a better automated diagnosis result, but it does help ophthalmologist to make more accurate and holistic clinical decisions. For instance, \authyear{liu2023prediction} combined OCT and fundus images to evaluate visual impairment in RP in terms of best-corrected visual acuity(BCVA) \autocite{liu2023prediction}. \authyear{Xu2021} leveraged a bi-modal CNN to diagnose AMD and polypoidal choroidal vasculopathy (PCV), where the architecture uses fundus and OCT images as input for transferred learning CNN and concatenates the retrieved features to classify 3 diseases including dry AMD, wet AMD and PCV \autocite{Xu2021}. And \author{Andrearczyk2018} ingeniously combined medical images and biomedical textual information to discriminate different diseases, which is a novel method for the usage of multi-modal application \autocite{Andrearczyk2018}.
 	
-	The key technical problem of multi-modal diagnosis is how to fuse the results from multifarious sources.  There are three types of fusion, namely early, late, and hybrid fusion.  Deciding on the optimal type of fusion is part of the exploratory process in the application of DL methods \autocite{Ichhpujani_Thakur_2021}.
+	The key technical problem of multi-modal diagnosis is how to fuse the results from multifarious sources. There are three types of fusion, namely early, late, and hybrid fusion. Deciding on the optimal type of fusion is part of the exploratory process in the application of DL methods \autocite{Ichhpujani_Thakur_2021}.
 	
 	
 	
 	\section{Overview}
 	
-	We develop the Multimodal Abnormity-Aware Model (MAAM) to aid ophthalmologists in diagnosing ocular diseases. It considers both OCT and color fundus image inputs. In addition, it simulates the decision-making process of ophthalmologists when they examine patients, i.e., first identifying the abnormities, and then deducing the disease. The model is designed in a way that partly opens up the ``black box'' of DL and presents more interpretable information for the reference of the ophthalmologists. 
+	We develop the Multimodal Abnormity-Aware Model (MAAM) to aid ophthalmologists in diagnosing ocular diseases. It considers both OCT and color fundus image inputs. In addition, it simulates the decision-making process of ophthalmologists when they examine patients, i.e., first identifying the abnormities, and then deducing the disease. The model is designed in a way that partly opens up the ``black box'' of DL and presents more interpretable information for the reference of ophthalmologists. 
 	
 	\begin{figure}[htbp]
 		\centering
@@ -86,11 +86,11 @@
 		\label{fig:3_parts}
 	\end{figure}
 	
-	The structure of the MAAM is shown in Fig.~\ref{fig:3_parts}. It consists of 2 submodels: the Abnormity Models and the Diagnosis Model. We input multiple OCT and fundus images to Abnormity Models, and output the classification of abnormities as inputs to Diagnosis Model, which generates disease probabilities as final result.
+	The structure of the MAAM is shown in Fig.~\ref{fig:3_parts}. It consists of 2 submodels: the Abnormity Models and the Diagnosis Model. We input multiple OCT and fundus images to the Abnormity Models, and output the classification of abnormities as inputs to the Diagnosis Model, which generates disease probabilities as the final result.
 	
 	\vspace{0.5cm}
 	
-	The Abnormity Models are classifiers for abnormities, which are symptoms that can be directly observed in the images. The MAAM identifies 11 OCT abnormities and 8 Fundus abnormities, as shown in Fig.~\ref{fig:abnormities}.  Also refer to ``Appendix'' for more details.
+	The Abnormity Models are classifiers for abnormities, which are symptoms that can be directly observed in the images. The MAAM identifies 11 OCT abnormities and 8 Fundus abnormities, as shown in Fig.~\ref{fig:abnormities}. Also refer to ``Appendix'' for more details.
 	
 	\begin{figure}[htbp]
 		\centering
@@ -100,17 +100,17 @@
 		\label{fig:abnormities}
 	\end{figure}
 	
-	The Abnormity Models also contains 2 submodels: the OCT Model and the Fundus Model, which identify OCT and fundus abnormities, respectively. Both of the submodels leverage CNNs with modified final full-connected (FC) layers. We compare the performances of 4 commonly used CNN, ResNet152, ResNet50, ResNet18 and VGG16, and choose the best one for each submodel. The final FC layers in each CNN are modified so that the size of their output vectors is equal to the number of OCT or fundus abnormities. In order to do normalization, we perform softmax operation for the FC layer. After an image is inputted into one of the submodels, the submodel returns a probability vector for all the abnormities.
+	The Abnormity Models also contain 2 submodels: the OCT Model and the Fundus Model, which identify OCT and fundus abnormities, respectively. Both of the submodels leverage CNNs with modified final fully-connected (FC) layers. We compare the performances of 4 commonly used CNNs, ResNet152, ResNet50, ResNet18 and VGG16, and choose the best one for each submodel. The final FC layer in each CNN is modified so that the size of its output vector is equal to the number of OCT or fundus abnormities. In order to normalize the output vector, we perform the softmax operation. After an image is inputted into one of the submodels, the submodel returns a probability vector for all the abnormities.
 	
 	\vspace{0.5cm}
 	
-	And the Diagnosis Model consists of two stages: the Stage D1 and Stage D2. 
+	The Diagnosis Model consists of two stages: Stage D1 and Stage D2. 
 	
 	\vspace{0.2cm}
 	
-	In Stage D1, we determine the severity level for each disease from the probability vectors from the Abnormity Models.  We use Abnormity to Disease Deduction Criteria (shown in Fig.~\ref{fig:criteria}) as ground truth. There are multiple submodels in Stage D1 and each one corresponds to one disease. From the deduction criteria, we determine the number of abnormities for one disease and use the number to define the severity levels. For example, there are totally 5 abnormities that are present in disease ``Referable DR'', i.e., OCT abnormity ``DME'' and Fundus abnormities ``Hemorrhage'', ``Vascular Abnormity'', ``Microaneurysm'', and ``Cotton Wool Patch''.  Therefore, when taking account of healthy status, we end up with 6 severity levels for disease ``Referable DR''.
+	In Stage D1, we determine the severity level for each disease from the probability vectors from the Abnormity Models. We use Abnormity-to-Disease Deduction Criteria (shown in Fig.~\ref{fig:criteria}) as ground truth. There are multiple submodels in Stage D1 and each one corresponds to one disease. From the deduction criteria, we determine the number of abnormities for one disease and use the number to define the severity levels. For example, there are totally 5 abnormities that are present in the disease ``Referable DR'': OCT abnormity ``DME'' and Fundus abnormities ``Hemorrhage'', ``Vascular Abnormity'', ``Microaneurysm'', and ``Cotton Wool Patch''. Therefore, taking into account the healthy status, we end up with 6 severity levels for disease ``Referable DR''.
 
-	We use fused vector as an input for each submodels in Stage D1, and have the vector pass a FC layer with softmax operation to generate severity level probability vectors.
+	We use the fused vector as an input for each submodels in Stage D1, and have the vector pass a FC layer with softmax operation to generate severity level probability vectors.
 	
 	\begin{figure}[htbp]
 		\centering
@@ -122,11 +122,11 @@
 
 	\vspace{0.2cm}
 	
-	In Stage D2, we determine the final disease probability vector.  Similarly we use a fused vector from the output of submodels in Stage D1, and have the vector pass a FC layer with softmax operation.  The result presents potential diseases that can be referenced by ophthalmologist.
+	In Stage D2, we determine the final disease probability vector. Similarly we use a fused vector from the outputs of submodels in Stage D1, and have the vector pass a FC layer with softmax operation. The result presents potential diseases that can be referenced by ophthalmologists.
 
 	\vspace{0.5cm}
 	
-	In MAAM, we leverage the fusion operation to incorporate all the results from different submodels.  As shown in Fig.~\ref{fig:fusion}, there are 3 fusion operations in MAAM.
+	In the MAAM, we leverage the fusion operation to incorporate all the results from different submodels. As shown in Fig.~\ref{fig:fusion}, there are 3 fusion operations in MAAM.
 	
 	\begin{figure}[htbp]
 		\centering
@@ -136,11 +136,11 @@
 		\label{fig:fusion}
 	\end{figure}
 
-	The first fusion occurs at the output of OCT Models or Fundus Models.  In reality, multiple OCT images and Fundus images can be used for ocular disease diagnosis. Each image goes through one of the Abnormity Models and generates a probability vector. To use the probability results from all the images, a maximization fusion is implemented for all the vectors so that the fusion yeilds one OCT abnormity probability vector and one Fundus abnormity probability vector with maximum values.
+	The first fusion occurs at the output of OCT Model or Fundus Model. In real cases, multiple OCT and Fundus images can be used for ocular disease diagnosis. Each image goes through one of the Abnormity Models and generates a probability vector. To use the probability results from all the images, a maximization fusion is implemented for all the vectors so that the fusion yields one OCT abnormity probability vector and one Fundus abnormity probability vector with maximum values.
 	
-	The second fusion occurs at the interface between Abnormity Model and Stage D1. A concatenation fusion is implemented for OCT abnormality probability vector and Fundus abnormality probability vector.  The fused vector works as an input to all the submodels in Stage D1.
+	The second fusion occurs at the interface between Abnormity Model and Stage D1. A concatenation fusion is implemented for OCT abnormity probability vector and Fundus abnormity probability vector. The fused vector works as an input to all the submodels in Stage D1.
 	
-	The third fusion occurs at the interface between Stage D1 and Stage D2.  We concatenation all the severity level vectors to feed the model in Stage D2.  The fused vector goes through the FC layer and does a softmax operation to yield the final result.
+	The third fusion occurs at the interface between Stage D1 and Stage D2. We concatenation all the severity level vectors to feed the model in Stage D2. The fused vector goes through the FC layer and undergoes a softmax operation to yield the final result.
 	
 	\section{Abnormity Models}
 	
@@ -154,13 +154,127 @@
 		\label{fig:A_data_prep}
 	\end{figure}
 	
-	Table: Data source for OCT and Fundus
-	numbered list of sources
-	columns for source number, final column = total number of imgs
-	rows for abnormities
+	The data preparation process is shown in Fig.~\ref{fig:A_data_prep}. First, 
+	
+	\begin{minipage}[t]{0.4\linewidth}
+		{
+			\fontsize{9}{12}\selectfont
+			{
+				\begin{longtable}{cccccc}
+					\caption{OCT abnormities}
+					\label{tb:OCT_source}\\
+					\toprule
+					\multirow{2}{*}{Abnormity}&\multicolumn{4}{c}{Source}&\multirow{2}{*}{Total}\\
+					&1&2&3&4&\\
+					\midrule
+					CNV               &2984&/  &/ &/ &2984\\
+					CSC               &/   &102&32&/ &134 \\
+					DME               &2500&/  &/ &/ &2500\\
+					Drusen            &2500&/  &/ &/ &2500\\
+					ERM               &/   &/  &/ &19&19  \\
+					Intraretinal&1097&/  &/ &/ &1097\\
+					MH                &/   &99 &31&/ &130 \\
+					Mactel            &/   &/  &29&/ &29  \\
+					Normal            &5000&/  &/ &/ &5000\\
+					RP                &/   &102&31&/ &133 \\
+					Stargardt         &/   &/  &23&/ &23  \\
+					Subretinal  &1083&/  &/ &/ &1083\\
+					\bottomrule
+				\end{longtable}
+				
+				\vspace{0.5cm}
+				\begin{enumerate}
+					\item Normal Disease Database
+					\vspace{-0.2cm}
+					
+					\item OpenICPSR
+					\vspace{-0.2cm}
+					
+					\item Few-shot
+					\vspace{-0.2cm}
+					
+					\item Google Image
+					\vspace{-0.2cm}
+				\end{enumerate}
+				
+				\vspace{0.5cm}
+			}
+		}
+	\end{minipage}
+	\begin{minipage}[t]{0.6\linewidth}
+		{
+			\fontsize{9}{12}\selectfont
+			{
+				\begin{longtable}{cccccccc}
+					\caption{Fundus abnormities}
+					\label{tb:Fundus_source}\\
+					\toprule
+					\multirow{2}{*}{Abnormity}&\multicolumn{6}{c}{Source}&\multirow{2}{*}{Total}\\
+					&1&2&3&4&5&6&\\
+					\midrule
+					Cotton  &/  &/ &/ &33 &205&/ &238\\
+					Drusen            &/  &/ &/ &50 &/  &/ &50 \\     
+					Hard    &20 &/ &/ &75 &284&/ &379\\ 
+					Hemorrhage        &13 &66&/ &105&278&/ &462\\     
+					MH                &/  &/ &/ &/  &/  &34&34 \\        
+					Micro   &55 &/ &/ &1  &219&/ &275\\
+					Normal            &100&37&15&/  &/  &/ &152\\      
+					RP                &/  &22&/ &/  &/  &44&66 \\         
+					Vascular&/  &64&/ &14 &/  &/ &78 \\
+					
+					\bottomrule
+				\end{longtable}
+				
+				\vspace{1cm}
+				\begin{enumerate}
+					
+					\item E-ophtha
+					\vspace{-0.2cm}
+					
+					\item Kaggle1000
+					\vspace{-0.2cm}
+					
+					\item HRF
+					\vspace{-0.2cm}
+					
+					\item STARE
+					\vspace{-0.2cm}
+					
+					\item EyePACS
+					\vspace{-0.2cm}
+					
+					\item Google Image
+					\vspace{-0.2cm}
+					
+				\end{enumerate}
+				
+				\vspace{0.5cm}
+			}
+		}
+	\end{minipage}
+	
+	
+	{
+		\fontsize{9}{12}\selectfont
+		{
+			\begin{longtable}{ccccc}
+				\caption{OCT images CycleGAN selection rate}
+				\label{tb:cycleGAN_selection_rate}\\
+				\toprule
+				Abnormity&Original&Generated&Selected&Selection Rate\\
+				\midrule
+				CSC      &134&1730&3000&57.667\% \\
+				ERM      &19 &1931&3000&64.367\% \\
+				MH       &130&1811&3000&60.367\% \\
+				Mactel   &29 &1900&3000&63.333\% \\
+				RP       &133&1923&3000&64.100\% \\
+				Stargardt&23 &2582&3000&86.067\% \\
+				\bottomrule
+			\end{longtable}
+		}
+	}
 	
 	TEXT: CycleGAN
-	Table: selection rates
 	selection criteria
 	Why I did not GAN Fundus
 	
@@ -168,8 +282,6 @@
 	for train: copy, flip, randomcomb1
 	for test: copy, flip, randomcomb2 -> explain truthfulness
 	explain differences between train and test, OCT and fundus
-	
-	Table: all data source
 	
 	\subsection{Training}
 	
@@ -406,7 +518,7 @@
 				\caption{OCT Abnormities}
 				\label{tb:oct-abnormites}\\
 				\toprule
-				Abnormality&Description\\
+				Abnormity&Description\\
 				\toprule
 				
 				\multicolumn{1}{l}{Central serous chorioretinopathy (CSC)}
@@ -434,7 +546,7 @@
 				& The abnormal growth of new blood vessels in the choroid layer.\\
 				
 				\multicolumn{1}{l}{Subretinal fluid}
-				&  The accumulation of fluid between the neurosensory retina and the retinal pigment epithelium (RPE)\\
+				& The accumulation of fluid between the neurosensory retina and the retinal pigment epithelium (RPE)\\
 				
 				\multicolumn{1}{l}{Intraretinal fluid}
 				& The accumulation of fluid within the layers of the retina.\\
@@ -454,7 +566,7 @@
 				\caption{Fundus Abnormalities}
 				\label{tb:fundus-ab}\\
 				\toprule
-				Abnormality&Description\\
+				Abnormity&Description\\
 				\toprule
 				
 				\multicolumn{1}{l}{Retinitis pigmentosa (RP)}
@@ -465,13 +577,13 @@
 				
 				\multicolumn{1}{l}{Macular hole (MH)} & Full-thickness macular hole showing a surrounding cuff of subretinal fluid.\\
 				
-				\multicolumn{1}{l}{Hard exudate} & Yellow or Yellow-White Deposits.  Hard Borders.  Distribution.  Clustering Around Blood Vessels\\
+				\multicolumn{1}{l}{Hard exudate} & Yellow or Yellow-White Deposits. Hard Borders. Distribution. Clustering Around Blood Vessels\\
 				
-				\multicolumn{1}{l}{Hemorrhage} & Small dot-like to larger blot.  Fresh hemorrhages typically appear bright red or deep red in color, indicating the presence of oxygenated blood. Over time, as the blood undergoes degradation and clotting, the hemorrhage may change color to darker red, orange, or yellowish hues.\\
+				\multicolumn{1}{l}{Hemorrhage} & Small dot-like to larger blot. Fresh hemorrhages typically appear bright red or deep red in color, indicating the presence of oxygenated blood. Over time, as the blood undergoes degradation and clotting, the hemorrhage may change color to darker red, orange, or yellowish hues.\\
 				
-				\multicolumn{1}{l}{Cotton wool patch / soft exudate} & White or off-white lesions.  Irregular shapes and margins.\\
+				\multicolumn{1}{l}{Cotton wool patch / soft exudate} & White or off-white lesions. Irregular shapes and margins.\\
 				
-				\multicolumn{1}{l}{Vascular abnormality} & Retinal Vessel Tortuosity.  Retinal Vessel Caliber Changes.  \\
+				\multicolumn{1}{l}{Vascular abnormity} & Retinal Vessel Tortuosity. Retinal Vessel Caliber Changes. \\
 				
 				\multicolumn{1}{l}{Drusen} & Small, round or oval-shaped yellow or white deposits.\\
 				

@@ -24,14 +24,14 @@ ERM
 intraretinal fluid
 	O Normal Disease Database (CNV) 1097
 
-Mactel
-	O Few-shot 29
-	CYCLE_GAN 3000 select 1900
-
 MH
 	O Few-shot 31
 	O OpenICPSR 99
 	CYCLE_GAN generate 3000 select 1811
+
+Mactel
+	O Few-shot 29
+	CYCLE_GAN 3000 select 1900
 
 Normal
 	O Normal Disease Database 5000
