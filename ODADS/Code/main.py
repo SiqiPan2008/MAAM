@@ -37,15 +37,15 @@ if task == "get results":
         diagnosis1_confusion_matrix.plot_conf_mat()
     elif name == "D2: tSNE, ROC, confusion matrix":
         diagnosis2_tSNE_ROC_confusion_matrix.plot_tSNE_ROC_conf_mat(plt_tSNE = True, plt_ROC = True, plt_conf_mat = True)
-    elif task == "graph all":
+    elif name == "graph all":
         abnormity_confusion_matrix.plot_all_conf_mat()
         diagnosis1_confusion_matrix.plot_conf_mat()
+        diagnosis2_tSNE_ROC_confusion_matrix.plot_tSNE_ROC_conf_mat(plt_tSNE = True, plt_ROC = True, plt_conf_mat = True)
         
         abnormity_loss_and_acc.plot_loss_and_acc()
         abnormity_ROC.plot_roc()
         abnormity_tSNE.plot_tsne()
         diagnosis1_acc_barchart.plot_acc_barchart()
-        diagnosis1_confusion_matrix.plot_conf_mat()
 
 
 

@@ -111,7 +111,6 @@ def plot_conf_mat():
             for i in range(conf_mat.shape[0]):
                 for j in range(conf_mat.shape[1]):
                     axs[row, col].text(j, i, conf_mat[i, j], ha='center', va='center', color='black' if conf_mat[i, j] < max / 2 else 'white')
-            plt.colorbar(mat)
             if col == 3:
                 col = 0
                 row += 1

@@ -79,31 +79,69 @@
 	
 	\section{Overview}
 		
-		The Optical Disease Auxiliary Diagnosis System (ODADS)
-		Model purpose: recognize abnormities, then diagnose disease; 
-			interpretable findings
-			
-		Fig: OCT abnormities and Fundus abnormities
+		The Optical Disease Auxiliary Diagnosis System (ODADS) is developed to aid doctors in diagnosing optical diseases. It simulates the decision-making process of doctors when they examine patients with optical diseases, i.e., first identifying the abnormities, and then deducing the disease. By doing so, the ODADS partly opens up the ``black box'' of DL and presents more interpretable conclusions. In addition, it is multi-modal and considers both OCT and color fundus image inputs. 
 		
-		TEXT: No real data. use the following criteria. source for criteria
+		The ODADS is trained to identify 12 OCT abnormities (including normal) and 9 Fundus abnormities (including normal), as shown in Fig.~\ref{fig:abnormities}.
 		
-		Fig: From Abnormity to Disease
+		\begin{figure}[htbp]
+			\centering
+			\includegraphics[width=\linewidth]{Figs/Temp.png}
+			\caption{Abnormities}
+			\vspace{0.3cm}
+			\label{fig:abnormities}
+		\end{figure}
 		
-		Fig: 3 parts
+		Most of the data we acquire are only labeled with abnormities (sometimes called ``findings'' in other studies). Therefore, we compose the following abnormity-disease conversion criteria and use these criteria to generate data for training (see Fig.~\ref{fig:criteria}). 
 		
-		TEXT: Model consists of 3 parts: OCT-Model, Fundus-Model, and Diagnosis-Model. OCT-Model and Fundus-Model are collectively called the Abnormity-Models. They use the same architecture (ResNet152, flatten to 2048 features, and fc). Diagnosis Model consists of num submodels, one of which is for normal, and the other ones for each disease. each submodel first fuses output from both Abnormity-Models, then uses an fc to get final results for normal or for the disease. 
+		\begin{figure}[htbp]
+			\centering
+			\includegraphics[width=\linewidth]{Figs/Temp.png}
+			\caption{Criteria}
+			\vspace{0.3cm}
+			\label{fig:criteria}
+		\end{figure}
 		
-		TEXT: max of OCT, max of fundus, concatenate; concatenate D1 outputs
+		The structure of the ODADS is shown in Fig.~\ref{fig:3_parts}. The ODADS constitutes of 2 parts: the Abnormity Models and the Diagnosis Model. 
 		
-		Fig: fusion
+		The Abnormity Models consists of the OCT Model and the Fundus Model, which identify OCT and Fundus abnormities, respectively. Both of the Abnormity Models are a CNN with a modified final FC layer. Four CNN structures (ResNet152, ResNet50, ResNet18, and VGG16) are tried and the best is chosen for each of the Abnormity Models. The final FC layers are modified so that the size of their output vectors is equal to the number of OCT or Fundus abnormities, and a softmax layer is added. After an image is inputted into one of the Abnormity Models, the model returns a probability vector containing the probabilities of different abnormities.
 		
-		TEXT: output
+		The Diagnosis Model consists of two stages: the Abnormity Number Stage (Stage D1) and the Disease Probability Stage (Stage D2). In Stage D1, there is a small NN for each of the diseases. Each NN takes input from the OCT and Fundus Models, passes the input through a FC layer and a softmax layer, and determines how many abnormities that are related to the specific disease (as in Fig.~\ref{fig:criteria}) are present in an image. Then, in Stage D2, an NN takes input from all the NNs in Stage D1, passes the input through a FC layer and a softmax layer, and returns the probability vector containing the probabilities of being normal and having different diseases.
+		
+		\begin{figure}[htbp]
+			\centering
+			\includegraphics[width=\linewidth]{Figs/Temp.png}
+			\caption{3 Parts}
+			\vspace{0.3cm}
+			\label{fig:3_parts}
+		\end{figure}
+		
+		Fig.~\ref{fig:fusion} shows how the different parts of the ODADS are connected.
+		
+		When multiple OCT and Fundus images are inputted, they are passed through the Abnormity Models, resulting in multiple OCT and Fundus probability vectors. For each OCT abnormity, we choose the maximum probability  from the OCT probability vectors. Thus, we can get a final OCT probability vector with all the maximum probabilities. We do this for Fundus as well, and then concatenate the final OCT and Fundus vectors as an input to the Diagnosis Model.
+		
+		Stage D1 then takes the input and generates multiple abnormity number vectors. All these vectors are concatenated and inputted into Stage D2, which finally yields the probability vector of diseases.
+		
+		The results are then given to a user interface and shown to the user.
+		
+		\begin{figure}[htbp]
+			\centering
+			\includegraphics[width=\linewidth]{Figs/Temp.png}
+			\caption{Fusion}
+			\vspace{0.3cm}
+			\label{fig:fusion}
+		\end{figure}
 		
 	\section{Abnormity Models}
 	
 		\subsection{Data Preparation}
 			
-			Fig: preparation flowchart (include cycleGAN)
+			\begin{figure}[htbp]
+				\centering
+				\includegraphics[width=\linewidth]{Figs/Temp.png}
+				\caption{Data preparation for abnormity models}
+				\vspace{0.3cm}
+				\label{fig:A_data_prep}
+			\end{figure}
 			
 			Table: Data source for OCT and Fundus
 				numbered list of sources
@@ -126,48 +164,44 @@
 			
 			TEXT: intro to five-fold train/valid (reason for using this?)
 			
-			TEXT: starting point of fine-tuning???????????????????????????????
+			TEXT: starting point of fine-tuning
 			prevent overfitting
 			
 			TEXT: crossentropyloss, ADAM optimizer with LR 1e-3, batchSize 16, number of epochs...
 			conda, PyTorch;
-			desktop computer with Intel® Xeon® Platinum 8352V Processor, 256G of RAM and 2 NVIDIA GPU (GeForce RTX 4090) with 48 VRAM
+			desktop computer with Intel$^®$ Xeon$^®$ Platinum 8352V Processor, 256G of RAM and 2 NVIDIA GPU (GeForce RTX 4090) with 48 VRAM
 			
-			Graph: accuracy and loss over epochs
+			\begin{figure}[htbp]
+				\centering
+				\includegraphics[width=\linewidth]{Figs/abnormity_OCT_loss_and_acc.pdf}
+				\caption{AO train}
+				\vspace{0.3cm}
+				\label{fig:AO_train}
+			\end{figure}
+			
+			\begin{figure}[htbp]
+				\centering
+				\includegraphics[width=\linewidth]{Figs/abnormity_Fundus_loss_and_acc.pdf}
+				\caption{AF train}
+				\vspace{0.3cm}
+				\label{fig:AF_train}
+			\end{figure}
+			
+			Graph bar chart for comparison? 
+			
 			TEXT: comments
 			
 		\subsection{Results}
 			
-			For both OCT and Fundus:
+			TEXT: accuracy; explain top-probs method
 			
-				TEXT: accuracy; explain top-probs method
-				
-				
-				
-				\begin{table}[htbp]
-					\centering
-					\caption{OCT Test}
-					\label{tb:OCT_test}
-					\pgfplotstabletypeset[
-						multicolumn names,
-						col sep=comma,
-						columns = {Abnormity, Precision, Sensitivity, Specificity, FOne, AUC},
-						columns/Abnormity/.style={string type, column name=Abnormities},
-						columns/Precision/.style={string type, column name=Precision},
-						columns/Sensitivity/.style={string type, column name=Sensitivity},
-						columns/Specificity/.style={string type, column name=Specificity},
-						columns/FOne/.style={string type, column name={F1 Score}},
-						columns/AUC/.style={string type, column name=AUC},
-						every head row/.style={before row=\toprule, after row=\midrule},
-						every last row/.style={ after row=\bottomrule}
-					]{Tables/abnormity_o_test.csv}
-				\end{table}
-				
-				\begin{table}[htbp]
-					\centering
-					\caption{Fundus Test}
-					\label{tb:Fundus_test}
-					\pgfplotstabletypeset[
+			
+			
+			\begin{table}[htbp]
+				\centering
+				\caption{OCT Test}
+				\label{tb:OCT_test}
+				\pgfplotstabletypeset[
 					multicolumn names,
 					col sep=comma,
 					columns = {Abnormity, Precision, Sensitivity, Specificity, FOne, AUC},
@@ -178,20 +212,73 @@
 					columns/FOne/.style={string type, column name={F1 Score}},
 					columns/AUC/.style={string type, column name=AUC},
 					every head row/.style={before row=\toprule, after row=\midrule},
-					every last row/.style={after row=\bottomrule}
-					]{Tables/abnormity_f_test.csv}
-				\end{table}
-					
-				Graph: Confusion matrix
-				TEXT: analyze which abnormities are commonly confused, and the effect on the numerical results
-				Graph: t-SNE
-				TEXT: which abnormities are "close"
+					every last row/.style={ after row=\bottomrule}
+				]{Tables/abnormity_o_test.csv}
+			\end{table}
+			
+			\begin{table}[htbp]
+				\centering
+				\caption{Fundus Test}
+				\label{tb:Fundus_test}
+				\pgfplotstabletypeset[
+				multicolumn names,
+				col sep=comma,
+				columns = {Abnormity, Precision, Sensitivity, Specificity, FOne, AUC},
+				columns/Abnormity/.style={string type, column name=Abnormities},
+				columns/Precision/.style={string type, column name=Precision},
+				columns/Sensitivity/.style={string type, column name=Sensitivity},
+				columns/Specificity/.style={string type, column name=Specificity},
+				columns/FOne/.style={string type, column name={F1 Score}},
+				columns/AUC/.style={string type, column name=AUC},
+				every head row/.style={before row=\toprule, after row=\midrule},
+				every last row/.style={after row=\bottomrule}
+				]{Tables/abnormity_f_test.csv}
+			\end{table}
+			
+			\begin{figure}[htbp]
+				\centering
+				\includegraphics[width=0.8\linewidth]{Figs/abnormity_confusion_matrix.pdf}
+				\caption{A Conf Mat}
+				\vspace{0.3cm}
+				\label{fig:A_conf_mat}
+			\end{figure}
+			
+			TEXT: analyze which abnormities are commonly confused, and the effect on the numerical results
+			
+			\begin{figure}[htbp]
+				\centering
+				\includegraphics[width=\linewidth]{Figs/abnormity_tSNE.pdf}
+				\caption{A ROC}
+				\vspace{0.3cm}
+				\label{fig:A_tSNE}
+			\end{figure}
+			
+			TEXT: which abnormities are "close"
+			
+			\begin{figure}[htbp]
+				\centering
+				\includegraphics[width=\linewidth]{Figs/abnormity_ROC.pdf}
+				\caption{A ROC}
+				\vspace{0.3cm}
+				\label{fig:A_ROC}
+			\end{figure}
+			
+			TEXT: comparison to other studies
 				
-				Graph: ROC for each abnormity
-				
-				TEXT: comparison to other studies
-				
-			Fig: GradCAM example
+			\begin{figure}[htbp]
+				\centering
+				\includegraphics[width=\linewidth]{Figs/abnormity_gradCAM.png}
+				\caption{GradCAM}
+				\vspace{0.3cm}
+				\label{fig:gradCAM}
+			\end{figure}
+			\begin{figure}[htbp]
+				\centering
+				\includegraphics[width=\linewidth]{Figs/abnormity_gradCAM_multiple_abnormities.png}
+				\caption{GradCAM with multiple abnormities}
+				\vspace{0.3cm}
+				\label{fig:gradCAM_multi_abnormity}
+			\end{figure}
 		
 	\section{Diagnosis Model}
 	
@@ -205,7 +292,6 @@
 			
 			TEXT: hyperparameters, software, hardware
 			
-			Graph: accuracy and loss over epochs
 			TEXT: comments
 				
 				
@@ -235,15 +321,46 @@
 				]{Tables/diagnosis2.csv}
 			\end{table}
 			
-			Graph: D1 acc bar chart (with D2 no use-top-probs and D2 use-top-probs)
-			Graph: D1 confusion matrix
+			\begin{figure}[htbp]
+				\centering
+				\includegraphics[width=\linewidth]{Figs/diagnosis1_acc_barchart.pdf}
+				\caption{D1 Acc Bar}
+				\vspace{0.3cm}
+				\label{fig:D1_acc_bar}
+			\end{figure}
+			
+			\begin{figure}[htbp]
+				\centering
+				\includegraphics[width=\linewidth]{Figs/diagnosis1_confusion_matrix.pdf}
+				\caption{D1 Conf Mat}
+				\vspace{0.3cm}
+				\label{fig:D1_conf_mat}
+			\end{figure}
 			TEXT: comments
 			
-			Graph: D2 confusion matrix
-			Graph: D2 tSNE
+			\begin{figure}[htbp]
+				\centering
+				\includegraphics[width=\linewidth]{Figs/diagnosis2_confusion_matrix.pdf}
+				\caption{D2 Conf Mat}
+				\vspace{0.3cm}
+				\label{fig:D2_conf_mat}
+			\end{figure}
+			\begin{figure}[htbp]
+				\centering
+				\includegraphics[width=\linewidth]{Figs/diagnosis2_tSNE.pdf}
+				\caption{D2 tSNE}
+				\vspace{0.3cm}
+				\label{fig:D2_tSNE}
+			\end{figure}
 			TEXT: comments
 			
-			Graph: D2 ROC for each disease
+			\begin{figure}[htbp]
+				\centering
+				\includegraphics[width=\linewidth]{Figs/diagnosis2_ROC.pdf}
+				\caption{D2 ROC}
+				\vspace{0.3cm}
+				\label{fig:D2_ROC}
+			\end{figure}
 			TEXT: comparison and comments
 	
 	\section{Discussion}
@@ -353,7 +470,14 @@
 	}
 	
 	
-	Fig: website
+	\begin{figure}[htbp]
+		\centering
+		\includegraphics[width=\linewidth]{Figs/Temp.png}
+		\caption{Result Page}
+		\vspace{0.3cm}
+		\label{fig:result_page}
+	\end{figure}
+	
 	TEXT: APP/website description
 	
 	Link: GitHub repo

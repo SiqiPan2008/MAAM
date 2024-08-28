@@ -31,7 +31,6 @@ def plot_complete_conf_mat(ax, complete_conf_mat, abnormities):
     for i in range(complete_conf_mat.shape[0]):
         for j in range(complete_conf_mat.shape[1]):
             ax.text(j, i, complete_conf_mat[i, j], ha='center', va='center', color='black' if complete_conf_mat[i, j] < max / 2 else 'white')
-    plt.colorbar(mat)
 
 def calc_and_save_numerical_results(csv_filename, type, source, conf_mat):
     setting = utils.get_setting()
