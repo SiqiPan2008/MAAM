@@ -78,40 +78,48 @@
 	
 	\section{Overview}
 		
-		We develop a multimodal abnormity-aware model to aid doctors in diagnosing ocular diseases. It is a multimodal model and considers both OCT and color fundus image inputs. In addition, tt simulates the decision-making process of doctors when they examine patients with ocular diseases, i.e., first identifying the abnormities, and then deducing the disease. By doing so, it partly opens up the ``black box'' of DL and presents more interpretable conclusions. 
-		
-		The structure of the model is shown in Fig.~\ref{fig:3_parts}. The model constitutes of 2 parts: the Abnormity Models and the Diagnosis Model. 
-		
-		The Abnormity Models consists of the OCT Model and the Fundus Model, which identify OCT and Fundus abnormities, respectively. Both of the Abnormity Models are CNNs with modified final FC layer. All CNNs that are used for classification tasks can be used. In this study, we consider ResNet152, ResNet50, ResNet18, and VGG16, tried and the best is chosen for each of the Abnormity Models. The final FC layers are modified so that the size of their output vectors is equal to the number of OCT or Fundus abnormities, and a softmax layer is added. After an image is inputted into one of the Abnormity Models, the model returns a probability vector containing the probabilities of different abnormities.
-		
-		The Diagnosis Model consists of two stages: the Abnormity Number Stage (Stage D1) and the Disease Probability Stage (Stage D2). In Stage D1, there is a small NN for each of the diseases. Each NN takes input from the OCT and Fundus Models, passes the input through a FC layer and a softmax layer, and determines how many abnormities that are related to the specific disease (as in Fig.~\ref{fig:criteria}) are present in an image. Then, in Stage D2, an NN takes input from all the NNs in Stage D1, passes the input through a FC layer and a softmax layer, and returns the probability vector containing the probabilities of being normal and having different diseases.
-		
-		The ODADS is trained to identify 12 OCT abnormities (including normal) and 9 Fundus abnormities (including normal), as shown in Fig.~\ref{fig:abnormities}.
+		We develop a multimodal abnormity-aware model to aid doctors in diagnosing ocular diseases. It is a multimodal model and considers both OCT and color fundus image inputs. In addition, tt simulates the decision-making process of doctors when they examine patients with ocular diseases, i.e., first identifying the abnormities, and then deducing the disease. Thus, it partly opens up the ``black box'' of DL and presents more interpretable conclusions. 
 		
 		\begin{figure}[htbp]
 			\centering
 			\includegraphics[width=\linewidth]{Figs/Temp.png}
-			\caption{Abnormities}
+			\caption{Model Overview}
+			\vspace{0.3cm}
+			\label{fig:3_parts}
+		\end{figure}
+		
+		The structure of the model is shown in Fig.~\ref{fig:3_parts}. The model constitutes of 2 parts: the Abnormity Models and the Diagnosis Model. 
+		
+		The Abnormity Models consists of the OCT Model and the Fundus Model, which identify OCT and Fundus abnormities, respectively. Both of the Abnormity Models are CNNs with modified final FC layers. All CNNs that are used for classification tasks can be used. In this study, we consider ResNet152, ResNet50, ResNet18 and VGG16, and choose the best CNN for both Abnormity Models. The final FC layers are modified so that the size of their output vectors is equal to the number of OCT or Fundus abnormities. We also add a softmax layer after it. After an image is inputted into one of the Abnormity Models, the model returns a probability vector containing the probabilities of different abnormities.
+		
+		The Diagnosis Model consists of two stages: the Abnormity Number Stage (Stage D1) and the Disease Probability Stage (Stage D2). In Stage D1, there is a submodel for each of the diseases. Each submodel takes input from the OCT and Fundus Models, passes the input through a FC layer and a softmax layer, and determines how many abnormities that are related to the specific disease (as in Fig.~\ref{fig:criteria}) are present in an image. Then, in Stage D2, the output of all the submodels in Stage D1 passes through a FC layer and a softmax layer, and returns a disease probability vector.
+		
+		\begin{figure}[htbp]
+			\centering
+			\includegraphics[width=\linewidth]{Figs/Temp.png}
+			\caption{OCT and Fundus abnormities}
 			\vspace{0.3cm}
 			\label{fig:abnormities}
 		\end{figure}
 		
-		Most of the data we acquire are only labeled with abnormities, which are symptoms that can be directly observed in the images. Therefore, we compose the following abnormity-disease conversion criteria and use these criteria to generate data for training (see Fig.~\ref{fig:criteria}). 
+		Abnormities are symptoms that can be directly observed in the images. The model is trained to identify 12 OCT abnormities (including normal) and 9 Fundus abnormities (including normal), as shown in Fig.~\ref{fig:abnormities}.
 		
 		\begin{figure}[htbp]
 			\centering
 			\includegraphics[width=\linewidth]{Figs/Temp.png}
-			\caption{Criteria}
+			\caption{Abnormity-to-disease conversion criteria}
 			\vspace{0.3cm}
 			\label{fig:criteria}
 		\end{figure}
 		
+		Most of the data we acquire are only labeled with abnormities. Therefore, we compose the following abnormity-to-disease conversion criteria and use these criteria to generate data for training the Diagnosis Model (see Fig.~\ref{fig:criteria}). 
+		
 		\begin{figure}[htbp]
 			\centering
 			\includegraphics[width=\linewidth]{Figs/Temp.png}
-			\caption{3 Parts}
+			\caption{Fusion}
 			\vspace{0.3cm}
-			\label{fig:3_parts}
+			\label{fig:fusion}
 		\end{figure}
 		
 		Fig.~\ref{fig:fusion} shows how the different parts of the ODADS are connected.
@@ -122,13 +130,6 @@
 		
 		The results are then given to a user interface and shown to the user.
 		
-		\begin{figure}[htbp]
-			\centering
-			\includegraphics[width=\linewidth]{Figs/Temp.png}
-			\caption{Fusion}
-			\vspace{0.3cm}
-			\label{fig:fusion}
-		\end{figure}
 		
 	\section{Abnormity Models}
 	
