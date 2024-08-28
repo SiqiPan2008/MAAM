@@ -46,8 +46,6 @@
 	
 	TEXT: abstract
 	
-	\pagebreak
-	
 	\section{Background}
 	
 	TEXT: Edit background
@@ -164,7 +162,7 @@
 	
 	The data preparation process is shown in Fig.~\ref{fig:A_data_prep}. 
 	
-	First, we acquire data from publicly available online datasets. For abnormities that we have no data of, we search for images on Google Image. The numbers of images acquired from each data source are shown in Tables \ref{tb:OCT_source} and \ref{tb:Fundus_source}. 
+	First, we acquire data from publicly available online datasets. For abnormities that we have no data of, we search for images on Google Image. The numbers of images acquired from each data source are shown in Tables \ref{tb:OCT_source} and \ref{tb:Fundus_source}. For the links if the images from Google Image, please refer to ``Appendix''. 
 	
 	\begin{minipage}[t]{0.4\linewidth}
 		{
@@ -285,10 +283,7 @@
 		}
 	}
 	
-	TEXT: transforms for OCT
-	for train: copy, flip, randomcomb1
-	for test: copy, flip, randomcomb2 -> explain truthfulness
-	explain differences between train and test, OCT and fundus
+	We separate the images, including generated images, into two datasets, one training and the other for testing. We implement a set of transformations on the images, including a horizontal flip, a random brightness change from -10\% to +10\%, random horizontal and vertical translations between -5\% and +5\%, random scaling between -20\% and +20\%, and a random rotation, which is between -10$^\circ$ and +10$^\circ$ for OCT images and between -30$^\circ$ and +30$^\circ$ for Fundus images. The rotation is only applied for images in the train dataset. Eventually, we get 5000 train images and 500 test images for each OCT abnormity, and 3000 train images and 300 test images for each fundus abnormity.
 	
 	\subsection{Training}
 	
