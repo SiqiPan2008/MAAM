@@ -90,14 +90,22 @@
 	
 	\vspace{0.5cm}
 	
-	The Abnormity Models are classifiers for abnormities, which are symptoms that can be directly observed in the images. The MAAM identifies 11 OCT abnormities and 8 Fundus abnormities, as shown in Fig.~\ref{fig:abnormities}. Also refer to ``Appendix'' for more details.
+	The Abnormity Models are classifiers for abnormities, which are symptoms that can be directly observed in the images. The MAAM identifies 11 OCT abnormities and 8 Fundus abnormities, as shown in Fig.~\ref{fig:OCT_abnormities} and Fig.~\ref{fig:fundus_abnormities}. Also refer to ``Appendix'' for more details.
+	
+	\begin{figure}[htbp]
+		\centering
+		\includegraphics[width=\linewidth]{Figs/OCT_Abnormities.png}
+		\caption{OCT Abnormities}
+		\vspace{0.3cm}
+		\label{fig:OCT_abnormities}
+	\end{figure}
 	
 	\begin{figure}[htbp]
 		\centering
 		\includegraphics[width=\linewidth]{Figs/Temp.png}
-		\caption{OCT and Fundus Abnormities}
+		\caption{Fundus Abnormities}
 		\vspace{0.3cm}
-		\label{fig:abnormities}
+		\label{fig:fundus_abnormities}
 	\end{figure}
 	
 	The Abnormity Models also contain 2 submodels: the OCT Model and the Fundus Model, which identify OCT and fundus abnormities, respectively. Both of the submodels leverage CNNs with modified final fully-connected (FC) layers. We compare the performances of 4 commonly used CNNs, ResNet152, ResNet50, ResNet18 and VGG16, and choose the best one for each submodel. The final FC layer in each CNN is modified so that the size of its output vector is equal to the number of OCT or fundus abnormities. In order to normalize the output vector, we perform the softmax operation. After an image is inputted into one of the submodels, the submodel returns a probability vector for all the abnormities.
@@ -396,7 +404,7 @@
 	\end{figure}
 	\begin{figure}[htbp]
 		\centering
-		\includegraphics[width=\linewidth]{Figs/abnormity_gradCAM_multiple_abnormities.png}
+		\includegraphics[width=0.8\linewidth]{Figs/abnormity_gradCAM_multiple_abnormities.png}
 		\caption{GradCAM with multiple abnormities}
 		\vspace{0.3cm}
 		\label{fig:gradCAM_multi_abnormity}
