@@ -48,7 +48,7 @@
 	TEXT: abstract
 	
 	\section{Background}
-	Ocular diseases can be diagnosed through various methods, including using optical coherence tomography (OCT) and color fundus images. Ophthalmologists usually identify ocular abnormalities to deduce the disease. Traditionally, the diagnosis primarily depends on the professional experience and knowledge of the ophthalmologists, which may result in high misdiagnosis rate and under-utilization of medical data. With the widespread application of artificial intelligence (AI), deep learning (DL) has made great contributions in providing support to patients in remote areas by sharing expert knowledge \autocite{Ichhpujani_Thakur_2021}. By leveraging DL, researchers have developed auxiliary diagnosis programs to help ophthalmologists in the process. Many studies use convolutional neural networks (CNNs) to analyze ocular images. Some commonly used CNNs are VGG, ResNet, and Inception \autocite{daich2023artificial}. And for segmenting images and finding abnormalities, U-net is widely used \autocite{Ronneberger_Fischer_Brox_2015}. With regards to training CNNs, most studies use transferred learning, which consists of three steps: learning, fine-tuning, and validation.
+	Ocular diseases can be diagnosed through various methods, including using optical coherence tomography (OCT) and color fundus images. Ophthalmologists usually identify ocular abnormalities to deduce the disease. Traditionally, the diagnosis primarily depends on the professional experience and knowledge of the ophthalmologists, which may result in high misdiagnosis rate and under-utilization of medical data. With the widespread application of artificial intelligence (AI), deep learning (DL) has made great contributions in providing support to patients in remote areas by sharing expert knowledge \autocite{Ichhpujani_Thakur_2021}. By leveraging DL, researchers have developed auxiliary diagnosis programs to help ophthalmologists in the process. Many studies use convolutional neural networks (CNN) to analyze ocular images. Some commonly used CNNs are VGG, ResNet, and Inception \autocite{daich2023artificial}. And for segmenting images and finding abnormalities, U-net is widely used \autocite{Ronneberger_Fischer_Brox_2015}. With regards to training CNNs, most studies use transferred learning, which consists of three steps: learning, fine-tuning, and validation.
 	
 	Some studies directly predict the disease from OCT images.
 	\authyear{li2019deep} used ResNet to analyze OCT images and distinguish between choroidal neovascularization (CNV), diabetic macular edema (DME), drusen, and healthy eyes. In addition, they performed occlusion testing to find out the regions that are the most important in diagnosis \autocite{li2019deep}. 
@@ -402,9 +402,11 @@
 		\label{fig:A_tSNE}
 	\end{figure}
 	
+	\vspace{0.3cm}
+	
 	We can use Grad-CAM \autocite{Selvaraju_Cogswell_Das_Vedantam_Parikh_Batra} to highlight areas on the image that make a large contribution to the final classification. If the model had been trained correctly, this would be equivalent to highlighting the abnormity. In Fig.~\ref{fig:gradCAM}, the left image in each pair of images is the original OCT or Fundus image, and the right one is the image with the abnormity correctly highlighted with Grad-CAM. 
 	
-	Furthermore, Grad-CAM can highlight any designated abnormity, so it can be used to highlight codominant abnormities. In Fig.~\ref{fig:gradCAM_multi_abnormity}, the middle images are the original OCT and fundus images. In the images on the left and right, respectively, the ground truth abnormity and its codominant abnormity are highlighted with Grad-CAM. 
+	Furthermore, Grad-CAM can highlight any designated abnormity, so it can be used to highlight codominant abnormities. In Fig.~\ref{fig:gradCAM_multi_abnormity}, the middle images are the original OCT and fundus images. In the images on the left and right, we use Grad-CAM to highlight the codominant abnormities.
 	
 	\begin{figure}[htbp]
 		\centering
