@@ -271,19 +271,21 @@
 		}
 	}
 	
-	We separate the images, including generated images, into training and test datasets, and implement a set of transformations on the images, including horizontal flips, random brightness changes from -10\% to +10\%, random horizontal and vertical translations between -5\% and +5\%, random scaling between -20\% and +20\%, and random rotations, which are between -10$^\circ$ and +10$^\circ$ for OCT images and between -30$^\circ$ and +30$^\circ$ for fundus images. The rotation is only applied to images in the train dataset. Eventually, we get 5000 train images and 500 test images for each OCT abnormity, and 3000 train images and 300 test images for each fundus abnormity.
+	We split the images, including generated images, into training and test datasets, and implement a set of transformations on the images, including horizontal flips, random brightness changes from -10\% to +10\%, random horizontal and vertical translations between -5\% and +5\%, random scaling between -20\% and +20\%, and random rotations, which are between -10$^\circ$ and +10$^\circ$ for OCT images and between -30$^\circ$ and +30$^\circ$ for fundus images. The rotation is only applied to images in the train dataset. Eventually, we get 5000 train images and 500 test images for each OCT abnormity, and 3000 train images and 300 test images for each fundus abnormity.
 	
 	\subsection{Training}
 	
-	We train the models on a desktop computer with Intel$^®$ Xeon$^®$ Platinum 8352V Processor, 256G of RAM and 2 NVIDIA GPU (GeForce RTX 4090) with 48 VRAM. The code is written with PyTorch in an Anaconda environment. For the link to the GitHub repository, refer to ``Appendix''. We use cross entropy loss, ADAM optimizer with learning rate 0.001, and a batch size of 32. We perform five-fold cross-validation during training. 
+	The model training is on a desktop computer with Intel$^®$ Xeon$^®$ Platinum 8352V Processor, 256GB of RAM and 2 NVIDIA GPU (GeForce RTX 4090) with 48GB VRAM. The training uses cross entropy loss, ADAM optimizer with learning rate 0.001, a batch size of 32 and five-fold cross-validation. The code is written with PyTorch in an Anaconda environment. Refer to ``Appendix'' for the link to the code repository on GitHub. 
+	
+	\vspace{0.3cm}
 	
 	For the Abnormity Models, we employ a strategy of transfer learning to finetuning. 
 	
-	In the transfer learning phase, we use pretrained weights from ImageNet. We freeze the weights in all the convolutional layers and only allow the weights in the final FC layer to learn. We train the model for 100 epochs. Every 10 epochs, we save the weights of the model with the best validation accuracy. In order to prevent overfitting on the train dataset, we introduce a measure called overall accuracy, which is the weighted average of validation and test accuracy. For all the saved models, we calculate the overall accuracy to find the model with the best overall performance on the validation and test datasets, and start finetuning based on this model. 
+	In the transfer learning phase, pretrained weights from ImageNet \autocite{Krizhevsky_Sutskever_Hinton_2017} are used. We freeze the weights in all the convolutional layers and only vary the weights in the final FC layer. The training lasts for 100 epochs. Every 10 epochs, weights of the model with the best validation accuracy are saved. In order to prevent overfitting on the train dataset, we introduce a measure called overall accuracy, which is the weighted average of validation and test accuracy. For all the saved models, we calculate the overall accuracy to select the model with the best overall performance on the validation and test datasets, and start finetuning based on this model. 
 	
-	In the finetuning phase, we start on the best model in the transfer learning phase, unfreezing all weights in the model. We train the model for 30 epochs. Similarly, we save the weights of the model with the best validation accuracy every 10 epochs, and find the model with the highest overall accuracy. Finally, we compare the overall accuracies of the best model in the transfer learning phase and the finetuning phase to determine the final model. 
+	In the finetuning phase, we start from the best model in the transfer learning phase, unfreezing all weights in the model. We train the model for 30 epochs. Similarly, we save the weights of the model with the best validation accuracy every 10 epochs, and find the model with the highest overall accuracy. Finally, we compare the overall accuracies of the best model in the transfer learning phase and the finetuning phase to determine the best model of all. 
 	
-	For both OCT and Fundus Models, we trained 4 commonly used CNNs: ResNet152, ResNet50, ResNet18, and VGG16. The accuracies and losses during training and validation phases are shown in Fig.~\ref{fig:AO_train} and Fig.~\ref{fig:AF_train} for all of the CNNs. 
+	For both OCT and Fundus Models, we trained 4 commonly used CNNs: ResNet152, ResNet50, ResNet18, and VGG16. The accuracies and losses during training and validation phases are shown in Fig.~\ref{fig:AO_train} and Fig.~\ref{fig:AF_train}. 
 	
 	\begin{figure}[htbp]
 		\centering
@@ -301,7 +303,13 @@
 		\label{fig:AF_train}
 	\end{figure}
 	
-	We can observe that finetuning significantly increases the model accuracy and, therefore, all the final models are finetuned models. As shown in Table~\ref{tb:A_accuracies}, the best CNN for OCT Model is ResNet50 and the best for Fundus Model is ResNet152. ResNet50 performed better than ResNet152 on OCT, possibly because it has fewer parameters and is less likely to overfit on OCT images, which has fewer and clearer traits; on the other hand, ResNet152 is better on fundus possibly because it has more parameters and can better discern the complex traits in fundus images. ResNet18 may have too few parameters, so it performs less well over all; and VGG16 sometimes experiences large dips in accuracy, possibly due to gradient vanishing, and this impairs its performance. Therefore, we will use ResNet50 for OCT Model and ResNet152 for Fundus Model. 
+	\vspace{0.3cm}
+	
+	We can observe that finetuning significantly increases the model accuracy and, therefore, all the final models are finetuned models. As shown in Table~\ref{tb:A_accuracies}, the best CNN for OCT Model is ResNet50 and the best for Fundus Model is ResNet152. ResNet50 performed better than ResNet152 on OCT, possibly because it has fewer parameters and is less likely to overfit on OCT images, which has fewer and clearer traits; on the other hand, ResNet152 is better on fundus possibly because it has more parameters and can better discern the complex traits in fundus images. ResNet18 may have too few parameters, so it performs less well over all; and VGG16 sometimes experiences large dips in accuracy, possibly due to gradient vanishing, and this impairs its performance. 
+	
+	\vspace{0.2cm}
+	
+	After all the training and comparisons, we determine to use a finetuned model with ResNet50 for OCT Model and a finetuned model with ResNet152 for Fundus Model. 
 	
 	{
 		\fontsize{9}{12}\selectfont
