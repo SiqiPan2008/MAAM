@@ -326,9 +326,7 @@
 	
 	\subsection{Results}
 	
-	TEXT: accuracy; explain top-probs method
-	
-	
+	Table~\ref{tb:OCT_test} and Table~\ref{tb:Fundus_test} show the predictive values obtained when the Abnormity Models are tested on the test dataset. Fig.~\ref{fig:A_ROC} shows the ROCs of each abnormity. From the tables and the figure, we can see that the performance of the OCT Model is significantly better than that of the Fundus Model, likely because fundus abnormities tend to be subtler and there are more fundus images that have multiple abnormities. 
 	
 	\begin{table}[htbp]
 		\centering
@@ -370,13 +368,21 @@
 	
 	\begin{figure}[htbp]
 		\centering
+		\includegraphics[width=\linewidth]{Figs/abnormity_ROC.pdf}
+		\caption{A ROC}
+		\vspace{0.3cm}
+		\label{fig:A_ROC}
+	\end{figure}
+	
+	We can further confirm that overlapping abnormities have a large impact by looking at the confusion matrices (Fig.~\ref{fig:A_conf_mat}) and the t-SNE graphs (Fig.~\ref{fig:A_tSNE}). During training, most of the abnormities are well-separated. However, this is not the case during testing. On the t-SNE graph, the OCT Model still shows clear separation of clusters, many of which, however, are mingled with data points that do not belong to the cluster. This may be because some OCT abnormities resemble each other. For example, ``IF'', ``DME'' and ``Mactel'' may look very similar. As to the Fundus Model, there are fewer small distinct clusters and there is a large cluster instead. This is likely due to the fact that many fundus images contain multiple abnormities. For example, a patient with the disease ``rDR'' shows the abnormities ``CWP'', ``HE'', ``HM'' and ``VA''. Therefore, many abnormities tend to appear together, impeding classification of abnormities. 
+	
+	\begin{figure}[htbp]
+		\centering
 		\includegraphics[width=0.8\linewidth]{Figs/abnormity_confusion_matrix.pdf}
 		\caption{A Conf Mat}
 		\vspace{0.3cm}
 		\label{fig:A_conf_mat}
 	\end{figure}
-	
-	TEXT: analyze which abnormities are commonly confused, and the effect on the numerical results
 	
 	\begin{figure}[htbp]
 		\centering
@@ -386,17 +392,7 @@
 		\label{fig:A_tSNE}
 	\end{figure}
 	
-	TEXT: which abnormities are "close"
 	
-	\begin{figure}[htbp]
-		\centering
-		\includegraphics[width=\linewidth]{Figs/abnormity_ROC.pdf}
-		\caption{A ROC}
-		\vspace{0.3cm}
-		\label{fig:A_ROC}
-	\end{figure}
-	
-	TEXT: comparison to other studies
 	
 	\begin{figure}[htbp]
 		\centering
@@ -405,6 +401,7 @@
 		\vspace{0.3cm}
 		\label{fig:gradCAM}
 	\end{figure}
+	
 	\begin{figure}[htbp]
 		\centering
 		\includegraphics[width=0.8\linewidth]{Figs/abnormity_gradCAM_multiple_abnormities.pdf}
@@ -412,6 +409,8 @@
 		\vspace{0.3cm}
 		\label{fig:gradCAM_multi_abnormity}
 	\end{figure}
+	
+	Considering that one image 050AO78.017\%, 152AF71.889\%
 	
 	\section{Diagnosis Model}
 	
