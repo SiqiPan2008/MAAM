@@ -24,6 +24,46 @@
             "Normal",
             "RP",
             "VascularAbnormity"
+        ],
+        "OCT Abbr": [
+            "CNV",
+            "CSC",
+            "DME",
+            "Drusen",
+            "ERM",
+            "IF",
+            "MH",
+            "Mactel",
+            "Healthy",
+            "RP",
+            "ST",
+            "SF"
+        ],
+        "Fundus Abbr": [
+            "CWP",
+            "Drusen",
+            "HE",
+            "HM",
+            "MH",
+            "MA",
+            "Healthy",
+            "RP",
+            "VA"
+        ],
+        "Disease Abbr": [
+            "BRVO",
+            "CRVO",
+            "CSC",
+            "dAMD",
+            "ERM",
+            "Mactel",
+            "MH",
+            "mDR",
+            "Healthy",
+            "rDR",
+            "RP",
+            "ST",
+            "wAMD"
         ]
     },
 

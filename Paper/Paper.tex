@@ -162,7 +162,7 @@
 	
 	The data preparation process is shown in Fig.~\ref{fig:A_data_prep}. 
 	
-	First, we acquire data from publicly available online datasets. For abnormities that we have no data of, we search for images on Google Image. The numbers of images acquired from each data source are shown in Tables \ref{tb:OCT_source} and \ref{tb:Fundus_source}. For the links if the images from Google Image, please refer to ``Appendix''. 
+	First, we acquire data from publicly available online datasets. For abnormities with no data found, we search for images on Google Image. The numbers of images acquired from each data source are shown in Table~\ref{tb:OCT_source} and Table~\ref{tb:Fundus_source}. For the links of the images from Google Image, please refer to ``Appendix''. 
 	
 	\begin{minipage}[t]{0.4\linewidth}
 		{
@@ -261,13 +261,13 @@
 		}
 	\end{minipage}
 	
-	Then, for OCT images that have less than 1000 images, we use Cycle-GAN to generate new images. We train a Cycle-GAN network to interconvert healthy and abnormity images, take out the generator that converts healthy images to abnormity images, and use it to generate new abnormity images. We manually eliminate generated images that look obviously wrong. The elimination rate is shown in Table~\ref{tb:cycleGAN_number}. We only used Cycle-GAN to generate OCT images because generated fundus images are too blurry and do not display the target abnormities.
+	Then, for OCT abnormities with less than 1000 images, we use Cycle-GAN to generate new images. We train a Cycle-GAN network to interconvert healthy and abnormity images, take out the generator that converts healthy to abnormity images, and use it to generate new abnormity images. We manually eliminate generated images that look obviously wrong. The elimination rates are shown in Table~\ref{tb:cycleGAN_number}. We did not use Cycle-GAN to generate fundus images because generated fundus images are too blurry and do not display the desired abnormities.
 	
 	{
 		\fontsize{9}{12}\selectfont
 		{
 			\begin{longtable}{ccccc}
-				\caption{OCT images CycleGAN elimination rate}
+				\caption{OCT images CycleGAN elimination rates}
 				\label{tb:cycleGAN_number}\\
 				\toprule
 				Abnormity&Original&Generated&Eliminated&Elimination Rate\\
@@ -283,15 +283,13 @@
 		}
 	}
 	
-	We separate the images, including generated images, into two datasets, one training and the other for testing. We implement a set of transformations on the images, including a horizontal flip, a random brightness change from -10\% to +10\%, random horizontal and vertical translations between -5\% and +5\%, random scaling between -20\% and +20\%, and a random rotation, which is between -10$^\circ$ and +10$^\circ$ for OCT images and between -30$^\circ$ and +30$^\circ$ for Fundus images. The rotation is only applied for images in the train dataset. Eventually, we get 5000 train images and 500 test images for each OCT abnormity, and 3000 train images and 300 test images for each fundus abnormity.
+	We separate the images, including generated images, into training and testing datasets. We implement a set of transformations on the images, including horizontal flips, random brightness changes from -10\% to +10\%, random horizontal and vertical translations between -5\% and +5\%, random scaling between -20\% and +20\%, and random rotations, which are between -10$^\circ$ and +10$^\circ$ for OCT images and between -30$^\circ$ and +30$^\circ$ for fundus images. The rotation is only applied to images in the train dataset. Eventually, we get 5000 train images and 500 test images for each OCT abnormity, and 3000 train images and 300 test images for each fundus abnormity.
 	
 	\subsection{Training}
 	
+	We 
+	
 	TEXT: intro to five-fold train/valid (reason for using this?)
-	
-	TEXT: starting point of fine-tuning
-	prevent overfitting
-	
 	TEXT: crossentropyloss, ADAM optimizer with LR 1e-3, batchSize 16, number of epochs...
 	conda, PyTorch;
 	desktop computer with Intel$^®$ Xeon$^®$ Platinum 8352V Processor, 256G of RAM and 2 NVIDIA GPU (GeForce RTX 4090) with 48 VRAM
