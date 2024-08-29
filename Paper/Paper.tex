@@ -389,7 +389,7 @@
 		\label{fig:A_tSNE}
 	\end{figure}
 	
-	We can use Grad-CAM to highlight areas on the image that make a large contribution to the final classification. If the model had been trained correctly, this would be equivalent to highlighting the abnormity. Fig.~\ref{fig:gradCAM} shows some examples. Furthermore, Grad-CAM can highlight a designated abnormity, so it may be able to highlight multiple abnormities on one image, as shown in Fig.~\ref{fig:gradCAM_multi_abnormity}. 
+	We can use Grad-CAM to highlight areas on the image that make a large contribution to the final classification \autocite{Selvaraju_Cogswell_Das_Vedantam_Parikh_Batra}. If the model had been trained correctly, this would be equivalent to highlighting the abnormity. Fig.~\ref{fig:gradCAM} shows some examples. Furthermore, Grad-CAM can highlight a designated abnormity, so it may be able to highlight multiple abnormities on one image, as shown in Fig.~\ref{fig:gradCAM_multi_abnormity}. 
 	
 	\begin{figure}[htbp]
 		\centering
@@ -407,7 +407,7 @@
 		\label{fig:gradCAM_multi_abnormity}
 	\end{figure}
 	
-	Fig.~\ref{fig:gradCAM_multi_abnormity} demonstrates that the Abnormity Models may be able to correctly identify multiple abnormities on an image. Knowning that OCT and fundus images often do include more than one abnormities, we employ a method to determine the codominant abnormities. We input an image to the Abnormity Models and get the abnormity probabilities vector, and we take the highest probability.   050AO78.017\%, 152AF71.889\%
+	Fig.~\ref{fig:gradCAM_multi_abnormity} demonstrates that the Abnormity Models may be able to correctly identify multiple abnormities on an image. Knowing that OCT and fundus images often do include more than one abnormity, we employ a method to determine the dominant abnormities. We input an image to the Abnormity Models and get the abnormity probabilities vector. If the abnormity with the highest probability has probability greater than 0.9, then we regard it as dominant; if not, we take the abnormity with the second high probability, and if the sum of the two probabilities is greater than 0.9, we regard them as codominant; we continue taking the abnormity with the next high probability until either the sum of probabilities reaches 0.9, or the number of abnormities reaches the maximum, which is 4.   050AO78.017\%, 152AF71.889\%
 	
 	\section{Diagnosis Model}
 	
