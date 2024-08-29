@@ -152,7 +152,7 @@
 	
 	\subsection{Data Preparation}
 	
-	First, we acquire data from publicly available online datasets. For abnormities with no data found, we search for images on Google Image. The numbers of images acquired from each data source are shown in Table~\ref{tb:OCT_source} and Table~\ref{tb:Fundus_source}. For the links of the images from Google Image, please refer to ``Appendix''. 
+	The images and labels used for training are mainly downloaded from public databases, but some abnormities are not included in these databases. For those abnormities, we use the search engine as an additional data source and search for images. The numbers of images acquired from each data source are shown in Table~\ref{tb:OCT_source} and Table~\ref{tb:Fundus_source}. As to the links of the images from the search engine, refer to ``Appendix''. 
 	
 	\begin{minipage}[t]{0.4\linewidth}
 		{
@@ -191,7 +191,7 @@
 					\item Few-shot
 					\vspace{-0.2cm}
 					
-					\item Google Image
+					\item Search engine
 					\vspace{-0.2cm}
 				\end{enumerate}
 				
@@ -241,7 +241,7 @@
 					\item EyePACS
 					\vspace{-0.2cm}
 					
-					\item Google Image
+					\item Search engine
 					\vspace{-0.2cm}
 					
 				\end{enumerate}
@@ -251,7 +251,7 @@
 		}
 	\end{minipage}
 	
-	Then, for OCT abnormities with less than 1000 images, we use Cycle-GAN to generate new images. We train a Cycle-GAN network to interconvert healthy and abnormity images, take out the generator that converts healthy to abnormity images, and use it to generate new abnormity images. We go through all generated images and adopt those that clearly display only the desired abnormities. The adoption rates are shown in Table~\ref{tb:cycleGAN_number}. We did not use Cycle-GAN to generate fundus images because generated fundus images are too blurry and do not show the desired abnormities.
+	For OCT abnormities with less than 1000 images, we use Cycle-GAN to generate new images. We train a Cycle-GAN network to interconvert healthy and abnormity images, take out the generator that converts healthy to abnormity images, and use it to generate new abnormity images. We go through all generated images and adopt those that clearly display only the abnormity of interest. The adoption rates are shown in Table~\ref{tb:cycleGAN_number}. Fundus images are not generated using Cycle-GAN because generated fundus images are too blurry; in addition, fundus abnormities are usually less salient than OCT ones and cannot be properly learned by Cycle-GAN, given that we only have a small number of fundus images.
 	
 	{
 		\fontsize{9}{12}\selectfont
@@ -273,11 +273,11 @@
 		}
 	}
 	
-	We separate the images, including generated images, into training and test datasets. We implement a set of transformations on the images, including horizontal flips, random brightness changes from -10\% to +10\%, random horizontal and vertical translations between -5\% and +5\%, random scaling between -20\% and +20\%, and random rotations, which are between -10$^\circ$ and +10$^\circ$ for OCT images and between -30$^\circ$ and +30$^\circ$ for fundus images. The rotation is only applied to images in the train dataset. Eventually, we get 5000 train images and 500 test images for each OCT abnormity, and 3000 train images and 300 test images for each fundus abnormity.
+	We separate the images, including generated images, into training and test datasets, and implement a set of transformations on the images, including horizontal flips, random brightness changes from -10\% to +10\%, random horizontal and vertical translations between -5\% and +5\%, random scaling between -20\% and +20\%, and random rotations, which are between -10$^\circ$ and +10$^\circ$ for OCT images and between -30$^\circ$ and +30$^\circ$ for fundus images. The rotation is only applied to images in the train dataset. Eventually, we get 5000 train images and 500 test images for each OCT abnormity, and 3000 train images and 300 test images for each fundus abnormity.
 	
 	\subsection{Training}
 	
-	We train the models on a desktop computer with Intel$^®$ Xeon$^®$ Platinum 8352V Processor, 256G of RAM and 2 NVIDIA GPU (GeForce RTX 4090) with 48 VRAM. The code is written with PyTorch in an Anaconda environment. For the link to the GitHub repository, please refer to ``Appendix''. We use cross entropy loss, ADAM optimizer with learning rate 0.001, and a batch size of 32. We perform five-fold cross-validation during training. 
+	We train the models on a desktop computer with Intel$^®$ Xeon$^®$ Platinum 8352V Processor, 256G of RAM and 2 NVIDIA GPU (GeForce RTX 4090) with 48 VRAM. The code is written with PyTorch in an Anaconda environment. For the link to the GitHub repository, refer to ``Appendix''. We use cross entropy loss, ADAM optimizer with learning rate 0.001, and a batch size of 32. We perform five-fold cross-validation during training. 
 	
 	For the Abnormity Models, we employ a strategy of transfer learning to finetuning. 
 	
@@ -303,7 +303,7 @@
 		\label{fig:AF_train}
 	\end{figure}
 	
-	We can observe that finetuning can significantly increase the model accuracy and, therefore, all the final models are finetuned models. As shown in Table~\ref{tb:A_accuracies}, the best CNN for OCT Model is ResNet50 and the best for Fundus Model is ResNet152. ResNet50 may have performed better than ResNet152 on OCT because it has fewer parameters and is less likely to overfit on OCT images, which has fewer and clearer traits; on the other hand, ResNet152 is better on fundus possibly because it has more parameters and can better discern the complex traits in fundus images. ResNet18 may have too few parameters, so it performs less well over all; and VGG16 sometimes experiences large dips in accuracy, possibly due to gradient vanishing, and this impairs its performance. Therefore, we will use ResNet50 for OCT Model and ResNet152 for Fundus Model. 
+	We can observe that finetuning significantly increases the model accuracy and, therefore, all the final models are finetuned models. As shown in Table~\ref{tb:A_accuracies}, the best CNN for OCT Model is ResNet50 and the best for Fundus Model is ResNet152. ResNet50 performed better than ResNet152 on OCT, possibly because it has fewer parameters and is less likely to overfit on OCT images, which has fewer and clearer traits; on the other hand, ResNet152 is better on fundus possibly because it has more parameters and can better discern the complex traits in fundus images. ResNet18 may have too few parameters, so it performs less well over all; and VGG16 sometimes experiences large dips in accuracy, possibly due to gradient vanishing, and this impairs its performance. Therefore, we will use ResNet50 for OCT Model and ResNet152 for Fundus Model. 
 	
 	{
 		\fontsize{9}{12}\selectfont
@@ -323,7 +323,6 @@
 			\end{table}
 		}
 	}
-	
 	
 	\subsection{Results}
 	
