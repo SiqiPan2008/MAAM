@@ -389,7 +389,7 @@
 		\label{fig:A_tSNE}
 	\end{figure}
 	
-	
+	We can use Grad-CAM to highlight areas on the image that make a large contribution to the final classification. If the model had been trained correctly, this would be equivalent to highlighting the abnormity. Fig.~\ref{fig:gradCAM} shows some examples. Furthermore, Grad-CAM can highlight a designated abnormity, so it may be able to highlight multiple abnormities on one image, as shown in Fig.~\ref{fig:gradCAM_multi_abnormity}. 
 	
 	\begin{figure}[htbp]
 		\centering
@@ -407,7 +407,7 @@
 		\label{fig:gradCAM_multi_abnormity}
 	\end{figure}
 	
-	Considering that one image 050AO78.017\%, 152AF71.889\%
+	Fig.~\ref{fig:gradCAM_multi_abnormity} demonstrates that the Abnormity Models may be able to correctly identify multiple abnormities on an image. Knowning that OCT and fundus images often do include more than one abnormities, we employ a method to determine the codominant abnormities. We input an image to the Abnormity Models and get the abnormity probabilities vector, and we take the highest probability.   050AO78.017\%, 152AF71.889\%
 	
 	\section{Diagnosis Model}
 	
