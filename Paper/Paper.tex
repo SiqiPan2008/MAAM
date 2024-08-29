@@ -261,43 +261,41 @@
 		}
 	\end{minipage}
 	
-	Then, for OCT abnormities with less than 1000 images, we use Cycle-GAN to generate new images. We train a Cycle-GAN network to interconvert healthy and abnormity images, take out the generator that converts healthy to abnormity images, and use it to generate new abnormity images. We manually eliminate generated images that look obviously wrong. The elimination rates are shown in Table~\ref{tb:cycleGAN_number}. We did not use Cycle-GAN to generate fundus images because generated fundus images are too blurry and do not display the desired abnormities.
+	Then, for OCT abnormities with less than 1000 images, we use Cycle-GAN to generate new images. We train a Cycle-GAN network to interconvert healthy and abnormity images, take out the generator that converts healthy to abnormity images, and use it to generate new abnormity images. We go through all generated images and adopt those that clearly display only the desired abnormities. The adoption rates are shown in Table~\ref{tb:cycleGAN_number}. We did not use Cycle-GAN to generate fundus images because generated fundus images are too blurry and do not show the desired abnormities.
 	
 	{
 		\fontsize{9}{12}\selectfont
 		{
 			\begin{longtable}{ccccc}
-				\caption{OCT images CycleGAN elimination rates}
+				\caption{OCT images CycleGAN adoption rates}
 				\label{tb:cycleGAN_number}\\
 				\toprule
-				Abnormity&Original&Generated&Eliminated&Elimination Rate\\
+				Abnormity&Original&Generated&Adopted&Adoption Rate\\
 				\midrule
-				CSC   &134&3000&1270&42.333\% \\
-				ERM   &19 &3000&1069&35.633\% \\
-				MH    &130&3000&1189&39.633\% \\
-				Mactel&29 &3000&1100&36.667\% \\
-				RP    &133&3000&1077&36.900\% \\
-				ST    &23 &3000&418 &13.933\% \\
+				CSC   &134&3000&1730&58.667\% \\
+				ERM   &19 &3000&1931&64.367\% \\
+				MH    &130&3000&1811&60.367\% \\
+				Mactel&29 &3000&1900&63.333\% \\
+				RP    &133&3000&1923&63.100\% \\
+				ST    &23 &3000&2572&86.067\% \\
 				\bottomrule
 			\end{longtable}
 		}
 	}
 	
-	We separate the images, including generated images, into training and testing datasets. We implement a set of transformations on the images, including horizontal flips, random brightness changes from -10\% to +10\%, random horizontal and vertical translations between -5\% and +5\%, random scaling between -20\% and +20\%, and random rotations, which are between -10$^\circ$ and +10$^\circ$ for OCT images and between -30$^\circ$ and +30$^\circ$ for fundus images. The rotation is only applied to images in the train dataset. Eventually, we get 5000 train images and 500 test images for each OCT abnormity, and 3000 train images and 300 test images for each fundus abnormity.
+	We separate the images, including generated images, into training and test datasets. We implement a set of transformations on the images, including horizontal flips, random brightness changes from -10\% to +10\%, random horizontal and vertical translations between -5\% and +5\%, random scaling between -20\% and +20\%, and random rotations, which are between -10$^\circ$ and +10$^\circ$ for OCT images and between -30$^\circ$ and +30$^\circ$ for fundus images. The rotation is only applied to images in the train dataset. Eventually, we get 5000 train images and 500 test images for each OCT abnormity, and 3000 train images and 300 test images for each fundus abnormity.
 	
 	\subsection{Training}
 	
 	We train the models on a desktop computer with Intel$^®$ Xeon$^®$ Platinum 8352V Processor, 256G of RAM and 2 NVIDIA GPU (GeForce RTX 4090) with 48 VRAM. The code is written with PyTorch in an Anaconda environment. For the link to the GitHub repository, please refer to ``Appendix''. We use cross entropy loss, ADAM optimizer with learning rate 0.001, and a batch size of 32. We perform five-fold cross-validation during training. 
 	
-	For both OCT and Fundus Models, we employ a strategy of transfer learning to finetuning. 
+	For the Abnormity Models, we employ a strategy of transfer learning to finetuning. 
 	
-	In the transfer learning phase, we use pretrained weights from ImageNet. We freeze the weights in all the convolutional layers and only allow the weights in the final FC layer to learn. We train the model for 100 epochs. Every 10 epochs, we save the weights of the model with the best validation accuracy. Of all the saved models, we find the model with the best overall performance on the validation and testing datasets, and start finetuning based on this model. 
+	In the transfer learning phase, we use pretrained weights from ImageNet. We freeze the weights in all the convolutional layers and only allow the weights in the final FC layer to learn. We train the model for 100 epochs. Every 10 epochs, we save the weights of the model with the best validation accuracy. For all the saved models, we calculate a overall accuracy, which is the weighted average of validation and test accuracy, to find the model with the best overall performance on the validation and test datasets, and start finetuning based on this model. 
 	
-	In the finetuning phase, we start on the best model in the transfer learning phase, unfreezing all weights in the model. We train the model for 30 epochs. Similarly, we save the weights of the model with the best validation accuracy every 10 epochs, and find the model with the best overall performance. Finally, we compare the performance of the best model in the transfer learning phase and the best one in the finetuning phase to determine the final model. 
+	In the finetuning phase, we start on the best model in the transfer learning phase, unfreezing all weights in the model. We train the model for 30 epochs. Similarly, we save the weights of the model with the best validation accuracy every 10 epochs, and find the model with the highest overall accuracy. Finally, we compare the overall accuracies of the best model in the transfer learning phase and the finetuning phase to determine the final model. 
 	
-	For OCT
-	
-	The accuracies and losses during training and validation phases are shown in Fig.~\ref{fig:AO_train} and Fig.~\ref{fig:AF_train}. 
+	For both OCT and Fundus Models, we trained 4 commonly used CNNs: ResNet152, ResNet50, ResNet18, and VGG16. The accuracies and losses during training and validation phases are shown in Fig.~\ref{fig:AO_train} and Fig.~\ref{fig:AF_train} for all of the CNNs. 
 	
 	\begin{figure}[htbp]
 		\centering
@@ -315,9 +313,27 @@
 		\label{fig:AF_train}
 	\end{figure}
 	
-	Graph bar chart for comparison? 
 	
-	TEXT: comments
+	
+	{
+		\fontsize{9}{12}\selectfont
+		{
+			\begin{table}
+				\centering
+				\caption{Validation accuracies}
+				\label{tb:A_accuracies}
+				\begin{tabular}{ccccc}
+					\toprule
+					Model&ResNet152&ResNet50&ResNet18&VGG16\\
+					\midrule
+					OCT Model   &91.906\%&\textbf{92.183\%}&91.011\%&89.744\% \\
+					Fundus Model&\textbf{89.111\%}&88.926\%&86.605\%&79.185\% \\
+					\bottomrule
+				\end{tabular}
+			\end{table}
+		}
+	}
+	
 	
 	\subsection{Results}
 	

@@ -41,6 +41,7 @@ def get_loss_and_acc(net_name, type, starting_epoch = 0):
     train_losses = [float(row[4]) for row in train_rs]
     epoch_test = [int(row[0]) + starting_epoch for row in test_rs]
     test_acc = [float(row[3]) for row in test_rs]
+    combined_acc = [(test_acc[i] + 2 * valid_acc[epoch_train.index(epoch_test[i])]) / 3 for i in range(len(epoch_test))]
     
     return {
         "epoch train": epoch_train,
@@ -51,7 +52,8 @@ def get_loss_and_acc(net_name, type, starting_epoch = 0):
         "epoch test": epoch_test,
         "test acc": test_acc,
         "best epoch": best_epoch,
-        "best acc": best_acc
+        "best acc": best_acc,
+        "combined acc": combined_acc
     }
 
 def plot_loss_and_acc_alt(): # (2x1) x (2x2) x (2x1)
