@@ -12,6 +12,7 @@
 \usepackage{booktabs}
 \usepackage{algorithm}
 \usepackage{algpseudocode}
+\usepackage{enumitem}
 \usepackage[style=ieee,sorting=nyt]{biblatex}
 \assignrefcontextentries[]{*}
 \addbibresource{References.bib}
@@ -103,7 +104,7 @@
 		\label{fig:fundus_abnormities}
 	\end{figure}
 	
-	The Abnormity Models also contain 2 submodels: the OCT Model and the Fundus Model, which classify OCT and fundus abnormities, respectively. Both of the submodels leverage CNNs with modified final fully-connected (FC) layers. We compare the performances of 4 commonly used CNNs, ResNet152, ResNet50, ResNet18\autocite{He_Zhang_Ren_Sun_2016} and VGG16\autocite{Simonyan_Zisserman_2015}, and choose the best one for each submodel. The final FC layer in each CNN is modified so that the size of its output vector is equal to the number of OCT or fundus abnormities. In order to normalize the output vector, we perform the softmax operation. Each submodel outputs a probability vector for all the abnormities.
+	The Abnormity Models also contain 2 submodels: the OCT Model and the Fundus Model, which classify OCT and fundus abnormities, respectively. Both of the submodels leverage CNNs with modified final fully-connected (FC) layers. We compare the performances of 4 commonly used CNNs, ResNet152, ResNet50, ResNet18 \autocite{He_Zhang_Ren_Sun_2016} and VGG16 \autocite{Simonyan_Zisserman_2015}, and choose the best one for each submodel. The final FC layer in each CNN is modified so that the size of its output vector is equal to the number of OCT or fundus abnormities. In order to normalize the output vector, we perform the softmax operation. Each submodel outputs a probability vector for all the abnormities.
 	
 	\vspace{0.5cm}
 	
@@ -149,7 +150,7 @@
 	
 	\subsection{Data Preparation}
 	
-	The images and labels used for training are mainly downloaded from public databases, but some abnormities are not included in these databases. For those abnormities, we use the search engine as an additional data source and search for images. The numbers of images acquired from each data source are shown in Table~\ref{tb:OCT_source} and Table~\ref{tb:Fundus_source}. As to the links of the images from the search engine, refer to ``Appendix''. 
+	The images and labels used for training are mainly downloaded from public databases, but some abnormities are not included in these databases. For those abnormities, we use the search engine as an additional data source to get images. The numbers of images acquired from each data source are shown in Table~\ref{tb:OCT_source} and Table~\ref{tb:Fundus_source}. As to the links of the images from the search engine, refer to ``Appendix''. 
 	
 	\begin{minipage}[t]{0.4\linewidth}
 		{
@@ -179,13 +180,13 @@
 				
 				\vspace{0.5cm}
 				\begin{enumerate}
-					\item Normal Disease Database
+					\item Normal Disease Database \autocite{Kermany_database}
 					\vspace{-0.2cm}
 					
-					\item OpenICPSR
+					\item OCTID \autocite{Gholami_Roy_Parthasarathy_Lakshminarayanan_2020}
 					\vspace{-0.2cm}
 					
-					\item Few-shot
+					\item Few-shot \autocite{Yoo_2020}
 					\vspace{-0.2cm}
 					
 					\item Search engine
@@ -221,21 +222,21 @@
 				\end{longtable}
 				
 				\vspace{1cm}
-				\begin{enumerate}
+				\begin{enumerate}[left=1.5cm]
 					
-					\item E-ophtha
+					\item E-ophtha \autocite{E_ophtha}.
 					\vspace{-0.2cm}
 					
-					\item Kaggle1000
+					\item Kaggle1000 \autocite{1000Fundus_Pytorch_TransferLearning}
 					\vspace{-0.2cm}
 					
-					\item HRF
+					\item HRF \autocite{HRF_2013}
 					\vspace{-0.2cm}
 					
-					\item STARE
+					\item STARE \autocite{STARE}
 					\vspace{-0.2cm}
 					
-					\item EyePACS
+					\item EyePACS \autocite{DR_dataset}
 					\vspace{-0.2cm}
 					
 					\item Search engine
@@ -248,7 +249,7 @@
 		}
 	\end{minipage}
 	
-	For OCT abnormities with less than 1000 images, we use Cycle-GAN\autocite{Zhu_Park_Isola_Efros_2020} to generate new images. We train a Cycle-GAN network to interconvert healthy and abnormity images, take out the generator that converts healthy to abnormity images, and use it to generate new abnormity images. We go through all generated images and adopt those that clearly display only the abnormity of interest. The adoption rates are shown in Table~\ref{tb:cycleGAN_number}. Fundus images are not generated using Cycle-GAN because generated fundus images are too blurry; in addition, fundus abnormities are usually less salient than OCT ones and cannot be properly learned by Cycle-GAN, given that we only have a small number of fundus images.
+	For OCT abnormities with less than 1000 images, we use Cycle-GAN \autocite{Zhu_Park_Isola_Efros_2020} to generate new images. We train a Cycle-GAN network to interconvert healthy and abnormity images, take out the generator that converts healthy to abnormity images, and use it to generate new abnormity images. We go through all generated images and adopt those that clearly display only the abnormity of interest. The adoption rates are shown in Table~\ref{tb:cycleGAN_number}. Fundus images are not generated using Cycle-GAN because generated fundus images are too blurry; in addition, fundus abnormities are usually less salient than OCT ones and cannot be properly learned by Cycle-GAN, given that we only have a small number of fundus images.
 	
 	{
 		\fontsize{9}{12}\selectfont
@@ -389,7 +390,7 @@
 		\label{fig:A_tSNE}
 	\end{figure}
 	
-	We can use Grad-CAM to highlight areas on the image that make a large contribution to the final classification \autocite{Selvaraju_Cogswell_Das_Vedantam_Parikh_Batra}. If the model had been trained correctly, this would be equivalent to highlighting the abnormity. Fig.~\ref{fig:gradCAM} shows some examples. Furthermore, Grad-CAM can highlight a designated abnormity, so it may be able to highlight multiple abnormities on one image, as shown in Fig.~\ref{fig:gradCAM_multi_abnormity}. 
+	We can use Grad-CAM \autocite{Selvaraju_Cogswell_Das_Vedantam_Parikh_Batra} to highlight areas on the image that make a large contribution to the final classification. If the model had been trained correctly, this would be equivalent to highlighting the abnormity. Fig.~\ref{fig:gradCAM} shows some examples. Furthermore, Grad-CAM can highlight a designated abnormity, so it may be able to highlight multiple abnormities on one image, as shown in Fig.~\ref{fig:gradCAM_multi_abnormity}. 
 	
 	\begin{figure}[htbp]
 		\centering
