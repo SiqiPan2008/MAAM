@@ -48,7 +48,7 @@
 	TEXT: abstract
 	
 	\section{Background}
-	Ocular diseases can be diagnosed through various methods, including using optical coherence tomography (OCT) and color fundus images. Ophthalmologists usually identify ocular abnormalities to deduce the disease. Traditionally, the diagnosis primarily depends on the professional experience and knowledge of the ophthalmologists, which may result in high misdiagnosis rate and under-utilization of medical data. With the widespread application of artificial intelligence (AI), deep learning (DL) has made great contributions in providing support to patients in remote areas by sharing expert knowledge \autocite{Ichhpujani_Thakur_2021}. By leveraging DL, researchers have developed auxiliary diagnosis programs to help ophthalmologists in the process. Many studies use convolutional neural network (CNN) to analyze ocular images. Some commonly used CNNs are VGG, ResNet, and Inception \autocite{daich2023artificial}. And for segmenting images and finding abnormalities, U-net is widely used \autocite{Ronneberger_Fischer_Brox_2015}. With regards to training CNNs, most studies use transferred learning, which consists of three steps: learning, fine-tuning, and validation.
+	Ocular diseases can be diagnosed through various methods, including using optical coherence tomography (OCT) and color fundus images. Ophthalmologists usually identify ocular abnormalities to deduce the disease. Traditionally, the diagnosis primarily depends on the professional experience and knowledge of the ophthalmologists, which may result in high misdiagnosis rate and under-utilization of medical data. With the widespread application of artificial intelligence (AI), deep learning (DL) has made great contributions in providing support to patients in remote areas by sharing expert knowledge \autocite{Ichhpujani_Thakur_2021}. By leveraging DL, researchers have developed auxiliary diagnosis programs to help ophthalmologists in the process. Many studies use convolutional neural networks (CNNs) to analyze ocular images. Some commonly used CNNs are VGG, ResNet, and Inception \autocite{daich2023artificial}. And for segmenting images and finding abnormalities, U-net is widely used \autocite{Ronneberger_Fischer_Brox_2015}. With regards to training CNNs, most studies use transferred learning, which consists of three steps: learning, fine-tuning, and validation.
 	
 	Some studies directly predict the disease from OCT images.
 	\authyear{li2019deep} used ResNet to analyze OCT images and distinguish between choroidal neovascularization (CNV), diabetic macular edema (DME), drusen, and healthy eyes. In addition, they performed occlusion testing to find out the regions that are the most important in diagnosis \autocite{li2019deep}. 
@@ -334,10 +334,11 @@
 	
 	Table~\ref{tb:OCT_test} and Table~\ref{tb:Fundus_test} show the predictive values on the test dataset. Fig.~\ref{fig:A_ROC} shows the ROCs, Fig.~\ref{fig:A_conf_mat} shows the confusion matrices and Fig.~\ref{fig:A_tSNE} shows the t-SNE graphs for each abnormity.
 	
-	The OCT Model tends to be overfitting, while the Fundus Model cannot reach a satisfying level in terms of DL. Overall, the performance of the OCT Model is significantly better than that of the Fundus Model.
+	The OCT Model tends to overfit, while the Fundus Model cannot reach a satisfying level in terms of DL. Overall, the performance of the OCT Model is significantly better than that of the Fundus Model.
 	
-	Fundus abnormities tend to be less prominent than those of OCT, since the abnormity in fundus image are usually quite small and scattered. Moreover, one fundus image usually contains more than one abnormity, while most OCT images contain only one abnormity on each image. Also given that we have less fundus images than OCT ones, the difficulties for fundus classification increases.
+	Fundus abnormities tend to be less prominent than those of OCT, since the abnormity in fundus image are usually quite small and scattered. Moreover, one fundus image usually contains more than one abnormity, while most OCT images contain only one abnormity per image. Also, given that we have fewer fundus images than OCT ones, the difficulties for fundus classification increases.
 	
+	In order to allow the Abnormity Models to identify multiple abnormities in one image, we employ a method to determine the codominant abnormities. We input an image to the Abnormity Models and get the abnormity probabilities vector. If the abnormity with the highest probability has probability greater than 0.9, it is regarded as dominant; if not, we continue taking the abnormity with the next high probability until either the sum of the probabilities of the chosen abnormities reaches 0.9, or the number of abnormities reaches the maximum, which is 4, and all the chosen abnormities are regarded as codominant. 
 	
 	\begin{table}[htbp]
 		\centering
@@ -401,7 +402,9 @@
 		\label{fig:A_tSNE}
 	\end{figure}
 	
-	We can use Grad-CAM \autocite{Selvaraju_Cogswell_Das_Vedantam_Parikh_Batra} to highlight areas on the image that make a large contribution to the final classification. If the model had been trained correctly, this would be equivalent to highlighting the abnormity. Fig.~\ref{fig:gradCAM} shows some examples. Furthermore, Grad-CAM can highlight a designated abnormity, so it may be able to highlight multiple abnormities on one image, as shown in Fig.~\ref{fig:gradCAM_multi_abnormity}. 
+	We can use Grad-CAM \autocite{Selvaraju_Cogswell_Das_Vedantam_Parikh_Batra} to highlight areas on the image that make a large contribution to the final classification. If the model had been trained correctly, this would be equivalent to highlighting the abnormity. In Fig.~\ref{fig:gradCAM}, the left image in each pair of images is the original OCT or Fundus image, and the right one is the image with the abnormity correctly highlighted with Grad-CAM. 
+	
+	Furthermore, Grad-CAM can highlight any designated abnormity, so it can be used to highlight codominant abnormities. In Fig.~\ref{fig:gradCAM_multi_abnormity}, the middle images are the original OCT and fundus images. In the images on the left and right, respectively, the ground truth abnormity and its codominant abnormity are highlighted with Grad-CAM. 
 	
 	\begin{figure}[htbp]
 		\centering
@@ -418,10 +421,6 @@
 		\vspace{0.3cm}
 		\label{fig:gradCAM_multi_abnormity}
 	\end{figure}
-	
-	Fig.~\ref{fig:gradCAM_multi_abnormity} demonstrates that the Abnormity Models may be able to correctly identify multiple abnormities on an image. Knowing that OCT and fundus images often do include more than one abnormity, we employ a method to determine the codominant abnormities. We input an image to the Abnormity Models and get the abnormity probabilities vector. If the abnormity with the highest probability has probability greater than 0.9, it is regarded as dominant; if not, we continue taking the abnormity with the next high probability until either the sum of the probabilities of the chosen abnormities reaches 0.9, or the number of abnormities reaches the maximum, which is 4, and all the chosen abnormities are regarded as codominant. 
-	
-	This codominant abnormities method allows the Abnormity Models to identify multiple abnormities. For example, the fundus image in Fig.~\ref{fig:gradCAM_multi_abnormity} only has ground truth label ``HE'', but the Fundus Model correctly predicts that it has codominant abnormities ``HE'' and ``HM''. 
 	
 	\section{Diagnosis Model}
 	
