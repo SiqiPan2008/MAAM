@@ -332,7 +332,7 @@
 	
 	\subsection{Results}
 	
-	Table~\ref{tb:OCT_test} and Table~\ref{tb:Fundus_test} show the predictive values obtained when the Abnormity Models are tested on the test dataset. Fig.~\ref{fig:A_ROC} shows the ROCs of each abnormity. From the tables and the figure, we can see that the performance of the OCT Model is significantly better than that of the Fundus Model, likely because fundus abnormities tend to be subtler and there are more fundus images that have multiple abnormities. 
+	Table~\ref{tb:OCT_test} and Table~\ref{tb:Fundus_test} show the predictive values on the test dataset. Fig.~\ref{fig:A_ROC} shows the ROCs of each abnormity. The results show that the performance of the OCT Model is significantly better than that of the Fundus Model. Fundus abnormities tend to be less prominent, since the abnormity on fundus image are usually quite small and scattered. Moreover, one fundus image usually contains more than one abnormities, while most OCT images contain only one abnormity on each image. Also given that we have less fundus images than OCT ones, the difficulties for fundus classification increases.
 	
 	\begin{table}[htbp]
 		\centering
@@ -380,7 +380,7 @@
 		\label{fig:A_ROC}
 	\end{figure}
 	
-	We can further confirm that overlapping abnormities have a large impact by looking at the confusion matrices (Fig.~\ref{fig:A_conf_mat}) and the t-SNE graphs (Fig.~\ref{fig:A_tSNE}). During training, most of the abnormities are well-separated. However, this is not the case during testing. On the t-SNE graph, the OCT Model still shows clear separation of clusters, many of which, however, are mingled with data points that do not belong to the cluster. This may be because some OCT abnormities resemble each other. For example, ``IF'', ``DME'' and ``Mactel'' may look very similar. As to the Fundus Model, there are fewer small distinct clusters and there is a large cluster instead. This is likely due to the fact that many fundus images contain multiple abnormities. For example, a patient with the disease ``rDR'' shows the abnormities ``CWP'', ``HE'', ``HM'' and ``VA''. Therefore, many abnormities tend to appear together, impeding classification of abnormities. 
+	The confusion matrices are shown in Fig.~\ref{fig:A_conf_mat}) and the t-SNE graphs are shown in Fig.~\ref{fig:A_tSNE}. During training, most of the abnormities are well-separated. However, this is not the case during testing. On the t-SNE graph, the OCT Model still shows clear separation of clusters, many of which, however, are mingled with data points that do not belong to the cluster. This is because some OCT abnormities resemble each other. For example, ``IF'', ``DME'' and ``Mactel'' may look very similar. As to the Fundus Model, there are fewer small distinct clusters and there is a large cluster instead. This is likely due to the fact that many fundus images contain multiple abnormities. For example, a patient with the disease ``rDR'' shows the abnormities ``CWP'', ``HE'', ``HM'' and ``VA''. Therefore, many abnormities tend to appear together, impeding classification of abnormities. 
 	
 	\begin{figure}[htbp]
 		\centering
