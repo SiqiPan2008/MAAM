@@ -47,14 +47,11 @@
 	TEXT: abstract
 	
 	\section{Background}
-	
-	TEXT: Edit background
-	
-	Ocular diseases can be diagnosed through various methods, including using optical coherence tomography (OCT) and color fundus images. Ophthalmologists usually identify ocular abnormalities to deduce the disease. Traditionally, the diagnosis primarily depends on the professional experience and knowledge of the ophthalmologists, which may result in high misdiagnosis rate and under-utilization of medical data. With the widespread application of artificial intelligence (AI), deep learning (DL) has made great contributions in providing support to patients in remote areas by sharing expert knowledge \autocite{Ichhpujani_Thakur_2021}. By leveraging DL, researchers have developed auxiliary diagnosis programs to help ophthalmologists in the process. Many studies use convolutional neural network (CNN) to analyze ocular images. Some commonly used CNNs are VGG, ResNet, and Inception \autocite{daich2023artificial}. And for segmenting images and finding abnormalities, U-net is widely used \autocite{Ronneberger_Fischer_Brox_2015}. In training CNNs, most studies use transferred learning, which consists of three steps: learning, fine-tuning, and validation.
+	Ocular diseases can be diagnosed through various methods, including using optical coherence tomography (OCT) and color fundus images. Ophthalmologists usually identify ocular abnormalities to deduce the disease. Traditionally, the diagnosis primarily depends on the professional experience and knowledge of the ophthalmologists, which may result in high misdiagnosis rate and under-utilization of medical data. With the widespread application of artificial intelligence (AI), deep learning (DL) has made great contributions in providing support to patients in remote areas by sharing expert knowledge \autocite{Ichhpujani_Thakur_2021}. By leveraging DL, researchers have developed auxiliary diagnosis programs to help ophthalmologists in the process. Many studies use convolutional neural network (CNN) to analyze ocular images. Some commonly used CNNs are VGG, ResNet, and Inception \autocite{daich2023artificial}. And for segmenting images and finding abnormalities, U-net is widely used \autocite{Ronneberger_Fischer_Brox_2015}. With regards to training CNNs, most studies use transferred learning, which consists of three steps: learning, fine-tuning, and validation.
 	
 	Some studies directly predict the disease from OCT images.
-	\authyear{li2019deep} used ResNet to analyze OCT images and distinguish between choroidal neovascularization (CNV), diabetic macular edema (DME), drusen, and normal eyes. In addition, they performed occlusion testing to find out the regions that are the most important in diagnosis \autocite{li2019deep}. 
-	\authyear{yoo2021feasibility} used generative adversarial network (GAN) and Inception-v3 together with a few-shot dataset to investigate the feasibility of improving OCT diagnosis of rare ocular diseases \autocite{yoo2021feasibility}. They cleverly handled the issues of training image shortage and data imbalance by creating ocular disease OCT images from healthy OCT images. \authyear{Kermany2018} conducts medical diagnosis and identifies treatable diseases by image-based deep learning. They also provided a widely used database including more than one hundred thousand OCT labeled images for 3 diseases \autocite{Kermany2018}.
+	\authyear{li2019deep} used ResNet to analyze OCT images and distinguish between choroidal neovascularization (CNV), diabetic macular edema (DME), drusen, and healthy eyes. In addition, they performed occlusion testing to find out the regions that are the most important in diagnosis \autocite{li2019deep}. 
+	\authyear{yoo2021feasibility} used generative adversarial network (GAN) and Inception-v3 together with a few-shot dataset to investigate the feasibility of improving OCT diagnosis of rare ocular diseases \autocite{yoo2021feasibility}. They handled the issues of training image shortage and data imbalance by creating ocular disease OCT images from healthy OCT images. \authyear{Kermany2018} conducts medical diagnosis and identifies treatable diseases by image-based deep learning. They also provided a widely used database including more than one hundred thousand OCT labeled images for 3 diseases \autocite{Kermany2018}.
 	
 	Some other studies can identify ocular abnormalities from annotated OCT images.
 	\authyear{camino2018deep} used DL to identify the region of preserved photoreceptors on \textit{en face} OCT in choroideremia and retinitis pigmentosa (RP) \autocite{camino2018deep}. 
@@ -74,7 +71,7 @@
 	
 	\section{Overview}
 	
-	We develop the Multimodal Abnormity-Aware Model (MAAM) to aid ophthalmologists in diagnosing ocular diseases. It considers both OCT and color fundus image inputs. In addition, it simulates the decision-making process of ophthalmologists when they examine patients, i.e., first identifying the abnormities, and then deducing the disease. The model is designed in a way that partly opens up the ``black box'' of DL and presents more interpretable information for the reference of ophthalmologists. 
+	We develop the Multimodal Abnormity-Aware Model (MAAM) to aid ophthalmologists in diagnosing ocular diseases. It considers both OCT and color fundus image inputs. In addition, it simulates the decision-making process of ophthalmologists when they examine patients, namely, first identifying the abnormities, and then deducing the disease. The model is designed in a way that partly opens up the ``black box'' of DL and presents more interpretable information to ophthalmologists for the reference. 
 	
 	\begin{figure}[htbp]
 		\centering
@@ -84,11 +81,11 @@
 		\label{fig:3_parts}
 	\end{figure}
 	
-	The structure of the MAAM is shown in Fig.~\ref{fig:3_parts}. It consists of 2 submodels: the Abnormity Models and the Diagnosis Model. We input multiple OCT and fundus images to the Abnormity Models, and output the classification of abnormities as inputs to the Diagnosis Model, which generates disease probabilities as the final result.
+	The structure of the MAAM is shown in Fig.~\ref{fig:3_parts}. It consists of 2 submodels: the Abnormity Model and the Diagnosis Model. We input multiple OCT and fundus images to the Abnormity Models, and output the classification of abnormities as an input to the Diagnosis Model, which yields disease probabilities as the final result.
 	
 	\vspace{0.5cm}
 	
-	The Abnormity Models are classifiers for abnormities, which are symptoms that can be directly observed in the images. The MAAM identifies 11 OCT abnormities and 8 Fundus abnormities, as shown in Fig.~\ref{fig:OCT_abnormities} and Fig.~\ref{fig:fundus_abnormities}. Also refer to ``Appendix'' for more details.
+	The Abnormity Models are de facto classifiers for abnormities, which are symptoms that can be directly observed in the images. The MAAM identifies 11 OCT abnormities and 8 Fundus abnormities, as shown in Fig.~\ref{fig:OCT_abnormities} and Fig.~\ref{fig:fundus_abnormities}. The abbreviations and detail information of abnormities and diseases are tabulated in ``Appendix''.
 	
 	\begin{figure}[htbp]
 		\centering
@@ -106,7 +103,7 @@
 		\label{fig:fundus_abnormities}
 	\end{figure}
 	
-	The Abnormity Models also contain 2 submodels: the OCT Model and the Fundus Model, which identify OCT and fundus abnormities, respectively. Both of the submodels leverage CNNs with modified final fully-connected (FC) layers. We compare the performances of 4 commonly used CNNs, ResNet152, ResNet50, ResNet18 and VGG16, and choose the best one for each submodel. The final FC layer in each CNN is modified so that the size of its output vector is equal to the number of OCT or fundus abnormities. In order to normalize the output vector, we perform the softmax operation. After an image is inputted into one of the submodels, the submodel returns a probability vector for all the abnormities.
+	The Abnormity Models also contain 2 submodels: the OCT Model and the Fundus Model, which classify OCT and fundus abnormities, respectively. Both of the submodels leverage CNNs with modified final fully-connected (FC) layers. We compare the performances of 4 commonly used CNNs, ResNet152, ResNet50, ResNet18 and VGG16, and choose the best one for each submodel. The final FC layer in each CNN is modified so that the size of its output vector is equal to the number of OCT or fundus abnormities. In order to normalize the output vector, we perform the softmax operation. Each submodel outputs a probability vector for all the abnormities.
 	
 	\vspace{0.5cm}
 	
@@ -114,9 +111,9 @@
 	
 	\vspace{0.2cm}
 	
-	In Stage D1, we determine the severity level for each disease from the probability vectors from the Abnormity Models. We use Abnormity-to-Disease Deduction Criteria (shown in Fig.~\ref{fig:criteria}) as ground truth. There are multiple submodels in Stage D1 and each one corresponds to one disease. From the deduction criteria, we determine the number of abnormities for one disease and use the number to define the severity levels. For example, there are totally 5 abnormities that are present in the disease ``rDR'': OCT abnormity ``DME'' and Fundus abnormities ``HM'', ``VA'', ``MA'', and ``CWP''. Therefore, taking into account the healthy status, we end up with 6 severity levels for disease ``Referable DR''.
+	In Stage D1, we determine the severity level for each disease from the probability vectors from the Abnormity Models. We use Abnormity-to-Disease Deduction Criteria (shown in Fig.~\ref{fig:criteria}) as ground truth. There are multiple submodels in Stage D1 and each one corresponds to one disease. Based on the deduction criteria, we determine the number of abnormities for one disease and use the number to define the severity levels. For example, there are totally 5 abnormities that are present in the disease ``rDR'': OCT abnormity ``DME'' and Fundus abnormities ``HM'', ``VA'', ``MA'', and ``CWP''. Therefore, taking into account the healthy status, we end up with 6 severity levels for disease ``rDR''.
 
-	We use the fused vector as an input for each submodels in Stage D1, and have the vector pass a FC layer with softmax operation to generate severity level probability vectors.
+	We use the fused vector as an input for each submodels in Stage D1, and have the vector go through a FC layer with softmax operation to yield severity level probability vectors.
 	
 	\begin{figure}[htbp]
 		\centering
@@ -128,11 +125,11 @@
 
 	\vspace{0.2cm}
 	
-	In Stage D2, we determine the final disease probability vector. Similarly we use a fused vector from the outputs of submodels in Stage D1, and have the vector pass a FC layer with softmax operation. The result presents potential diseases that can be referenced by ophthalmologists.
+	In Stage D2, we determine the final disease probability vector. Similarly, we use a fused vector from the outputs of submodels in Stage D1, and have the vector go through a FC layer with softmax operation. The result presents potential diseases that can be referenced by ophthalmologists.
 
 	\vspace{0.5cm}
 	
-	In the MAAM, we leverage the fusion operation to incorporate all the results from different submodels. As shown in Fig.~\ref{fig:fusion}, there are 3 fusion operations in MAAM.
+	In the MAAM, we leverage the fusion operation to incorporate all the results from different submodels. As shown in Fig.~\ref{fig:fusion}, there are totally 3 fusion operations in MAAM.
 	
 	\begin{figure}[htbp]
 		\centering
@@ -142,7 +139,7 @@
 		\label{fig:fusion}
 	\end{figure}
 
-	The first fusion occurs at the output of OCT Model or Fundus Model. In real cases, multiple OCT and Fundus images can be used for ocular disease diagnosis. Each image goes through one of the Abnormity Models and generates a probability vector. To use the probability results from all the images, a maximization fusion is implemented for all the vectors so that the fusion yields one OCT abnormity probability vector and one Fundus abnormity probability vector with maximum values.
+	The first fusion occurs at the output of OCT Model or Fundus Model. In real scenarios, multiple OCT and Fundus images can be used for ocular disease diagnosis. Each image goes through either the OCT Model or the Fundus Model to yield a probability vector. To use the probability results from all the images, a maximization fusion is implemented for all the vectors so that the fusion yields one OCT abnormity probability vector and one Fundus abnormity probability vector with maximum values.
 	
 	The second fusion occurs at the interface between Abnormity Model and Stage D1. A concatenation fusion is implemented for OCT abnormity probability vector and Fundus abnormity probability vector. The fused vector works as an input to all the submodels in Stage D1.
 	
