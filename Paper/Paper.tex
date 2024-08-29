@@ -114,7 +114,7 @@
 	
 	\vspace{0.2cm}
 	
-	In Stage D1, we determine the severity level for each disease from the probability vectors from the Abnormity Models. We use Abnormity-to-Disease Deduction Criteria (shown in Fig.~\ref{fig:criteria}) as ground truth. There are multiple submodels in Stage D1 and each one corresponds to one disease. From the deduction criteria, we determine the number of abnormities for one disease and use the number to define the severity levels. For example, there are totally 5 abnormities that are present in the disease ``Referable DR'': OCT abnormity ``DME'' and Fundus abnormities ``Hemorrhage'', ``Vascular Abnormity'', ``Microaneurysm'', and ``Cotton Wool Patch''. Therefore, taking into account the healthy status, we end up with 6 severity levels for disease ``Referable DR''.
+	In Stage D1, we determine the severity level for each disease from the probability vectors from the Abnormity Models. We use Abnormity-to-Disease Deduction Criteria (shown in Fig.~\ref{fig:criteria}) as ground truth. There are multiple submodels in Stage D1 and each one corresponds to one disease. From the deduction criteria, we determine the number of abnormities for one disease and use the number to define the severity levels. For example, there are totally 5 abnormities that are present in the disease ``rDR'': OCT abnormity ``DME'' and Fundus abnormities ``HM'', ``VA'', ``MA'', and ``CWP''. Therefore, taking into account the healthy status, we end up with 6 severity levels for disease ``Referable DR''.
 
 	We use the fused vector as an input for each submodels in Stage D1, and have the vector pass a FC layer with softmax operation to generate severity level probability vectors.
 	
@@ -287,12 +287,17 @@
 	
 	\subsection{Training}
 	
-	We 
+	We train the models on a desktop computer with Intel$^®$ Xeon$^®$ Platinum 8352V Processor, 256G of RAM and 2 NVIDIA GPU (GeForce RTX 4090) with 48 VRAM. The code is written with PyTorch in an Anaconda environment. For the link to the GitHub repository, please refer to ``Appendix''. We use cross entropy loss, ADAM optimizer with learning rate 0.001, and a batch size of 32. We perform five-fold cross-validation during training. 
 	
-	TEXT: intro to five-fold train/valid (reason for using this?)
-	TEXT: crossentropyloss, ADAM optimizer with LR 1e-3, batchSize 16, number of epochs...
-	conda, PyTorch;
-	desktop computer with Intel$^®$ Xeon$^®$ Platinum 8352V Processor, 256G of RAM and 2 NVIDIA GPU (GeForce RTX 4090) with 48 VRAM
+	For both OCT and Fundus Models, we employ a strategy of transfer learning to finetuning. 
+	
+	In the transfer learning phase, we use pretrained weights from ImageNet. We freeze the weights in all the convolutional layers and only allow the weights in the final FC layer to learn. We train the model for 100 epochs. Every 10 epochs, we save the weights of the model with the best validation accuracy. Of all the saved models, we find the model with the best overall performance on the validation and testing datasets, and start finetuning based on this model. 
+	
+	In the finetuning phase, we start on the best model in the transfer learning phase, unfreezing all weights in the model. We train the model for 30 epochs. Similarly, we save the weights of the model with the best validation accuracy every 10 epochs, and find the model with the best overall performance. Finally, we compare the performance of the best model in the transfer learning phase and the best one in the finetuning phase to determine the final model. 
+	
+	For OCT
+	
+	The accuracies and losses during training and validation phases are shown in Fig.~\ref{fig:AO_train} and Fig.~\ref{fig:AF_train}. 
 	
 	\begin{figure}[htbp]
 		\centering
