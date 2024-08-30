@@ -3,6 +3,8 @@ import os
 import matplotlib.pyplot as plt
 from Utils import utils
 
+# Add D2 accuracy with codominant method
+
 def plot_acc_barchart():
     setting = utils.get_setting()
     csv_file_path = os.path.join(setting.D1_folder, "000D1TORS.csv")

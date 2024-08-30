@@ -7,6 +7,3 @@ II: TR: train data; TO: test other data; TI: test inside of train data
 TT: RS - acc/... result; WT - weight; MR - model results
 [Additional]: TdddDDD = Temporary transfer learning best model from epoch ddd to epoch DDD
               Tddd = model at epoch ddd; this is the best transfer learning model in a certain epoch range
-
-TODO:
-* learn about cycleGAN, gradCAM, ResNet, VGG, tSNE, numerical results
