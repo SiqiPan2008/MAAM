@@ -532,10 +532,13 @@
 	
 	\vspace{0.3cm}
 	
-	Fundus 103262 imgs, 15 abnormities, 8 diseases \autocite{Son2023}
+	The MAAM, or specifically the abnormity models, does not have a very satisfactory performance.
 	
-	TEXT: Strengths and weaknesses
-	how to improve
+	In terms of classifying OCT abnormities, \citeauthor{leandro2023oct}'s model is trained on 10770 images, classifies 8 abnormities, and has overall accuracy between 93\% and 99\% \autocite{leandro2023oct}. \citeauthor{li2019deep}'s model is trained on 21357 images, classifies 4 abnormities, and has overall accuracy 97.3\% \autocite{li2019deep}. In comparison, our OCT Model is trained on 15632 images, classifies 11 abnormities, and has overall accuracy less than 80\%. \citeauthor{leandro2023oct}'s and \citeauthor{li2019deep}'s model perform better than ours because ophthalmologists labeled their data and they have more images per abnormity than ours.
+	
+	In terms of the classifying fundus abnormities, \citeauthor{Son2023}'s model is trained on 103262 images, classifies 15 abnormities, and has a mean AUC of 0.980 \autocite{Son2023}. In comparison, our Fundus Model is trained on 1734 images, classifies 8 abnormities, and has a mean AUC of 0.909, which is much lower than \citeauthor{Son2023}'s because they have much more data with professional labeling. 
+	
+	\citeauthor{Son2023} also have diagnosis model, which classifies 8 diseases and has mean AUC 0.992. Our Diagnosis Model classifies 12 diseases and has mean AUC of 0.984, which is quite close to \citeauthor{Son2023}'s value. 
 	
 	\section{Conclusion}
 	
