@@ -343,44 +343,46 @@
 	
 	In order to allow the Abnormity Models to identify multiple abnormities in one image, we employ a method to determine the codominant abnormities. We input an image to the Abnormity Models and get the abnormity probabilities vector. If the abnormity with the highest probability has probability greater than 0.9, it is regarded as dominant; if not, we continue taking the abnormity with the next high probability until either the sum of the probabilities of the chosen abnormities reaches 0.9, or the number of abnormities reaches the maximum, which is 4, and all the chosen abnormities are regarded as codominant. 
 	
-	\begin{table}[htbp]
-		\centering
-		\caption{OCT Test}
-		\label{tb:OCT_test}
-		\pgfplotstabletypeset[
-		multicolumn names,
-		col sep=comma,
-		columns = {Abnormity, Precision, Sensitivity, Specificity, FOne, AUC},
-		columns/Abnormity/.style={string type, column name=Abnormities},
-		columns/Precision/.style={string type, column name=Precision},
-		columns/Sensitivity/.style={string type, column name=Sensitivity},
-		columns/Specificity/.style={string type, column name=Specificity},
-		columns/FOne/.style={string type, column name={F1 Score}},
-		columns/AUC/.style={string type, column name=AUC},
-		every head row/.style={before row=\toprule, after row=\midrule},
-		every last row/.style={ after row=\bottomrule}
-		]{Tables/abnormity_o_test.csv}
-	\end{table}
+			\begin{table}[htbp]
+				\centering
+				\fontsize{9}{12}\selectfont{
+				\caption{OCT Test}
+				\label{tb:OCT_test}
+				\pgfplotstabletypeset[
+				multicolumn names,
+				col sep=comma,
+				columns = {Abnormity, Precision, Sensitivity, Specificity, FOne, AUC},
+				columns/Abnormity/.style={string type, column name=Abnormities},
+				columns/Precision/.style={string type, column name=Precision},
+				columns/Sensitivity/.style={string type, column name=Sensitivity},
+				columns/Specificity/.style={string type, column name=Specificity},
+				columns/FOne/.style={string type, column name={F1 Score}},
+				columns/AUC/.style={string type, column name=AUC},
+				every head row/.style={before row=\toprule, after row=\midrule},
+				every last row/.style={ after row=\bottomrule}
+				]{Tables/abnormity_o_test.csv}}
+			\end{table}
 	
-	\begin{table}[htbp]
-		\centering
-		\caption{Fundus Test}
-		\label{tb:Fundus_test}
-		\pgfplotstabletypeset[
-		multicolumn names,
-		col sep=comma,
-		columns = {Abnormity, Precision, Sensitivity, Specificity, FOne, AUC},
-		columns/Abnormity/.style={string type, column name=Abnormities},
-		columns/Precision/.style={string type, column name=Precision},
-		columns/Sensitivity/.style={string type, column name=Sensitivity},
-		columns/Specificity/.style={string type, column name=Specificity},
-		columns/FOne/.style={string type, column name={F1 Score}},
-		columns/AUC/.style={string type, column name=AUC},
-		every head row/.style={before row=\toprule, after row=\midrule},
-		every last row/.style={after row=\bottomrule}
-		]{Tables/abnormity_f_test.csv}
-	\end{table}
-	
+			\begin{table}[htbp]
+				\centering
+				\fontsize{9}{12}\selectfont{
+				\caption{Fundus Test}
+				\label{tb:Fundus_test}
+				\pgfplotstabletypeset[
+				multicolumn names,
+				col sep=comma,
+				columns = {Abnormity, Precision, Sensitivity, Specificity, FOne, AUC},
+				columns/Abnormity/.style={string type, column name=Abnormities},
+				columns/Precision/.style={string type, column name=Precision},
+				columns/Sensitivity/.style={string type, column name=Sensitivity},
+				columns/Specificity/.style={string type, column name=Specificity},
+				columns/FOne/.style={string type, column name={F1 Score}},
+				columns/AUC/.style={string type, column name=AUC},
+				every head row/.style={before row=\toprule, after row=\midrule},
+				every last row/.style={after row=\bottomrule}
+				]{Tables/abnormity_f_test.csv}}
+			\end{table}
+
 	\begin{figure}[htbp]
 		\centering
 		\includegraphics[width=\linewidth]{Figs/abnormity_ROC.pdf}
@@ -468,6 +470,7 @@
 	
 	\begin{table}[htbp]
 		\centering
+		\fontsize{9}{12}\selectfont{
 		\caption{Diagnosis Test}
 		\label{tb:diagnosis_test}
 		\pgfplotstabletypeset[
@@ -482,7 +485,7 @@
 		columns/AUC/.style={string type, column name=AUC},
 		every head row/.style={before row=\toprule, after row=\midrule},
 		every last row/.style={ after row=\bottomrule}
-		]{Tables/diagnosis2.csv}
+		]{Tables/diagnosis2.csv}}
 	\end{table}
 	
 	\begin{figure}[htbp]

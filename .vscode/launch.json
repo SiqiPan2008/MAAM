@@ -5,7 +5,7 @@
             "name": "Graph all",
             "type": "debugpy",
             "request": "launch",
-            "program": "ODADS/Code/main.py",
+            "program": "MAAM/Code/main.py",
             "console": "integratedTerminal",
             "args": ["get results", "graph all", "cuda:0"]
         },
@@ -13,7 +13,7 @@
             "name": "A: gradCAM",
             "type": "debugpy",
             "request": "launch",
-            "program": "ODADS/Code/main.py",
+            "program": "MAAM/Code/main.py",
             "console": "integratedTerminal",
             "args":["get results", "A: gradCAM", "cuda:0", "Original/OCT/DME/DME-323904-8.jpeg", "DME"]
         },
@@ -21,7 +21,7 @@
             "name": "A: Loss and Acc",
             "type": "debugpy",
             "request": "launch",
-            "program": "ODADS/Code/main.py",
+            "program": "MAAM/Code/main.py",
             "console": "integratedTerminal",
             "args": ["get results", "A: Loss and Acc", "cpu"]
         },
@@ -29,7 +29,7 @@
             "name": "A: ROC",
             "type": "debugpy",
             "request": "launch",
-            "program": "ODADS/Code/main.py",
+            "program": "MAAM/Code/main.py",
             "console": "integratedTerminal",
             "args": ["get results", "A: ROC", "cpu"]
         },
@@ -37,7 +37,7 @@
             "name": "A: tSNE",
             "type": "debugpy",
             "request": "launch",
-            "program": "ODADS/Code/main.py",
+            "program": "MAAM/Code/main.py",
             "console": "integratedTerminal",
             "args": ["get results", "A: tSNE", "cpu"]
         },
@@ -45,7 +45,7 @@
             "name": "A: confusion matrix",
             "type": "debugpy",
             "request": "launch",
-            "program": "ODADS/Code/main.py",
+            "program": "MAAM/Code/main.py",
             "console": "integratedTerminal",
             "args":["get results", "A: confusion matrix", "cpu"]
         },
@@ -53,7 +53,7 @@
             "name": "D1: Acc barchart",
             "type": "debugpy",
             "request": "launch",
-            "program": "ODADS/Code/main.py",
+            "program": "MAAM/Code/main.py",
             "console": "integratedTerminal",
             "args": ["get results", "D1: Acc barchart", "cpu"]
         },
@@ -61,7 +61,7 @@
             "name": "D1: confusion matrix",
             "type": "debugpy",
             "request": "launch",
-            "program": "ODADS/Code/main.py",
+            "program": "MAAM/Code/main.py",
             "console": "integratedTerminal",
             "args": ["get results", "D1: confusion matrix", "cpu"]
         },
@@ -69,7 +69,7 @@
             "name": "D2: tSNE, ROC, confusion matrix",
             "type": "debugpy",
             "request": "launch",
-            "program": "ODADS/Code/main.py",
+            "program": "MAAM/Code/main.py",
             "console": "integratedTerminal",
             "args": ["get results", "D2: tSNE, ROC, confusion matrix", "cpu"]
         },
@@ -82,7 +82,7 @@
             "name": "152AO train all",
             "type": "debugpy",
             "request": "launch",
-            "program": "ODADS/Code/main.py",
+            "program": "MAAM/Code/main.py",
             "console": "integratedTerminal",
             "args": ["abnormity all", "152AO", "cuda:1"]
         },
@@ -90,7 +90,7 @@
             "name": "152AF train all",
             "type": "debugpy",
             "request": "launch",
-            "program": "ODADS/Code/main.py",
+            "program": "MAAM/Code/main.py",
             "console": "integratedTerminal",
             "args": ["abnormity all", "152AF", "cuda:0"]
         },
@@ -98,7 +98,7 @@
             "name": "050AO train all",
             "type": "debugpy",
             "request": "launch",
-            "program": "ODADS/Code/main.py",
+            "program": "MAAM/Code/main.py",
             "console": "integratedTerminal",
             "args": ["abnormity all", "050AO", "cuda:1"]
         },
@@ -106,7 +106,7 @@
             "name": "050AF train all",
             "type": "debugpy",
             "request": "launch",
-            "program": "ODADS/Code/main.py",
+            "program": "MAAM/Code/main.py",
             "console": "integratedTerminal",
             "args": ["abnormity all", "050AF", "cuda:0"]
         },
@@ -114,7 +114,7 @@
             "name": "018AO train all",
             "type": "debugpy",
             "request": "launch",
-            "program": "ODADS/Code/main.py",
+            "program": "MAAM/Code/main.py",
             "console": "integratedTerminal",
             "args": ["abnormity all", "018AO", "cuda:0"]
         },
@@ -122,7 +122,7 @@
             "name": "018AF train all",
             "type": "debugpy",
             "request": "launch",
-            "program": "ODADS/Code/main.py",
+            "program": "MAAM/Code/main.py",
             "console": "integratedTerminal",
             "args": ["abnormity all", "018AF", "cuda:1"]
         },
@@ -130,7 +130,7 @@
             "name": "016AO train all",
             "type": "debugpy",
             "request": "launch",
-            "program": "ODADS/Code/main.py",
+            "program": "MAAM/Code/main.py",
             "console": "integratedTerminal",
             "args": ["abnormity all", "016AO", "cuda:1"]
         },
@@ -138,7 +138,7 @@
             "name": "016AF train all",
             "type": "debugpy",
             "request": "launch",
-            "program": "ODADS/Code/main.py",
+            "program": "MAAM/Code/main.py",
             "console": "integratedTerminal",
             "args": ["abnormity all", "016AF", "cuda:0"]
         },
@@ -151,7 +151,7 @@
             "name": "Diagnosis all",
             "type": "debugpy",
             "request": "launch",
-            "program": "ODADS/Code/main.py",
+            "program": "MAAM/Code/main.py",
             "console": "integratedTerminal",
             "args": ["diagnosis all", "152, 050", "cuda:0"]
         },
@@ -169,7 +169,7 @@
             "name": "AO transfer learning",
             "type": "debugpy",
             "request": "launch",
-            "program": "ODADS/Code/main.py",
+            "program": "MAAM/Code/main.py",
             "console": "integratedTerminal",
             "args": ["train", "152AOTRRS - T", "cuda:0"]
         },
@@ -177,7 +177,7 @@
             "name": "AO test transfer-learned model",
             "type": "debugpy",
             "request": "launch",
-            "program": "ODADS/Code/main.py",
+            "program": "MAAM/Code/main.py",
             "console": "integratedTerminal",
             "args": ["test", "152AOTORS - T", "cuda:0"]
         },
@@ -185,7 +185,7 @@
             "name": "AO finetuning",
             "type": "debugpy",
             "request": "launch",
-            "program": "ODADS/Code/main.py",
+            "program": "MAAM/Code/main.py",
             "console": "integratedTerminal",
             "args": ["train", "152AOTRRS - F", "cuda:0"]
         },
@@ -193,7 +193,7 @@
             "name": "AO test finetuned model",
             "type": "debugpy",
             "request": "launch",
-            "program": "ODADS/Code/main.py",
+            "program": "MAAM/Code/main.py",
             "console": "integratedTerminal",
             "args": ["test", "152AOTORS - F", "cuda:0"]
         },
@@ -201,7 +201,7 @@
             "name": "AO get MR",
             "type": "debugpy",
             "request": "launch",
-            "program": "ODADS/Code/main.py",
+            "program": "MAAM/Code/main.py",
             "console": "integratedTerminal",
             "args": ["get MR", "152AOTRMR", "cuda:0"]
         },
@@ -210,7 +210,7 @@
             "name": "AF transfer learning",
             "type": "debugpy",
             "request": "launch",
-            "program": "ODADS/Code/main.py",
+            "program": "MAAM/Code/main.py",
             "console": "integratedTerminal",
             "args": ["train", "152AFTRRS - T", "cuda:1"]
         },
@@ -218,7 +218,7 @@
             "name": "AF test transfer-learned model",
             "type": "debugpy",
             "request": "launch",
-            "program": "ODADS/Code/main.py",
+            "program": "MAAM/Code/main.py",
             "console": "integratedTerminal",
             "args": ["test", "152AFTORS - T", "cuda:1"]
         },
@@ -226,7 +226,7 @@
             "name": "AF finetuning",
             "type": "debugpy",
             "request": "launch",
-            "program": "ODADS/Code/main.py",
+            "program": "MAAM/Code/main.py",
             "console": "integratedTerminal",
             "args": ["train", "152AFTRRS - F", "cuda:1"]
         },
@@ -234,7 +234,7 @@
             "name": "AF test fine-tuned model",
             "type": "debugpy",
             "request": "launch",
-            "program": "ODADS/Code/main.py",
+            "program": "MAAM/Code/main.py",
             "console": "integratedTerminal",
             "args": ["test", "152AFTORS - F", "cuda:1"]
         },
@@ -242,7 +242,7 @@
             "name": "AF get MR",
             "type": "debugpy",
             "request": "launch",
-            "program": "ODADS/Code/main.py",
+            "program": "MAAM/Code/main.py",
             "console": "integratedTerminal",
             "args": ["get MR", "152AFTOMR", "cuda:1"]
         },
@@ -255,7 +255,7 @@
             "name": "D1 train single disease",
             "type": "debugpy",
             "request": "launch",
-            "program": "ODADS/Code/main.py",
+            "program": "MAAM/Code/main.py",
             "console": "integratedTerminal",
             "args": ["train", "152D1TRRS - ERM, 050D1TRRS - ERM", "cuda:0"]
         },
@@ -263,7 +263,7 @@
             "name": "D1 train all",
             "type": "debugpy",
             "request": "launch",
-            "program": "ODADS/Code/main.py",
+            "program": "MAAM/Code/main.py",
             "console": "integratedTerminal",
             "args": ["train", "152D1TRRS, 050D1TRRS", "cuda:0"]
         },
@@ -271,7 +271,7 @@
             "name": "D1 test all",
             "type": "debugpy",
             "request": "launch",
-            "program": "ODADS/Code/main.py",
+            "program": "MAAM/Code/main.py",
             "console": "integratedTerminal",
             "args": ["test", "152D1TORS, 050D1TORS", "cuda:1"]
         },
@@ -282,7 +282,7 @@
             "name": "D2 train",
             "type": "debugpy",
             "request": "launch",
-            "program": "ODADS/Code/main.py",
+            "program": "MAAM/Code/main.py",
             "console": "integratedTerminal",
             "args": ["train", "152D2TRRS, 050D2TRRS", "cuda:0"]
         },
@@ -292,7 +292,7 @@
             "name": "D2 test",
             "type": "debugpy",
             "request": "launch",
-            "program": "ODADS/Code/main.py",
+            "program": "MAAM/Code/main.py",
             "console": "integratedTerminal",
             "args": ["test", "152D2TORS, 050D2TORS", "cuda:1"]
         }

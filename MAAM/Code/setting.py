@@ -170,6 +170,17 @@ class Setting:
             return oct_abnormities
         else:
             return fundus_abnormities
+        
+    def get_abbr_abnormities(self, name: str = "All Abnormities") -> list:
+        criteria = utils.get_criteria()
+        oct_abnormities = [("OCT", abnormity) for abnormity in criteria["All"]["OCT Abbr"]]
+        fundus_abnormities = [("Fundus", abnormity) for abnormity in criteria["All"]["Fundus Abbr"]]
+        if name == "All Abnormities":
+            return  oct_abnormities + fundus_abnormities
+        elif self.is_OCT(name) or name == "OCT Abnormities":
+            return oct_abnormities
+        else:
+            return fundus_abnormities
     
     def get_correct_abnormities(self, name: str) -> list:
         criteria = utils.get_criteria()
@@ -270,6 +281,14 @@ class Setting:
             diseases = [disease for disease in criteria.keys() if disease != "All"]
         else:
             diseases = [disease for disease in criteria.keys() if disease != "All" and disease != "Normal"]
+        return diseases
+    
+    def get_abbr_diseases(self, include_normal: bool = True) -> list:
+        criteria = utils.get_criteria()
+        if include_normal:
+            diseases = criteria["All"]["Disease Abbr"]
+        else:
+            diseases = [disease for disease in criteria["All"]["Disease Abbr"] if disease != "Healthy"]
         return diseases
     
     def get_epoch_num(self, filename: str) -> int:

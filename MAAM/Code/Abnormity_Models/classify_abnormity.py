@@ -14,11 +14,3 @@ def get_abnormities_probs(img, model, device):
     output = torch.nn.functional.softmax(output[0], dim=0)
     # print(output)
     return output
-
-def get_abnormity_probs_from_img(img, numClasses, device, featureExtract, modelName, foldername, wtsName):
-    model = abnormity_models.initialize_abnormity_model(modelName, numClasses, featureExtract)
-    model = model.to(device)
-    trainedModel = torch.load(f"ODADS/Data/Weights/{foldername}/{wtsName}")
-    model.load_state_dict(trainedModel["state_dict"])
-    utils.img_show(img)
-    return get_abnormities_probs(img, model, device)

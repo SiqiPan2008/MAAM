@@ -13,7 +13,7 @@ os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 
 # read Criteria.json and get criteria
 def get_criteria():
-    with open('ODADS/Code/criteria.json', 'r', encoding='utf-8') as file:
+    with open('MAAM/Code/criteria.json', 'r', encoding='utf-8') as file:
         criteria = json.load(file)
     return criteria
 
@@ -24,7 +24,7 @@ def load_json(filename: str) -> Dict:
 
 # read Setting.json
 def get_setting():
-    json_data = load_json('ODADS/CODE/Setting.json')
+    json_data = load_json('MAAM/Code/Setting.json')
     return setting.Setting.from_dict(json_data)
 
 # resize the image so that its longer edge has length "longEdgeSize"

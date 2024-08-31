@@ -37,6 +37,7 @@ def calc_and_save_numerical_results(csv_filename, type, source, conf_mat):
     table_folder = setting.table_folder
     table_path = os.path.join(table_folder, csv_filename + ".csv")
     abnormities = setting.get_abnormities("OCT Abnormities") if type == "OCT" else setting.get_abnormities("Fundus Abnormities")
+    abbr_abnormities = setting.get_abbr_abnormities("OCT Abnormities") if type == "OCT" else setting.get_abbr_abnormities("Fundus Abnormities")
     with open(table_path, 'w', newline = "") as file:
         writer = csv.writer(file)
         writer.writerow([
@@ -59,7 +60,7 @@ def calc_and_save_numerical_results(csv_filename, type, source, conf_mat):
             sensitivity = tp / (tp + fn)
             f1 = 2 * precision * sensitivity / (precision + sensitivity)
             writer.writerow([
-                abnormities[i][1],
+                abbr_abnormities[i][1],
                 f"{precision:.3f}",
                 f"{sensitivity:.3f}",
                 f"{specificity:.3f}",

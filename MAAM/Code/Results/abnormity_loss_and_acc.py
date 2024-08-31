@@ -140,7 +140,7 @@ def plot_loss_and_acc(): # 2 x (4x1) x (2x2)
         fig_file = "abnormity_Fundus_loss_and_acc.pdf" if type == "AF" else "abnormity_OCT_loss_and_acc.pdf"
         fig_path = os.path.join(fig_folder, fig_file)
         
-        fig = plt.figure(figsize=(8, 13))
+        fig = plt.figure(figsize=(4, 13))
         grid = gridspec.GridSpec(4, 1, wspace = 0, hspace = 0.2)
         plt.axis(False)
         plt.title("Fundus" if type == "AF" else "OCT")
