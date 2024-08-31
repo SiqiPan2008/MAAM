@@ -164,18 +164,18 @@
 					\multirow{2}{*}{Abnormity}&\multicolumn{4}{c}{Source}&\multirow{2}{*}{Total}\\
 					&1&2&3&4&\\
 					\midrule
-					CNV    &2984&/  &/ &/ &2984\\
-					CSC    &/   &102&32&/ &134 \\
-					DME    &2500&/  &/ &/ &2500\\
-					Drusen &2500&/  &/ &/ &2500\\
-					ERM    &/   &/  &/ &19&19  \\
-					IF     &1097&/  &/ &/ &1097\\
-					MH     &/   &99 &31&/ &130 \\
-					Mactel &/   &/  &29&/ &29  \\
-					Healthy&5000&/  &/ &/ &5000\\
-					RP     &/   &102&31&/ &133 \\
-					ST     &/   &/  &23&/ &23  \\
-					SF     &1083&/  &/ &/ &1083\\
+					CNV    &2984&-  &- &- &2984\\
+					CSC    &-   &102&32&- &134 \\
+					DME    &2500&-  &- &- &2500\\
+					Drusen &2500&-  &- &- &2500\\
+					ERM    &-   &-  &- &19&19  \\
+					IF     &1097&-  &- &- &1097\\
+					MH     &-   &99 &31&- &130 \\
+					Mactel &-   &-  &29&- &29  \\
+					Healthy&5000&-  &- &- &5000\\
+					RP     &-   &102&31&- &133 \\
+					ST     &-   &-  &23&- &23  \\
+					SF     &1083&-  &- &- &1083\\
 					\bottomrule
 				\end{longtable}
 				
@@ -209,15 +209,15 @@
 					\multirow{2}{*}{Abnormity}&\multicolumn{6}{c}{Source}&\multirow{2}{*}{Total}\\
 					&1&2&3&4&5&6&\\
 					\midrule
-					CWP    &/  &/ &/ &33 &205&/ &238\\
-					Drusen &/  &/ &/ &50 &/  &/ &50 \\     
-					HE     &20 &/ &/ &75 &284&/ &379\\ 
-					HM     &13 &66&/ &105&278&/ &462\\     
-					MH     &/  &/ &/ &/  &/  &34&34 \\        
-					MA     &55 &/ &/ &1  &219&/ &275\\
-					Healthy&100&37&15&/  &/  &/ &152\\      
-					RP     &/  &22&/ &/  &/  &44&66 \\         
-					VA     &/  &64&/ &14 &/  &/ &78 \\
+					CWP    &-  &- &- &33 &205&- &238\\
+					Drusen &-  &- &- &50 &-  &- &50 \\     
+					HE     &20 &- &- &75 &284&- &379\\ 
+					HM     &13 &66&- &105&278&- &462\\     
+					MH     &-  &- &- &-  &-  &34&34 \\        
+					MA     &55 &- &- &1  &219&- &275\\
+					Healthy&100&37&15&-  &-  &- &152\\      
+					RP     &-  &22&- &-  &-  &44&66 \\         
+					VA     &-  &64&- &14 &-  &- &78 \\
 					
 					\bottomrule
 				\end{longtable}
@@ -318,7 +318,7 @@
 		{
 			\begin{table}
 				\centering
-				\caption{Validation accuracies}
+				\caption{Overall accuracies}
 				\label{tb:A_accuracies}
 				\begin{tabular}{ccccc}
 					\toprule
@@ -510,9 +510,29 @@
 	
 	\section{Discussion}
 	
-	TEXT: Do two models increase accuracy? How?
+	The combination of the Abnormity Models and the Diagnosis Model successfully improve the performance of the MAAM. The OCT Model and Fundus Model only have accuracies between 70\% and 80\% with the codominant abnormities method, with the Fundus Model having lower accuracy. The average accuracy of submodels in Stage D1 is still slightly lower than the OCT Model's accuracy, but it is already higher than the Fundus Model. Stage D2 makes the accuracy increase even further, with a 82\% accuracy without the codominant diseases method and a 89\% accuracy with the method. 
 	
-	TEXT: Comparison to other studies
+	\vspace{0.2cm}
+	
+	The Abnormity Models does not perform very well due to several reasons. 
+	
+	There are often multiple abnormities on one image, and this is especially true for fundus images. Multiple abnormities increase the difficulty for the model to correctly extract and identify the abnormities. 
+	
+	Also, the data used for training are collected from various online sources. The labeling criteria are different for different sources, so our data lack a uniform standard. Furthermore, some of the data selection are done by ourselves, but we do not have the expertise of ophthalmologists. As a result, our data is not very reliable. 
+	
+	In addition, the size of our dataset is quite small and there is an imbalance between the number of images of different abnormities. In the OCT Model, the imbalance is partly neutralized by using Cycle-GAN to generate images. However, in the Fundus Model, we could only perform transformations to get more images, which may increase the model's tendency of being overfitting or make it hard for the model to extract the correct abnormities. 
+	
+	\vspace{0.2cm}
+	
+	The Diagnosis Model can increase the accuracy of the diagnosis for the following reasons.
+	
+	The Diagnosis Model performs two additional feature extracts based on the outputs of the Abnormity Models. In Stage D1, the severity levels of the diseases are extracted; and in Stage D2, the probabilities of diseases are extracted. Even though the Abnormity Models are not very accurate, for example, in discriminating similar abnormities, the Diagnosis Model can still extract key features and make a correct diagnosis. 
+	
+	Additionally, in training the Diagnosis Model, we use the Abnormity-to-Disease Deduction Criteria to generate a new set of inputs and labels, which are reliable as long as the Criteria is correct. The Diagnosis Model is therefore trained on a relatively reliable set of data compared to the Abnormity Model. 
+	
+	\vspace{0.3cm}
+	
+	Fundus 103262 imgs, 15 abnormities, 8 diseases \autocite{Son2023}
 	
 	TEXT: Strengths and weaknesses
 	how to improve
