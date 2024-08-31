@@ -510,35 +510,15 @@
 	
 	\section{Discussion}
 	
-	The Abnormity Models do not have a very satisfactory performance.
+	There are some studies working on classifying OCT abnormities.  For examples, \citeauthor{leandro2023oct}'s model is trained on 10770 images (most images belong to multiple classes), classifies 8 abnormities, and has overall accuracy between 93\% and 99\% \autocite{leandro2023oct}. \citeauthor{li2019deep}'s model is trained on 21357 images, classifies 4 abnormities, and has overall accuracy 97.3\% \autocite{li2019deep}.  And there are some studies working on classifying fundus abnormities.  For example,  	\citeauthor{Son2023}'s model is trained on 103262 images, classifies 15 abnormities, and has a mean AUC of 0.980 \autocite{Son2023}. In comparison, our OCT Model is trained on 15632 images, classifies 11 abnormities, and has overall accuracy less than 80\%.  And our Fundus Model is trained on 1734 images, classifies 8 abnormities, and has a mean AUC of 0.909. As a matter of fact, our Abnormity Models are not satisfying in terms of performance.
 	
-	In terms of classifying OCT abnormities, \citeauthor{leandro2023oct}'s model is trained on 10770 images (most images belong to multiple classes), classifies 8 abnormities, and has overall accuracy between 93\% and 99\% \autocite{leandro2023oct}. \citeauthor{li2019deep}'s model is trained on 21357 images, classifies 4 abnormities, and has overall accuracy 97.3\% \autocite{li2019deep}. In comparison, our OCT Model is trained on 15632 images, classifies 11 abnormities, and has overall accuracy less than 80\%. 
-	
-	In terms of the classifying fundus abnormities, \citeauthor{Son2023}'s model is trained on 103262 images, classifies 15 abnormities, and has a mean AUC of 0.980 \autocite{Son2023}. In comparison, our Fundus Model is trained on 1734 images, classifies 8 abnormities, and has a mean AUC of 0.909. 
-	
-	All three models mentioned above perform better than ours. The Abnormity Models do not perform very well due to several factors: 
-	
-	Our data are collected from various online sources and therefore lack a uniform standard. Furthermore, some of the data selection are done by ourselves, but we do not have the expertise of ophthalmologists. In contrast, in all the three studies, the data are labeled by ophthalmologists and are more reliable. 
-	
-	The size of our dataset is quite small. There is also an imbalance between the number of images of different abnormities. In the OCT Model, the imbalance is partly neutralized by using Cycle-GAN to generate images. However, in the Fundus Model, we could only perform transformations to get more images, which may increase the model's tendency of being overfitting or make it hard for the model to extract the correct abnormities. In comparison, two of the studies have more images than ours, and all three have datasets that are more balanced. 
-	
-	In addition, there are often multiple abnormities on one image, which increase the difficulty for the models to correctly extract and identify the abnormities. 
+	Our data are collected from various online sources and therefore lack a uniform standard. Furthermore, some of the data are labeled by ourselves, while we do not have the expertise of ophthalmologists. Moreover, our data is not sufficient. There is also an imbalance between the number of images of different abnormities. In the OCT Model, the imbalance is partly neutralized by using Cycle-GAN. However, in the Fundus Model, we could only perform transformations to generate more images, which may increase the model's tendency of being overfitting and make it hard for the model to extract the correct features. Also as mentioned before, in our model, there are often multiple abnormities on one image, which increase the difficulty to identify one specific abnormity correctly. 
 	
 	\vspace{0.3cm}
 	
-	However, the addition the Diagnosis Model successfully improves the performance of the MAAM. 
+	In MAAM, the Diagnosis Model improves the overall performance successfully. There are also some studies using similar framework. For example, \citeauthor{Son2023}'s diagnosis model classifies 8 diseases and has mean AUC 0.992\autocite{Son2023}. In comparison, our Diagnosis Model classifies 12 diseases and has mean AUC of 0.984 which is close to other studies.
 	
-	\citeauthor{Son2023}'s study also has a diagnosis model, which classifies 8 diseases and has mean AUC 0.992. Our Diagnosis Model classifies 12 diseases and has mean AUC of 0.984 \autocite{Son2023}. The diagnosis model has helped narrow the gap between the MAAM and \citeauthor{Son2023}'s model.
-	
-	with the codominant abnormities method, with the Fundus Model having lower accuracy. The average accuracy of submodels in Stage D1 is still slightly lower than the OCT Model's accuracy, but it is already higher than the Fundus Model. Stage D2 makes the accuracy increase even further, with a 82\% accuracy without the codominant diseases method and a 89\% accuracy with the method. 
-	
-	The Diagnosis Model can increase the accuracy of diagnosis for the following factors:
-	
-	The Diagnosis Model performs two additional feature extractions based on the outputs of the Abnormity Models. The Abnormity Models only have accuracies between 70\% and 80\%. After the severity levels of diseases are extracted Stage D1, the average accuracy of the submodels of Stage D1 is still slightly lower than the OCT Model's accuracy, but is already higher than the Fundus Model. And after the disease probabilities are extracted in Stage D2, accuracy increases even further to 89\%. These two extractions can help correct some mistakes made by the Abnormity Models and make the features of the diseases more distinct. 
-	
-	Additionally, in training the Diagnosis Model, we use the Abnormity-to-Disease Deduction Criteria to generate a new set of inputs and labels, which are reliable as long as the Criteria is correct. The Diagnosis Model is therefore trained on a relatively reliable set of data compared to the Abnormity Model. 
-	
-	
+	It is noted that the goal of MAAM is not to identify one specific disease.  It is developed for identifying all the potential diseases, which is different from other studies mentioned in this paper.  Therefore, we introduced codominant abnormities and codominant diseases, which buff up the performances. Moreover, the Diagnosis Model performs two additional feature extractions. While the Abnormity Models only have accuracies between 70\% and 80\%, after we extracted the features of severity levels of diseases in Stage D1, the average accuracy increases. And after we extracted the features of disease in Stage D2, the accuracy keep on increasing up to a satisfying level. These two stages enhance the performance of the Abnormity Models and make the features of the diseases more distinct.	Also, in training the Diagnosis Model, we use the Abnormity-to-Disease Deduction Criteria to generate ground truth, which is reliable even without involving ophthalmologists.
 	
 	\section{Conclusion}
 	
