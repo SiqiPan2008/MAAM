@@ -432,20 +432,20 @@
 	
 	The purpose of Stage D1 is to determine the severity level for all diseases, each of which has a corresponding submodel. We prepare data for each submodel according to the Abnormity-to-Disease Deduction Criteria (shown in Fig.~\ref{fig:criteria}). As stated in Section~\ref{sec:overview}, we determine the target abnormities for one disease and use the number of target abnormities to define the severity levels. If a disease has 5 target abnormities, then, taking into account the healthy status, we get 6 severity levels, namely 0 to 5. We use sets of images as inputs to the submodel, and the severity level label for one set is equal to the number of target abnormities that appear in the set. We randomly choose sets of images from the OCT and fundus images and determine the severity level for each set. In the end, we get 10000 inputs for training and 10000 inputs for testing for each severity level. 
 	
-	The purpose of Stage D2 is to output the disease probability vectors. For each disease, we use the Abnormity-to-Disease Deduction Criteria to find the target abnormities, randomly choose sets of images that are composed of one image for each of the target abnormities, and label the sets of images with the disease. We get 10000 sets of images for training and 10000 sets of images for testing for each of the disease.
+	The purpose of Stage D2 is to output the disease probability vectors. For each disease, we use the Abnormity-to-Disease Deduction Criteria to find the target abnormities, randomly choose sets of images where each of them is from one target abnormitiy, and label the sets of images with the disease. We get 10000 sets of images for training and 10000 sets of images for testing for each of the disease.
 	
 	\subsection{Training}
 	
 	The Diagnosis Model is trained with the same hardware as the Abnormity Models. Stage D1 submodels are trained for 10 epochs and Stage D2 model is trained for 30 epochs, and all the other hyperparameters are identical to those of the Abnormity Models. Refer to Section~\ref{sec:a_training} for details. 
 	
-	Submodels in Stage D1 and the model in Stage D2 quickly reach very high accuracies during training and validation because they only consists of a FC layer. 
+	Submodels in Stage D1 and the model in Stage D2 quickly reach very high accuracies during training and validation because there are plenty of training data and the models leverage relatively simpler networks. 
 	
 	
 	\subsection{Results}
 	
-	Fig.~\ref{fig:D1_conf_mat} shows the confusion matrices for Stage D1 and Fig.~\ref{fig:D1_conf_mat} shows the accuracies of the submodels of Stage D1. Table~\ref{tb:diagnosis_test} shows the predictive values of Stage D2, Fig.~\ref{fig:D2_ROC} shows the ROCs, Fig.~\ref{fig:D2_conf_mat} shows the confusion matrix and Fig~\ref{fig:D2_tSNE} shows the t-SNE graph.
+	Fig.~\ref{fig:D1_conf_mat} shows the confusion matrices for Stage D1 and Fig.~\ref{fig:D1_acc_bar} shows the accuracies of the submodels of Stage D1. Table~\ref{tb:diagnosis_test} shows the predictive values of Stage D2, Fig.~\ref{fig:D2_ROC} shows the ROCs, Fig.~\ref{fig:D2_conf_mat} shows the confusion matrix and Fig~\ref{fig:D2_tSNE} shows the t-SNE graph.
 	
-	The submodels of Stage D1 tend to yield results one severity level higher or lower than the label. This impairs the accuracies of the submodels of Stage D1. However, Stage D2 partly solves this problem, as the model in Stage D2 has a higher accuracy than the average accuracy of the Stage D1 submodels. 
+	The submodels of Stage D1 tend to yield results where the predicted severity level is 1 level offset from the label. This impairs the accuracies of the submodels of Stage D1. However, Stage D2 partly solves this problem, as the model in Stage D2 has a higher accuracy than the average accuracy of the Stage D1 submodels. 
 	
 	Stage D2 performs quite well on classifying the diseases. Furthermore, considering that some diseases may look alike each other, we employ a method similar to the codominant abnormities method to allow Stage D2 to give up to 3 codominant diseases. As shown in Fig.~\ref{fig:D1_acc_bar}, if the codominant diseases method is used, the accuracy of Stage D2 further increases. 
 	
