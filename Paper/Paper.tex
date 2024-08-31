@@ -45,7 +45,7 @@
 	
 	\section*{Abstract}
 	
-	TEXT: abstract
+	We develop a novel model called the Multimodal Abnormity-Aware Model, which uses optical coherence tomography (OCT) and color fundus images to diagnose ocular diseases. The model is composed of the Abnormity Models, which use OCT images to identify 11 abnormities and fundus images to identify 8 abnormities, and the Diagnosis Model, which diagnoses 12 diseases by integrating information from the Abnormity Models. We use an abnormity-to-disease approach and simulate the decision-making process of ophthalmologists. Information integration is achieved through employing a fusion mechanism.  We also introduced codominant abnormities and diseases, providing more information for reference. 
 	
 	\section{Background}
 	Ocular diseases can be diagnosed through various methods, including using optical coherence tomography (OCT) and color fundus images. Ophthalmologists usually identify ocular abnormalities to deduce the disease. Traditionally, the diagnosis primarily depends on the professional experience and knowledge of the ophthalmologists, which may result in high misdiagnosis rate and under-utilization of medical data. With the widespread application of artificial intelligence (AI), deep learning (DL) has made great contributions in providing support to patients in remote areas by sharing expert knowledge \autocite{Ichhpujani_Thakur_2021}. By leveraging DL, researchers have developed auxiliary diagnosis programs to help ophthalmologists in the process. Many studies use convolutional neural networks (CNN) to analyze ocular images. Some commonly used CNNs are VGG, ResNet, and Inception \autocite{daich2023artificial}. And for segmenting images and finding abnormalities, U-net is widely used \autocite{Ronneberger_Fischer_Brox_2015}. With regards to training CNNs, most studies use transferred learning, which consists of three steps: learning, fine-tuning, and validation.
@@ -522,7 +522,9 @@
 	
 	\section{Conclusion}
 	
-	TEXT: conclusion
+	We developed the Multimodal Abnormity-Aware Model, which takes both OCT and fundus images as input. We integrate information from different sources by employing the fusion mechanism. Moreover, we use an abnormity-to-disease approach and simulate the decision-making process of ophthalmologists. We also introduced codominant abnormities and diseases, providing more information for reference. 
+	
+	The main goal of this study is to devise a novel model and verify its feasibility. The MAAM still has room for improvement, such as gathering more authentic data, introducing the expertise of ophthalmologists, refining the Abnormity-to-Disease Deduction Criteria, and improving the structure of the Diagnosis Model. 
 	
 	\phantomsection
 	\addcontentsline{toc}{section}{References}
