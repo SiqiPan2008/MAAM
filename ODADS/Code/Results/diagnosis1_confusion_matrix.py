@@ -86,7 +86,7 @@ def get_conf_mat(device, disease):
 def plot_conf_mat():
     setting = utils.get_setting()
     diseases = setting.get_diseases(include_normal = False)
-    folder_path = setting.D2_folder
+    folder_path = setting.D1_folder
     fig_folder = setting.fig_folder
     fig_file = "diagnosis1_confusion_matrix.pdf"
     fig_path = os.path.join(fig_folder, fig_file)
@@ -97,7 +97,7 @@ def plot_conf_mat():
     row = 0
     col = 0
     
-    with open(os.path.join(folder_path, "00D1TORS.csv"), "w", newline="") as file:  
+    with open(os.path.join(folder_path, "000D1TORS.csv"), "w", newline="") as file:  
         writer = csv.writer(file)
         for i in range(len(diseases)):
             disease = diseases[i]

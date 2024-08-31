@@ -286,6 +286,8 @@
             "console": "integratedTerminal",
             "args": ["train", "152D2TRRS, 050D2TRRS", "cuda:0"]
         },
+        */
+        
         {
             "name": "D2 test",
             "type": "debugpy",
@@ -294,6 +296,6 @@
             "console": "integratedTerminal",
             "args": ["test", "152D2TORS, 050D2TORS", "cuda:1"]
         }
-        */
+        
     ]
 }

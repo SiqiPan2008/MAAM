@@ -106,6 +106,7 @@ def plot_tSNE_ROC_conf_mat(plt_tSNE = True, plt_ROC = True, plt_conf_mat = True)
     
     start_time = time.time()
     corrects = 0
+    corrects_codominant = 0
     total = 0
     shape = mr.shape
     for i in range(shape[0]):
@@ -113,6 +114,8 @@ def plot_tSNE_ROC_conf_mat(plt_tSNE = True, plt_ROC = True, plt_conf_mat = True)
             output = mr[i][j]
             predicted = np.argmax(np.array(output))
             corrects += (predicted == i).item()
+            output = torch.nn.functional.softmax(torch.Tensor(output))
+            corrects_codominant += i in utils.get_top_prob_indices(output, setting.D2_top_probs_max_num, setting.D2_top_probs_min_prob)
             total += 1
             
             conf_mat[i][predicted] += 1
@@ -122,9 +125,11 @@ def plot_tSNE_ROC_conf_mat(plt_tSNE = True, plt_ROC = True, plt_conf_mat = True)
                 roc_probs[disease].append(output[k])
             
     acc = corrects / total
+    acc_codominant = corrects_codominant / total
     time_elapsed = time.time() - start_time
     print(f"Time elapsed {time_elapsed // 60 :.0f}m {time_elapsed % 60 :.2f}s")
     print(f"acc: {corrects}/{total} = {acc :.4f}")
+    print(f"acc: {corrects_codominant}/{total} = {acc_codominant :.4f}")
     
     tSNE_features = [[] for _ in range(disease_num_including_normal)]
     for i in range(len(tSNE_features)):
@@ -143,7 +148,7 @@ def plot_tSNE_ROC_conf_mat(plt_tSNE = True, plt_ROC = True, plt_conf_mat = True)
     
     with open(os.path.join(setting.D2_folder, "000D2TORS.csv"), "w", newline="") as file:
         writer = csv.writer(file)
-        writer.writerow([corrects, total, acc])
+        writer.writerow([corrects, corrects_codominant, total, acc, acc_codominant])
     
     with open(os.path.join(setting.table_folder, "diagnosis2.csv"), "w", newline="") as file:
         writer = csv.writer(file)
