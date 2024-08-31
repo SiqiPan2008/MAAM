@@ -71,6 +71,7 @@
 	
 	
 	\section{Overview}
+	\label{sec:overview}
 	
 	We develop the Multimodal Abnormity-Aware Model (MAAM) to aid ophthalmologists in diagnosing ocular diseases. It considers both OCT and color fundus image inputs. In addition, it simulates the decision-making process of ophthalmologists when they examine patients, namely, first identifying the abnormities, and then deducing the disease. The model is designed in a way that partly opens up the ``black box'' of DL and presents more interpretable information to ophthalmologists for the reference. 
 	
@@ -274,6 +275,7 @@
 	We split the images, including generated images, into training and test datasets, and implement a set of transformations on the images, including horizontal flips, random brightness changes from -10\% to +10\%, random horizontal and vertical translations between -5\% and +5\%, random scaling between -20\% and +20\%, and random rotations, which are between -10$^\circ$ and +10$^\circ$ for OCT images and between -30$^\circ$ and +30$^\circ$ for fundus images. The rotation is only applied to images in the train dataset. Eventually, we get 5000 train images and 500 test images for each OCT abnormity, and 3000 train images and 300 test images for each fundus abnormity.
 	
 	\subsection{Training}
+	\label{sec:a_training}
 	
 	The model training is on a desktop computer with Intel$^®$ Xeon$^®$ Platinum 8352V Processor, 256GB of RAM and 2 NVIDIA GPU (GeForce RTX 4090) with 48GB VRAM. The training uses cross entropy loss, ADAM optimizer with learning rate 0.001, a batch size of 32 and five-fold cross-validation. The code is written with PyTorch in an Anaconda environment. Refer to ``Appendix'' for the link to the code repository on GitHub. 
 	
@@ -428,24 +430,40 @@
 	
 	\subsection{Data Preparation}
 	
-	In Stage D1, we 
+	The purpose of Stage D1 is to determine the severity level for all diseases, each of which has a corresponding submodel. We prepare data for each submodel according to the Abnormity-to-Disease Deduction Criteria (shown in Fig.~\ref{fig:criteria}). As stated in Section~\ref{sec:overview}, we determine the target abnormities for one disease and use the number of target abnormities to define the severity levels. If a disease has 5 target abnormities, then, taking into account the healthy status, we get 6 severity levels, namely 0 to 5. We use sets of images as inputs to the submodel, and the severity level label for one set is equal to the number of target abnormities that appear in the set. We randomly choose sets of images from the OCT and fundus images and determine the severity level for each set. In the end, we get 10000 inputs for training and 10000 inputs for testing for each severity level. 
 	
-	TEXT: how to choose data (with an example)
-	how to find level (number of traits = level for the disease as label during training)
-	
+	The purpose of Stage D2 is to output the disease probability vectors. For each disease, we use the Abnormity-to-Disease Deduction Criteria to find the target abnormities, randomly choose sets of images that are composed of one image for each of the target abnormities, and label the sets of images with the disease. We get 10000 sets of images for training and 10000 sets of images for testing for each of the disease.
 	
 	\subsection{Training}
 	
-	%The model training is on a desktop computer with Intel$^®$ Xeon$^®$ Platinum 8352V Processor, 256GB of RAM and 2 NVIDIA GPU (GeForce RTX 4090) with 48GB VRAM. The training uses cross entropy loss, ADAM optimizer with learning rate 0.001, a batch size of 32 and five-fold cross-validation. The code is written with PyTorch in an Anaconda environment. Refer to ``Appendix'' for the link to the code repository on GitHub. 
+	The Diagnosis Model is trained with the same hardware as the Abnormity Models. Stage D1 submodels are trained for 10 epochs and Stage D2 model is trained for 30 epochs, and all the other hyperparameters are identical to those of the Abnormity Models. Refer to Section~\ref{sec:a_training} for details. 
 	
-	TEXT: comments
+	Submodels in Stage D1 and the model in Stage D2 quickly reach very high accuracies during training and validation because they only consists of a FC layer. 
 	
 	
 	\subsection{Results}
 	
-	used for checking number of abnormities associated to the disease
+	Fig.~\ref{fig:D1_conf_mat} shows the confusion matrices for Stage D1 and Fig.~\ref{fig:D1_conf_mat} shows the accuracies of the submodels of Stage D1. Table~\ref{tb:diagnosis_test} shows the predictive values of Stage D2, Fig.~\ref{fig:D2_ROC} shows the ROCs, Fig.~\ref{fig:D2_conf_mat} shows the confusion matrix and Fig~\ref{fig:D2_tSNE} shows the t-SNE graph.
 	
-	TEXT: top-probs method
+	The submodels of Stage D1 tend to yield results one severity level higher or lower than the label. This impairs the accuracies of the submodels of Stage D1. However, Stage D2 partly solves this problem, as the model in Stage D2 has a higher accuracy than the average accuracy of the Stage D1 submodels. 
+	
+	Stage D2 performs quite well on classifying the diseases. Furthermore, considering that some diseases may look alike each other, we employ a method similar to the codominant abnormities method to allow Stage D2 to give up to 3 codominant diseases. As shown in Fig.~\ref{fig:D1_acc_bar}, if the codominant diseases method is used, the accuracy of Stage D2 further increases. 
+	
+	\begin{figure}[htbp]
+		\centering
+		\includegraphics[width=\linewidth]{Figs/diagnosis1_confusion_matrix.pdf}
+		\caption{D1 Conf Mat}
+		\vspace{0.3cm}
+		\label{fig:D1_conf_mat}
+	\end{figure}
+	
+	\begin{figure}[htbp]
+		\centering
+		\includegraphics[width=\linewidth]{Figs/diagnosis1_acc_barchart.pdf}
+		\caption{D1 Acc Bar}
+		\vspace{0.3cm}
+		\label{fig:D1_acc_bar}
+	\end{figure}
 	
 	\begin{table}[htbp]
 		\centering
@@ -468,20 +486,11 @@
 	
 	\begin{figure}[htbp]
 		\centering
-		\includegraphics[width=\linewidth]{Figs/diagnosis1_acc_barchart.pdf}
-		\caption{D1 Acc Bar}
+		\includegraphics[width=\linewidth]{Figs/diagnosis2_ROC.pdf}
+		\caption{D2 ROC}
 		\vspace{0.3cm}
-		\label{fig:D1_acc_bar}
+		\label{fig:D2_ROC}
 	\end{figure}
-	
-	\begin{figure}[htbp]
-		\centering
-		\includegraphics[width=\linewidth]{Figs/diagnosis1_confusion_matrix.pdf}
-		\caption{D1 Conf Mat}
-		\vspace{0.3cm}
-		\label{fig:D1_conf_mat}
-	\end{figure}
-	TEXT: comments
 	
 	\begin{figure}[htbp]
 		\centering
@@ -490,6 +499,7 @@
 		\vspace{0.3cm}
 		\label{fig:D2_conf_mat}
 	\end{figure}
+	
 	\begin{figure}[htbp]
 		\centering
 		\includegraphics[width=\linewidth]{Figs/diagnosis2_tSNE.pdf}
@@ -497,16 +507,6 @@
 		\vspace{0.3cm}
 		\label{fig:D2_tSNE}
 	\end{figure}
-	TEXT: comments
-	
-	\begin{figure}[htbp]
-		\centering
-		\includegraphics[width=\linewidth]{Figs/diagnosis2_ROC.pdf}
-		\caption{D2 ROC}
-		\vspace{0.3cm}
-		\label{fig:D2_ROC}
-	\end{figure}
-	TEXT: comparison and comments
 	
 	\section{Discussion}
 	
