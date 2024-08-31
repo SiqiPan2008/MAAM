@@ -44,10 +44,18 @@
 	\date{}
 	\maketitle
 	
+	\vspace{-0.2cm}
+	\hrule
+	\vspace{-0.1cm}
 	\section*{Abstract}
-	
+	\hrule
+	\vspace{0.4cm}
 	We devise a novel model, the Multimodal Abnormity-Aware Model (MAAM), for assisting ocular disease diagnosis. The MAAM enables input of 2 kinds of ophthalmological images, namely optical coherence tomography (OCT) and color fundus images, and simulates the decision-making process by deducing the disease from abnormities. The model is composed of 2 submodels, the Abnormity Models and the Diagnosis Model, where the Abnormity Models identify 11 OCT abnormities and 8 fundus abnormities, and the Diagnosis Model identifies 12 diseases by integrating features from the former model. In MAAM, we introduce the fusion mechanics, the concept of codominant abnormities and diseases, and the Abnormity-to-Disease Criteria.  The model breaks the black box of complex neural network and expose more interpretable information for the reference of ophthalmologists. And it gets the overall accuracy of 89\% and thus the feasibility is verified.
+	\vspace{0.4cm}
+	\hrule
+	\vspace{1cm}
 	
+	\begin{multicols}{2}
 	\section{Background}
 	Ocular diseases can be diagnosed through various methods, including using optical coherence tomography (OCT) and color fundus images. Ophthalmologists usually identify ocular abnormalities to deduce the disease. Traditionally, the diagnosis primarily depends on the professional experience and knowledge of the ophthalmologists, which may result in high misdiagnosis rate and under-utilization of medical data. With the widespread application of artificial intelligence (AI), deep learning (DL) has made great contributions in providing support to patients in remote areas by sharing expert knowledge \autocite{Ichhpujani_Thakur_2021}. By leveraging DL, researchers have developed auxiliary diagnosis programs to help ophthalmologists in the process. Many studies use convolutional neural networks (CNN) to analyze ocular images. Some commonly used CNNs are VGG, ResNet, and Inception \autocite{daich2023artificial}. And for segmenting images and finding abnormalities, U-net is widely used \autocite{Ronneberger_Fischer_Brox_2015}. With regards to training CNNs, most studies use transferred learning, which consists of three steps: learning, fine-tuning, and validation.
 	
@@ -69,26 +77,28 @@
 	
 	The key technical problem of multi-modal diagnosis is how to fuse the results from multifarious sources. There are three types of fusion, namely early, late, and hybrid fusion. Deciding on the optimal type of fusion is part of the exploratory process in the application of DL methods \autocite{Ichhpujani_Thakur_2021}.
 	
-	
-	
 	\section{Overview}
 	\label{sec:overview}
 	
 	We develop the Multimodal Abnormity-Aware Model (MAAM) to aid ophthalmologists in diagnosing ocular diseases. It considers both OCT and color fundus image inputs. In addition, it simulates the decision-making process of ophthalmologists when they examine patients, namely, first identifying the abnormities, and then deducing the disease. The model is designed in a way that partly opens up the ``black box'' of DL and presents more interpretable information to ophthalmologists for the reference. 
-	
-	\begin{figure}[htbp]
-		\centering
-		\includegraphics[width=\linewidth]{Figs/model_overview.pdf}
-		\caption{Model Overview}
-		\vspace{0.3cm}
-		\label{fig:3_parts}
-	\end{figure}
 	
 	The structure of the MAAM is shown in Fig.~\ref{fig:3_parts}. It consists of 2 submodels: the Abnormity Model and the Diagnosis Model. We input multiple OCT and fundus images to the Abnormity Models, and output the classification of abnormities as an input to the Diagnosis Model, which yields disease probabilities as the final result.
 	
 	\vspace{0.5cm}
 	
 	The Abnormity Models are de facto classifiers for abnormities, which are symptoms that can be directly observed in the images. The MAAM identifies 11 OCT abnormities and 8 Fundus abnormities, as shown in Fig.~\ref{fig:OCT_abnormities} and Fig.~\ref{fig:fundus_abnormities}. The abbreviations and detail information of abnormities and diseases are tabulated in ``Appendix''.
+	
+	\end{multicols}
+
+	\begin{figure}[htbp]
+	\centering
+	\includegraphics[width=\linewidth]{Figs/model_overview.pdf}
+	\caption{Model Overview}
+	\vspace{0.3cm}
+	\label{fig:3_parts}
+	\end{figure}
+
+
 	
 	\begin{figure}[htbp]
 		\centering
@@ -106,6 +116,8 @@
 		\label{fig:fundus_abnormities}
 	\end{figure}
 	
+	\begin{multicols}{2}
+		
 	The Abnormity Models also contain 2 submodels: the OCT Model and the Fundus Model, which classify OCT and fundus abnormities, respectively. Both of the submodels leverage CNNs with modified final fully-connected (FC) layers. We compare the performances of 4 commonly used CNNs, ResNet152, ResNet50, ResNet18 \autocite{He_Zhang_Ren_Sun_2016} and VGG16 \autocite{Simonyan_Zisserman_2015}, and choose the best one for each submodel. The final FC layer in each CNN is modified so that the size of its output vector is equal to the number of OCT or fundus abnormities. In order to normalize the output vector, we perform the softmax operation. Each submodel outputs a probability vector for all the abnormities.
 	
 	\vspace{0.5cm}
@@ -117,6 +129,8 @@
 	In Stage D1, we determine the severity level for each disease from the probability vectors from the Abnormity Models. We use Abnormity-to-Disease Deduction Criteria (shown in Fig.~\ref{fig:criteria}) as ground truth. There are multiple submodels in Stage D1 and each one corresponds to one disease. Based on the deduction criteria, we determine the number of abnormities for one disease and use the number to define the severity levels. For example, there are totally 5 abnormities that are present in the disease ``rDR'': OCT abnormity ``DME'' and Fundus abnormities ``HM'', ``VA'', ``MA'', and ``CWP''. Therefore, taking into account the healthy status, we end up with 6 severity levels for disease ``rDR''.
 
 	We use the fused vector as an input for each submodels in Stage D1, and have the vector go through a FC layer with softmax operation to yield severity level probability vectors.
+	
+	\end{multicols}
 	
 	\begin{figure}[htbp]
 		\centering
@@ -148,6 +162,7 @@
 	
 	The third fusion occurs at the interface between Stage D1 and Stage D2. We concatenation all the severity level vectors to feed the model in Stage D2. The fused vector goes through the FC layer and undergoes a softmax operation to yield the final result.
 	
+
 	\section{Abnormity Models}
 	
 	\subsection{Data Preparation}
