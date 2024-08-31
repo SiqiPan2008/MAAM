@@ -3,7 +3,7 @@ import os
 import numpy as np
 from Utils import utils
 import matplotlib.pyplot as plt
-import matplotlib.pyplot as plt
+from matplotlib.lines import Line2D
 import matplotlib.gridspec as gridspec
 
 def read_csv(path):
@@ -129,13 +129,18 @@ def plot_loss_and_acc(): # 2 x (4x1) x (2x2)
         ("016", (1, 1))
     ]
     
+    plt.rcParams['axes.titlesize'] = 12
+    plt.rcParams['axes.labelsize'] = 9
+    plt.rcParams['xtick.labelsize'] = 9
+    plt.rcParams['ytick.labelsize'] = 9
+    
     for type in ["AF", "AO"]:
         best_net = setting.best_f_net if type == "AF" else setting.best_o_net
         fig_file = "abnormity_Fundus_loss_and_acc.pdf" if type == "AF" else "abnormity_OCT_loss_and_acc.pdf"
         fig_path = os.path.join(fig_folder, fig_file)
         
         fig = plt.figure(figsize=(8, 6))
-        grid = gridspec.GridSpec(2, 2, wspace = 0, hspace = 0.2)
+        grid = gridspec.GridSpec(2, 2, wspace = 0.05, hspace = 0.25)
         plt.axis(False)
         plt.title("Fundus" if type == "AF" else "OCT")
         
@@ -143,7 +148,7 @@ def plot_loss_and_acc(): # 2 x (4x1) x (2x2)
             sub_ax = fig.add_subplot(grid[pos])
             sub_ax.set_title(net_name)
             sub_ax.set_axis_off()
-            sub_grid = gridspec.GridSpecFromSubplotSpec(2, 1, subplot_spec = grid[pos], wspace = 0, hspace = 0.05)
+            sub_grid = gridspec.GridSpecFromSubplotSpec(2, 1, subplot_spec = grid[pos], wspace = 0, hspace = 0.025)
             
             rst = get_loss_and_acc(net_name, type) # ReSults from Transferred learning
             rsf = get_loss_and_acc(net_name, type, starting_epoch = rst["best epoch"]) # ReSults from Finetuning
@@ -172,6 +177,22 @@ def plot_loss_and_acc(): # 2 x (4x1) x (2x2)
             loss_ax.plot(rsf["epoch train"], rsf["train losses"], color='blue')
             loss_ax.plot(rst["epoch train"], rst["valid losses"], color='red')
             loss_ax.plot(rsf["epoch train"], rsf["valid losses"], color='red')
+
+            acc_ax.xaxis.set_ticks([])
+            if pos[1] == 1:
+                acc_ax.yaxis.tick_right()
+                acc_ax.yaxis.set_label_position('right')
+                loss_ax.yaxis.tick_right()
+                loss_ax.yaxis.set_label_position('right')
+        
+        if type == "AF" and pos == (1, 1):
+            legend_lines = [
+                Line2D([0], [0], color='blue', lw=2, linestyle='-', label='Training accuracy / loss'),
+                Line2D([0], [0], color='red', lw=2, linestyle='-', label='Validation accuracy / loss'),
+                Line2D([0], [0], color='green', lw=2, linestyle='-', label='Overall accuracy')
+            ]
+
+            fig.legend(handles=legend_lines, ncols = 3, bbox_to_anchor = (0.95,0.05))
+            plt.show()
         
         plt.savefig(fig_path)
-        plt.show()
