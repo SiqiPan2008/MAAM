@@ -21,9 +21,9 @@
 *.toc
 Paper/Paper.pdf
 __pycache__/
-ODADS/Code/.vscode/
-ODADS/Data
-ODADS/Data_s
+MAAM/Code/.vscode/
+MAAM/Data
+MAAM/Data_s
 CycleGAN/.vscode/
 Paper/Figs/GradCAM/*.png
 Paper/Figs/GradCAM/*.jpg
