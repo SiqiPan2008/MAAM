@@ -187,6 +187,11 @@ class Setting:
         abbr_abnormities = self.get_abbr_abnormities("OCT Abnormities" if type == "AO" or type == "OCT" else "Fundus Abnormities")
         return abbr_abnormities[abnormities.index(("OCT" if type == "AO" or type == "OCT" else "Fundus", abnormity))][1]
     
+    def convert_disease_to_abbr(self, disease: str) -> str:
+        diseases = self.get_diseases()
+        abbr_diseases = self.get_abbr_diseases()
+        return abbr_diseases[diseases.index(disease)]
+    
     def get_correct_abnormities(self, name: str) -> list:
         criteria = utils.get_criteria()
         disease_name = self.get_disease_name(name)

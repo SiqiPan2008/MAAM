@@ -8,6 +8,7 @@ import csv
 from sklearn.manifold import TSNE
 from sklearn.metrics import roc_curve, auc
 import matplotlib.pyplot as plt
+from matplotlib.lines import Line2D
 from Diagnosis_Model import diagnosis_model
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 
@@ -31,14 +32,21 @@ def plot_tSNE(features, labels, diseases):
     plt.show()
 
 def plot_all_ROC(labels, probs, diseases, draw_roc = True):
+    plt.rcParams['axes.titlesize'] = 9
+    plt.rcParams['axes.labelsize'] = 9
+    plt.rcParams['xtick.labelsize'] = 9
+    plt.rcParams['ytick.labelsize'] = 9
+    plt.rcParams['legend.fontsize'] = 9
+    
     setting = utils.get_setting()
     fig_folder = setting.fig_folder
     fig_file = "diagnosis2_ROC.pdf"
     fig_path = os.path.join(fig_folder, fig_file)
     
     if draw_roc:
-        fig = plt.figure(figsize = (8, 8))
-        axs = fig.subplots(4, 4)
+        fig = plt.figure(figsize = (8, 5))
+        axs = fig.subplots(3, 5)
+        plt.subplots_adjust(wspace=0.1, hspace=0.125)
     
     row = 0
     col = 0
@@ -48,20 +56,42 @@ def plot_all_ROC(labels, probs, diseases, draw_roc = True):
         fpr, tpr, _ = roc_curve(labels[disease], probs[disease])
         aucs.append(auc(fpr, tpr))
         if draw_roc:
-            axs[row, col].plot(fpr, tpr, color = "red")
-            axs[row, col].set_xlim([0.0, 1.0])
-            axs[row, col].set_ylim([0.0, 1.0])
-            axs[row, col].plot([0, 1], [0, 1], color = "black")
-        if col == 3:
+            ax = axs[row, col]
+            abbr = setting.convert_disease_to_abbr(disease)
+            ax.plot(fpr, tpr, color = "#FF0000", linewidth = 1.2)
+            ax.set_xlim([0.0, 1.0])
+            ax.set_ylim([0.0, 1.0])
+            ax.plot([0, 1], [0, 1], color = "gray", linewidth = 0.6)
+            ax.text(0.95, 0.05, abbr, verticalalignment='bottom', horizontalalignment='right', fontsize=9)
+            ax.set_xticks([0, 0.25, 0.5, 0.75, 1])
+            ax.xaxis.set_ticks_position('top')
+            ax.set_yticks([0, 0.25, 0.5, 0.75, 1])
+            ax.xaxis.set_tick_params(labelbottom=False, labeltop=True)
+            if row == 0:
+                ax.set_xticklabels(["0", "", "0.5", "", "1"])
+            else:
+                ax.set_xticks([])
+            if col == 0:
+                ax.set_yticklabels(["0", "", "0.5", "", "1"])
+            else:
+                ax.set_yticks([])
+        if col == 4:
             col = 0
             row += 1
         else:
             col += 1
     
-    for col in range(1, 4):
-        axs[3, col].set_axis_off()
-    
+    for col in range(3, 5):
+        axs[2, col].set_axis_off()
+
     if draw_roc:
+        legend_lines = [
+            Line2D([0], [0], color="#FF0000", linewidth = 1.2, linestyle='-', label='ROC'),
+            Line2D([0], [0], color="gray", linewidth = 0.6,linestyle='-', label='y = x'),
+        ]
+        fig.legend(handles=legend_lines, ncols = 2, loc = "lower right", bbox_to_anchor = (0.91,0.1))
+        fig.text(0.898, 0.18, "Horizontal axes: specificity\nVertical axes: sensitivity", fontsize=9, 
+            verticalalignment='bottom', horizontalalignment='right', bbox=dict(facecolor='white', edgecolor='#D1D1D1', boxstyle='round,pad=0.25'))
         plt.savefig(fig_path)
         plt.show()
     return aucs
@@ -114,7 +144,7 @@ def plot_tSNE_ROC_conf_mat(plt_tSNE = True, plt_ROC = True, plt_conf_mat = True)
             output = mr[i][j]
             predicted = np.argmax(np.array(output))
             corrects += (predicted == i).item()
-            output = torch.nn.functional.softmax(torch.Tensor(output))
+            output = torch.nn.functional.softmax(torch.Tensor(output), dim=0)
             corrects_codominant += i in utils.get_top_prob_indices(output, setting.D2_top_probs_max_num, setting.D2_top_probs_min_prob)
             total += 1
             
@@ -139,12 +169,12 @@ def plot_tSNE_ROC_conf_mat(plt_tSNE = True, plt_ROC = True, plt_conf_mat = True)
     tSNE_features = np.concatenate(tSNE_features)
     tSNE_labels = np.concatenate(tSNE_labels)
     
-    if plt_tSNE:
-        plot_tSNE(tSNE_features, tSNE_labels, diseases_including_normal)
+    #if plt_tSNE:
+    #    plot_tSNE(tSNE_features, tSNE_labels, diseases_including_normal)
     if plt_ROC:
         aucs = plot_all_ROC(roc_labels, roc_probs, diseases_including_normal)
-    if plt_conf_mat:
-        plot_conf_mat(conf_mat, diseases_including_normal)
+    #if plt_conf_mat:
+    #    plot_conf_mat(conf_mat, diseases_including_normal)
     
     with open(os.path.join(setting.D2_folder, "000D2TORS.csv"), "w", newline="") as file:
         writer = csv.writer(file)

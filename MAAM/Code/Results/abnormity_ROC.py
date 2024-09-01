@@ -110,9 +110,10 @@ def plot_roc():
     legend_lines = [
         Line2D([0], [0], color=colors["TR"], linewidth = 1.2, linestyle='-', label='ROC for training'),
         Line2D([0], [0], color=colors["TO"], linewidth = 1.2,linestyle='-', label='ROC for testing'),
+        Line2D([0], [0], color="gray", linewidth = 0.6,linestyle='-', label='y = x'),
     ]
     fig.legend(handles=legend_lines, ncols = 2, loc = "lower right", bbox_to_anchor = (0.91,0.1))
-    fig.text(0.898, 0.17, "Horizontal axes: specificity\nVertical axes: sensitivity", fontsize=9, 
+    fig.text(0.898, 0.2, "Horizontal axes: specificity\nVertical axes: sensitivity", fontsize=9, 
         verticalalignment='bottom', horizontalalignment='right', bbox=dict(facecolor='white', edgecolor='#D1D1D1', boxstyle='round,pad=0.25'))
     plt.savefig(fig_path)
     plt.show()
