@@ -105,17 +105,26 @@ def get_single_conf_mat(complete_conf_mat, index):
     return conf_mat
 
 def plot_conf_mat(conf_mat, diseases):
+    plt.rcParams['axes.titlesize'] = 9
+    plt.rcParams['axes.labelsize'] = 9
+    plt.rcParams['xtick.labelsize'] = 9
+    plt.rcParams['ytick.labelsize'] = 9
+    plt.rcParams['legend.fontsize'] = 9
+    
     setting = utils.get_setting()
     fig_folder = setting.fig_folder
     fig_file = "diagnosis2_confusion_matrix.pdf"
     fig_path = os.path.join(fig_folder, fig_file)
     
+
     mat = plt.matshow(conf_mat, cmap='Blues')
     max = np.max(conf_mat)
     for i in range(conf_mat.shape[0]):
         for j in range(conf_mat.shape[1]):
-            plt.text(j, i, conf_mat[i, j], ha='center', va='center', color='black' if conf_mat[i, j] < max / 2 else 'white')
-    
+            plt.text(j, i, conf_mat[i, j], ha='center', va='center', color='black' if conf_mat[i, j] < max / 2 else 'white', fontsize=7)
+    plt.xticks(np.arange(len(diseases)), labels=diseases, rotation=-90)
+    plt.yticks(np.arange(len(diseases)), labels=diseases)
+    plt.tick_params(axis='x', which='both', bottom=False)
     plt.savefig(fig_path)
     plt.show()
 
@@ -125,6 +134,7 @@ def plot_tSNE_ROC_conf_mat(plt_tSNE = True, plt_ROC = True, plt_conf_mat = True)
     name = "000D2TOMR"
     tSNE_point_num = setting.tSNE_point_num
     diseases_including_normal = setting.get_diseases(include_normal = True)
+    abbr_diseases = setting.get_abbr_diseases(include_normal = True)
     disease_num_including_normal = setting.get_disease_num(include_normal = True)
     mr_path = os.path.join(setting.D2_folder, name + ".bin")
     mr = np.fromfile(mr_path, dtype = np.float64).reshape((disease_num_including_normal, setting.D2_test_class_size, disease_num_including_normal))
@@ -174,13 +184,13 @@ def plot_tSNE_ROC_conf_mat(plt_tSNE = True, plt_ROC = True, plt_conf_mat = True)
     #if plt_ROC:
     #    aucs = plot_all_ROC(roc_labels, roc_probs, diseases_including_normal)
     if plt_conf_mat:
-        plot_conf_mat(conf_mat, diseases_including_normal)
+        plot_conf_mat(conf_mat, abbr_diseases)
     
     with open(os.path.join(setting.D2_folder, "000D2TORS.csv"), "w", newline="") as file:
         writer = csv.writer(file)
         writer.writerow([corrects, corrects_codominant, total, acc, acc_codominant])
     
-    with open(os.path.join(setting.table_folder, "diagnosis2.csv"), "w", newline="") as file:
+    '''with open(os.path.join(setting.table_folder, "diagnosis2.csv"), "w", newline="") as file:
         writer = csv.writer(file)
         writer.writerow([
                 "Abnormity",
@@ -190,7 +200,7 @@ def plot_tSNE_ROC_conf_mat(plt_tSNE = True, plt_ROC = True, plt_conf_mat = True)
                 "FOne", 
                 "AUC"
             ])
-        '''for i in range(len(diseases_including_normal)):
+        for i in range(len(diseases_including_normal)):
             disease_conf_mat = get_single_conf_mat(conf_mat, i)
             tp = disease_conf_mat[0][0]
             fn = disease_conf_mat[0][1]

@@ -33,7 +33,7 @@ def plot_complete_conf_mat(ax, complete_conf_mat, abnormities, fontsize, title):
             ax.text(j, i, complete_conf_mat[i, j], ha='center', va='center', color='black' if complete_conf_mat[i, j] < max / 2 else 'white', fontsize = fontsize)
     ax.set_xticks(np.arange(len(abnormities)))
     ax.set_yticks(np.arange(len(abnormities)))
-    ax.set_xticklabels(abnormities, rotation=-90)
+    ax.set_xticklabels(abnormities, rotation=90)
     ax.set_yticklabels(abnormities)
     ax.tick_params(axis='x', which='both', bottom=False)
     ax.set_title(title, fontsize = 12, pad = 20)
