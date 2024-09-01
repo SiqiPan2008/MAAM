@@ -36,7 +36,7 @@ def plot_complete_conf_mat(ax, complete_conf_mat, abnormities, fontsize, title):
     ax.set_xticklabels(abnormities, rotation=-90)
     ax.set_yticklabels(abnormities)
     ax.tick_params(axis='x', which='both', bottom=False)
-    ax.set_title(title, fontsize = 12)
+    ax.set_title(title, fontsize = 12, pad = 20)
 
 def calc_and_save_numerical_results(csv_filename, type, source, conf_mat):
     setting = utils.get_setting()
@@ -99,9 +99,9 @@ def plot_all_conf_mat():
     plt.rcParams['xtick.labelsize'] = 9
     plt.rcParams['ytick.labelsize'] = 9
     
-    fig = plt.figure(figsize=(8, 8))
+    fig = plt.figure(figsize=(8, 9.5))
     axs = fig.subplots(2, 2)
-    fig.subplots_adjust(hspace = 0.35, wspace = 0.2)
+    fig.subplots_adjust(hspace = 0.55, wspace = 0.25)
     
     o_train_mr_path = os.path.join(abnormity_folder_path, o_train_mr_name + ".bin")
     o_train_mr = np.fromfile(o_train_mr_path, dtype = np.float64).reshape((o_abnormity_num, o_train_class_size, o_abnormity_num))

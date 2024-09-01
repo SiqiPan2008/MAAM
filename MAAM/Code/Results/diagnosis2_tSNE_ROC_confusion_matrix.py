@@ -171,10 +171,10 @@ def plot_tSNE_ROC_conf_mat(plt_tSNE = True, plt_ROC = True, plt_conf_mat = True)
     
     #if plt_tSNE:
     #    plot_tSNE(tSNE_features, tSNE_labels, diseases_including_normal)
-    if plt_ROC:
-        aucs = plot_all_ROC(roc_labels, roc_probs, diseases_including_normal)
-    #if plt_conf_mat:
-    #    plot_conf_mat(conf_mat, diseases_including_normal)
+    #if plt_ROC:
+    #    aucs = plot_all_ROC(roc_labels, roc_probs, diseases_including_normal)
+    if plt_conf_mat:
+        plot_conf_mat(conf_mat, diseases_including_normal)
     
     with open(os.path.join(setting.D2_folder, "000D2TORS.csv"), "w", newline="") as file:
         writer = csv.writer(file)
@@ -190,7 +190,7 @@ def plot_tSNE_ROC_conf_mat(plt_tSNE = True, plt_ROC = True, plt_conf_mat = True)
                 "FOne", 
                 "AUC"
             ])
-        for i in range(len(diseases_including_normal)):
+        '''for i in range(len(diseases_including_normal)):
             disease_conf_mat = get_single_conf_mat(conf_mat, i)
             tp = disease_conf_mat[0][0]
             fn = disease_conf_mat[0][1]
@@ -207,4 +207,4 @@ def plot_tSNE_ROC_conf_mat(plt_tSNE = True, plt_ROC = True, plt_conf_mat = True)
                 f"{specificity:.3f}",
                 f"{f1:.3f}", 
                 f"{aucs[i]:.3f}"
-            ])
+            ])'''
