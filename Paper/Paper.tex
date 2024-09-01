@@ -134,41 +134,49 @@
 	
 	\begin{figure}[htbp]
 		\centering
-		\includegraphics[width=0.8\linewidth]{Figs/criteria.pdf}
+		\includegraphics[width=0.7\linewidth]{Figs/criteria.pdf}
 		\caption{Abnormity-to-disease Deduction Criteria}
 		\vspace{0.3cm}
 		\label{fig:criteria}
 	\end{figure}
 
 	\vspace{0.2cm}
-	
+
+	\begin{multicols}{2}	
 	In Stage D2, we determine the final disease probability vector. Similarly, we use a fused vector from the outputs of submodels in Stage D1, and have the vector go through a FC layer with softmax operation. The result presents potential diseases that can be referenced by ophthalmologists.
 
 	\vspace{0.5cm}
 	
 	In the MAAM, we leverage the fusion operation to incorporate all the results from different submodels. As shown in Fig.~\ref{fig:fusion}, there are totally 3 fusion operations in MAAM.
-	
-	\begin{figure}[htbp]
-		\centering
-		\includegraphics[width=\linewidth]{Figs/fusion.pdf}
-		\caption{Fusion}
-		\vspace{0.3cm}
-		\label{fig:fusion}
-	\end{figure}
 
 	The first fusion occurs at the output of OCT Model or Fundus Model. In real scenarios, multiple OCT and Fundus images can be used for ocular disease diagnosis. Each image goes through either the OCT Model or the Fundus Model to yield a probability vector. To use the probability results from all the images, a maximization fusion is implemented for all the vectors so that the fusion yields one OCT abnormity probability vector and one Fundus abnormity probability vector with maximum values.
 	
 	The second fusion occurs at the interface between Abnormity Model and Stage D1. A concatenation fusion is implemented for OCT abnormity probability vector and Fundus abnormity probability vector. The fused vector works as an input to all the submodels in Stage D1.
 	
 	The third fusion occurs at the interface between Stage D1 and Stage D2. We concatenation all the severity level vectors to feed the model in Stage D2. The fused vector goes through the FC layer and undergoes a softmax operation to yield the final result.
-	
 
+	\end{multicols}
+
+	\begin{figure}[htbp]
+	\centering
+	\includegraphics[width=\linewidth]{Figs/fusion.pdf}
+	\caption{Fusion}
+	\vspace{0.3cm}
+	\label{fig:fusion}
+	\end{figure}
+	
+	\begin{multicols}{2}
+		
 	\section{Abnormity Models}
 	
 	\subsection{Data Preparation}
 	
 	The images and labels used for training are mainly downloaded from public databases, but some abnormities are not included in these databases. For those abnormities, we use the search engine as an additional data source to get images. The numbers of images acquired from each data source are shown in Table~\ref{tb:OCT_source} and Table~\ref{tb:Fundus_source}. As to the links of the images from the search engine, refer to ``Appendix''. 
+
+	For OCT abnormities with less than 1000 images, we use Cycle-GAN \autocite{Zhu_Park_Isola_Efros_2020} to generate new images. We train a Cycle-GAN network to interconvert healthy and abnormity images, take out the generator that converts healthy to abnormity images, and use it to generate new abnormity images. We go through all generated images and adopt those that clearly display only the abnormity of interest. The adoption rates are shown in Table~\ref{tb:cycleGAN_number}. Fundus images are not generated using Cycle-GAN because generated fundus images are too blurry; in addition, fundus abnormities are usually less salient than OCT ones and cannot be properly learned by Cycle-GAN, given that we only have a small number of fundus images.
+	\end{multicols}
 	
+	\vspace{-0.5cm}
 	\begin{minipage}[t]{0.4\linewidth}
 		{
 			\fontsize{9}{12}\selectfont
@@ -266,8 +274,6 @@
 		}
 	\end{minipage}
 	
-	For OCT abnormities with less than 1000 images, we use Cycle-GAN \autocite{Zhu_Park_Isola_Efros_2020} to generate new images. We train a Cycle-GAN network to interconvert healthy and abnormity images, take out the generator that converts healthy to abnormity images, and use it to generate new abnormity images. We go through all generated images and adopt those that clearly display only the abnormity of interest. The adoption rates are shown in Table~\ref{tb:cycleGAN_number}. Fundus images are not generated using Cycle-GAN because generated fundus images are too blurry; in addition, fundus abnormities are usually less salient than OCT ones and cannot be properly learned by Cycle-GAN, given that we only have a small number of fundus images.
-	
 	{
 		\fontsize{9}{12}\selectfont
 		{
@@ -288,6 +294,7 @@
 		}
 	}
 	
+	\begin{multicols}{2}
 	We split the images, including generated images, into training and test datasets, and implement a set of transformations on the images, including horizontal flips, random brightness changes from -10\% to +10\%, random horizontal and vertical translations between -5\% and +5\%, random scaling between -20\% and +20\%, and random rotations, which are between -10$^\circ$ and +10$^\circ$ for OCT images and between -30$^\circ$ and +30$^\circ$ for fundus images. The rotation is only applied to images in the train dataset. Eventually, we get 5000 train images and 500 test images for each OCT abnormity, and 3000 train images and 300 test images for each fundus abnormity.
 	
 	\subsection{Training}
@@ -305,23 +312,6 @@
 	
 	For both OCT and Fundus Models, we trained 4 commonly used CNNs: ResNet152, ResNet50, ResNet18, and VGG16. The accuracies and losses during training and validation phases are shown in Fig.~\ref{fig:A_train}. 
 	
-	\pagebreak
-		
-	\begin{figure}[htbp]
-		\centering
-		\includegraphics[width=\linewidth]{Figs/abnormity_OCT_loss_and_acc.pdf}
-	\end{figure}
-	\begin{figure}[htbp]
-		\centering
-		\vspace{-1cm}
-		\includegraphics[width=\linewidth]{Figs/abnormity_Fundus_loss_and_acc.pdf}
-		\caption{Abnormity training}
-		\vspace{0.3cm}
-		\label{fig:A_train}
-	\end{figure}
-		
-	\pagebreak
-	
 	\vspace{0.3cm}
 	
 	We can observe that finetuning significantly increases the model accuracy and, therefore, all the final models are finetuned models. As shown in Table~\ref{tb:A_accuracies}, the best CNN for OCT Model is ResNet50 and the best for Fundus Model is ResNet152. ResNet50 performed better than ResNet152 on OCT, possibly because it has fewer parameters and is less likely to overfit on OCT images, which has fewer and clearer traits; on the other hand, ResNet152 is better on fundus possibly because it has more parameters and can better discern the complex traits in fundus images. ResNet18 may have too few parameters, so it performs less well over all; and VGG16 sometimes experiences large dips in accuracy, possibly due to gradient vanishing, and this impairs its performance. 
@@ -330,79 +320,79 @@
 	
 	After all the training and comparisons, we determine to use a finetuned model with ResNet50 for OCT Model and a finetuned model with ResNet152 for Fundus Model. 
 	
+	\end{multicols}
+	
+	\begin{figure}[htbp]
+		\centering
+		\includegraphics[width=\linewidth]{Figs/abnormity_OCT_loss_and_acc.pdf}
+		\includegraphics[width=\linewidth]{Figs/abnormity_Fundus_loss_and_acc.pdf}
+		\caption{Abnormity training}
+		\label{fig:A_train}
+	\end{figure}
+	
 	{
-		\fontsize{9}{12}\selectfont
-		{
-			\begin{table}
-				\centering
-				\caption{Overall accuracies}
-				\label{tb:A_accuracies}
-				\begin{tabular}{ccccc}
-					\toprule
-					Model&ResNet152&ResNet50&ResNet18&VGG16\\
-					\midrule
-					OCT Model   &91.906\%&\textbf{92.183\%}&91.011\%&89.744\% \\
-					Fundus Model&\textbf{89.111\%}&88.926\%&86.605\%&79.185\% \\
-					\bottomrule
-				\end{tabular}
-			\end{table}
-		}
+	\fontsize{9}{12}\selectfont
+	{
+		\begin{table}
+			\centering
+			\caption{Overall accuracies}
+			\label{tb:A_accuracies}
+			\begin{tabular}{ccccc}
+				\toprule
+				Model&ResNet152&ResNet50&ResNet18&VGG16\\
+				\midrule
+				OCT Model   &91.906\%&\textbf{92.183\%}&91.011\%&89.744\% \\
+				Fundus Model&\textbf{89.111\%}&88.926\%&86.605\%&79.185\% \\
+				\bottomrule
+			\end{tabular}
+		\end{table}
 	}
+	}	
 	
-	\subsection{Results}
+	\begin{table}[htbp]
+		\centering
+		\fontsize{9}{12}\selectfont{
+		\caption{OCT Test}
+		\label{tb:OCT_test}
+		\pgfplotstabletypeset[
+		multicolumn names,
+		col sep=comma,
+		columns = {Abnormity, Precision, Sensitivity, Specificity, FOne, AUC},
+		columns/Abnormity/.style={string type, column name=Abnormities},
+		columns/Precision/.style={string type, column name=Precision},
+		columns/Sensitivity/.style={string type, column name=Sensitivity},
+		columns/Specificity/.style={string type, column name=Specificity},
+		columns/FOne/.style={string type, column name={F1 Score}},
+		columns/AUC/.style={string type, column name=AUC},
+		every head row/.style={before row=\toprule, after row=\midrule},
+		every last row/.style={ after row=\bottomrule}
+		]{Tables/abnormity_o_test.csv}}
+	\end{table}
+	\begin{table}[H]
+		\centering
+		\fontsize{9}{12}\selectfont{
+		\caption{Fundus Test}
+		\label{tb:Fundus_test}
+		\pgfplotstabletypeset[
+		multicolumn names,
+		col sep=comma,
+		columns = {Abnormity, Precision, Sensitivity, Specificity, FOne, AUC},
+		columns/Abnormity/.style={string type, column name=Abnormities},
+		columns/Precision/.style={string type, column name=Precision},
+		columns/Sensitivity/.style={string type, column name=Sensitivity},
+		columns/Specificity/.style={string type, column name=Specificity},
+		columns/FOne/.style={string type, column name={F1 Score}},
+		columns/AUC/.style={string type, column name=AUC},
+		every head row/.style={before row=\toprule, after row=\midrule},
+		every last row/.style={after row=\bottomrule}
+		]{Tables/abnormity_f_test.csv}}
+	\end{table}
 	
-	Table~\ref{tb:OCT_test} and Table~\ref{tb:Fundus_test} show the predictive values on the test dataset. Fig.~\ref{fig:A_ROC} shows the ROCs, Fig.~\ref{fig:A_conf_mat} shows the confusion matrices and Fig.~\ref{fig:A_tSNE} shows the t-SNE graphs for each abnormity.
-	
-	The OCT Model tends to overfit, while the Fundus Model cannot reach a satisfying level in terms of DL. Overall, the performance of the OCT Model is significantly better than that of the Fundus Model.
-	
-	Fundus abnormities tend to be less prominent than those of OCT, since the abnormity in fundus image are usually quite small and scattered. Moreover, one fundus image usually contains more than one abnormity, while most OCT images contain only one abnormity per image. Also, given that we have fewer fundus images than OCT ones, the difficulties for fundus classification increases.
-	
-	In order to allow the Abnormity Models to identify multiple abnormities in one image, we employ a method to determine the codominant abnormities. We input an image to the Abnormity Models and get the abnormity probabilities vector. If the abnormity with the highest probability has probability greater than 0.9, it is regarded as dominant; if not, we continue taking the abnormity with the next high probability until either the sum of the probabilities of the chosen abnormities reaches 0.9, or the number of abnormities reaches the maximum, which is 4, and all the chosen abnormities are regarded as codominant. 
-	
-			\begin{table}[htbp]
-				\centering
-				\fontsize{9}{12}\selectfont{
-				\caption{OCT Test}
-				\label{tb:OCT_test}
-				\pgfplotstabletypeset[
-				multicolumn names,
-				col sep=comma,
-				columns = {Abnormity, Precision, Sensitivity, Specificity, FOne, AUC},
-				columns/Abnormity/.style={string type, column name=Abnormities},
-				columns/Precision/.style={string type, column name=Precision},
-				columns/Sensitivity/.style={string type, column name=Sensitivity},
-				columns/Specificity/.style={string type, column name=Specificity},
-				columns/FOne/.style={string type, column name={F1 Score}},
-				columns/AUC/.style={string type, column name=AUC},
-				every head row/.style={before row=\toprule, after row=\midrule},
-				every last row/.style={ after row=\bottomrule}
-				]{Tables/abnormity_o_test.csv}}
-			\end{table}
-	
-			\begin{table}[htbp]
-				\centering
-				\fontsize{9}{12}\selectfont{
-				\caption{Fundus Test}
-				\label{tb:Fundus_test}
-				\pgfplotstabletypeset[
-				multicolumn names,
-				col sep=comma,
-				columns = {Abnormity, Precision, Sensitivity, Specificity, FOne, AUC},
-				columns/Abnormity/.style={string type, column name=Abnormities},
-				columns/Precision/.style={string type, column name=Precision},
-				columns/Sensitivity/.style={string type, column name=Sensitivity},
-				columns/Specificity/.style={string type, column name=Specificity},
-				columns/FOne/.style={string type, column name={F1 Score}},
-				columns/AUC/.style={string type, column name=AUC},
-				every head row/.style={before row=\toprule, after row=\midrule},
-				every last row/.style={after row=\bottomrule}
-				]{Tables/abnormity_f_test.csv}}
-			\end{table}
+	\pagebreak
 
 	\begin{figure}[htbp]
 		\centering
 		\includegraphics[width=\linewidth]{Figs/abnormity_ROC.pdf}
-		\vspace{-1.5cm}
 		\caption{A ROC}
 		\vspace{0.3cm}
 		\label{fig:A_ROC}
@@ -424,12 +414,6 @@
 		\label{fig:A_tSNE}
 	\end{figure}
 	
-	\vspace{0.3cm}
-	
-	We can use Grad-CAM \autocite{Selvaraju_Cogswell_Das_Vedantam_Parikh_Batra} to highlight areas on the image that make a large contribution to the final classification. If the model had been trained correctly, this would be equivalent to highlighting the abnormity. In Fig.~\ref{fig:gradCAM}, the left image in each pair of images is the original OCT or Fundus image, and the right one is the image with the abnormity correctly highlighted with Grad-CAM. 
-	
-	Furthermore, Grad-CAM can highlight any designated abnormity, so it can be used to highlight codominant abnormities. In Fig.~\ref{fig:gradCAM_multi_abnormity}, the middle images are the original OCT and fundus images. In the images on the left and right, we use Grad-CAM to highlight the codominant abnormities.
-	
 	\begin{figure}[htbp]
 		\centering
 		\includegraphics[width=\linewidth]{Figs/abnormity_gradCAM.pdf}
@@ -445,6 +429,26 @@
 		\vspace{0.3cm}
 		\label{fig:gradCAM_multi_abnormity}
 	\end{figure}
+	
+		\vspace{1.5cm}
+	
+	\begin{multicols}{2}
+		
+		\subsection{Results}
+		
+		Table~\ref{tb:OCT_test} and Table~\ref{tb:Fundus_test} show the predictive values on the test dataset. Fig.~\ref{fig:A_ROC} shows the ROCs, Fig.~\ref{fig:A_conf_mat} shows the confusion matrices and Fig.~\ref{fig:A_tSNE} shows the t-SNE graphs for each abnormity.
+		
+		The OCT Model tends to overfit, while the Fundus Model cannot reach a satisfying level in terms of DL. Overall, the performance of the OCT Model is significantly better than that of the Fundus Model.
+		
+		Fundus abnormities tend to be less prominent than those of OCT, since the abnormity in fundus image are usually quite small and scattered. Moreover, one fundus image usually contains more than one abnormity, while most OCT images contain only one abnormity per image. Also, given that we have fewer fundus images than OCT ones, the difficulties for fundus classification increases.
+		
+		In order to allow the Abnormity Models to identify multiple abnormities in one image, we employ a method to determine the codominant abnormities. We input an image to the Abnormity Models and get the abnormity probabilities vector. If the abnormity with the highest probability has probability greater than 0.9, it is regarded as dominant; if not, we continue taking the abnormity with the next high probability until either the sum of the probabilities of the chosen abnormities reaches 0.9, or the number of abnormities reaches the maximum, which is 4, and all the chosen abnormities are regarded as codominant. 
+		
+		\vspace{0.3cm}
+		
+		We can use Grad-CAM \autocite{Selvaraju_Cogswell_Das_Vedantam_Parikh_Batra} to highlight areas on the image that make a large contribution to the final classification. If the model had been trained correctly, this would be equivalent to highlighting the abnormity. In Fig.~\ref{fig:gradCAM}, the left image in each pair of images is the original OCT or Fundus image, and the right one is the image with the abnormity correctly highlighted with Grad-CAM. 
+		
+		Furthermore, Grad-CAM can highlight any designated abnormity, so it can be used to highlight codominant abnormities. In Fig.~\ref{fig:gradCAM_multi_abnormity}, the middle images are the original OCT and fundus images. In the images on the left and right, we use Grad-CAM to highlight the codominant abnormities.
 	
 	\section{Diagnosis Model}
 	
@@ -469,6 +473,8 @@
 	
 	Stage D2 performs quite well on classifying the diseases. Furthermore, considering that some diseases may look alike each other, we employ a method similar to the codominant abnormities method to allow Stage D2 to give up to 3 codominant diseases. As shown in Fig.~\ref{fig:D1_acc_bar}, if the codominant diseases method is used, the accuracy of Stage D2 further increases. 
 	
+	\end{multicols}
+	
 	\begin{figure}[htbp]
 		\centering
 		\includegraphics[width=\linewidth]{Figs/diagnosis1_confusion_matrix.pdf}
@@ -485,26 +491,6 @@
 		\label{fig:D1_acc_bar}
 	\end{figure}
 	
-	\begin{table}[htbp]
-		\centering
-		\fontsize{9}{12}\selectfont{
-		\caption{Diagnosis Test}
-		\label{tb:diagnosis_test}
-		\pgfplotstabletypeset[
-		multicolumn names,
-		col sep=comma,
-		columns = {Abnormity, Precision, Sensitivity, Specificity, FOne, AUC},
-		columns/Abnormity/.style={string type, column name=Abnormities},
-		columns/Precision/.style={string type, column name=Precision},
-		columns/Sensitivity/.style={string type, column name=Sensitivity},
-		columns/Specificity/.style={string type, column name=Specificity},
-		columns/FOne/.style={string type, column name={F1 Score}},
-		columns/AUC/.style={string type, column name=AUC},
-		every head row/.style={before row=\toprule, after row=\midrule},
-		every last row/.style={ after row=\bottomrule}
-		]{Tables/diagnosis2.csv}}
-	\end{table}
-	
 	\begin{figure}[htbp]
 		\centering
 		\includegraphics[width=\linewidth]{Figs/diagnosis2_ROC.pdf}
@@ -513,22 +499,45 @@
 		\label{fig:D2_ROC}
 	\end{figure}
 	
-	\begin{figure}[htbp]
+	\begin{figure}[H]
 		\centering
-		\includegraphics[width=0.6\linewidth]{Figs/diagnosis2_confusion_matrix.pdf}
+		\includegraphics[width=0.7\linewidth]{Figs/diagnosis2_confusion_matrix.pdf}
+		\vspace{-0.8cm}
 		\caption{D2 Conf Mat}
-		\vspace{0.3cm}
 		\label{fig:D2_conf_mat}
 	\end{figure}
 	
-	\begin{figure}[htbp]
+	\begin{figure}[H]
 		\centering
-		\includegraphics[width=0.6\linewidth]{Figs/diagnosis2_tSNE.pdf}
+		\includegraphics[width=0.65\linewidth]{Figs/diagnosis2_tSNE.pdf}
+		\vspace{-0.3cm}
 		\caption{D2 tSNE}
-		\vspace{0.3cm}
 		\label{fig:D2_tSNE}
 	\end{figure}
 	
+		\begin{table}[H]
+		\centering
+		\fontsize{9}{12}\selectfont{
+			\caption{Diagnosis Test}
+			\label{tb:diagnosis_test}
+			\pgfplotstabletypeset[
+			multicolumn names,
+			col sep=comma,
+			columns = {Abnormity, Precision, Sensitivity, Specificity, FOne, AUC},
+			columns/Abnormity/.style={string type, column name=Abnormities},
+			columns/Precision/.style={string type, column name=Precision},
+			columns/Sensitivity/.style={string type, column name=Sensitivity},
+			columns/Specificity/.style={string type, column name=Specificity},
+			columns/FOne/.style={string type, column name={F1 Score}},
+			columns/AUC/.style={string type, column name=AUC},
+			every head row/.style={before row=\toprule, after row=\midrule},
+			every last row/.style={ after row=\bottomrule}
+			]{Tables/diagnosis2.csv}}
+	\end{table}
+	
+	\vspace{1cm}
+	
+	\begin{multicols}{2}
 	\section{Discussion}
 	
 	There are some studies working on classifying OCT abnormities.  For examples, \citeauthor{leandro2023oct}'s model is trained on 10770 images (most images belong to multiple classes), classifies 8 abnormities, and has overall accuracy between 93\% and 99\% \autocite{leandro2023oct}. \citeauthor{li2019deep}'s model is trained on 21357 images, classifies 4 abnormities, and has overall accuracy 97.3\% \autocite{li2019deep}.  And there are some studies working on classifying fundus abnormities.  For example,  	\citeauthor{Son2023}'s model is trained on 103262 images, classifies 15 abnormities, and has a mean AUC of 0.980 \autocite{Son2023}. In comparison, our OCT Model is trained on 15632 images, classifies 11 abnormities, and has overall accuracy less than 80\%.  And our Fundus Model is trained on 1734 images, classifies 8 abnormities, and has a mean AUC of 0.909. As a matter of fact, our Abnormity Models are not satisfying in terms of performance.
@@ -549,6 +558,8 @@
 	\addcontentsline{toc}{section}{References}
 	\newrefcontext[sorting=nyt]
 	\printbibliography
+	
+	\end{multicols}
 	
 	\pagebreak
 	\section*{Appendix}
