@@ -1,15 +1,18 @@
 import csv
 import os
 import numpy as np
+from matplotlib.lines import Line2D
 from Utils import utils
 from sklearn.metrics import roc_curve, auc
 import matplotlib.pyplot as plt
-import matplotlib.pyplot as plt
+import matplotlib.gridspec as gridspec
 
-def plot_single_roc(type, abnormity, draw_roc = True, ax = None):
-    colors = {"TR": "red", "TO": "green"}
+def plot_single_roc(type, abnormity, draw_roc = True, ax = None, row = 0, col = 0):
+    colors = {"TR": "#FF0000", "TO": "#00BB00"}
+    linewidths = {"TR": 1.2, "TO": 1.2}
     
     setting = utils.get_setting()
+    abbr = setting.convert_abnormity_to_abbr(abnormity, type)
     abnormities = setting.get_abnormities("OCT Abnormities") if type == "OCT" else setting.get_abnormities("Fundus Abnormities")
     abnormity_index = abnormities.index((type, abnormity))
     abnormity_folder_path = setting.A_folder
@@ -41,11 +44,24 @@ def plot_single_roc(type, abnormity, draw_roc = True, ax = None):
         fpr, tpr, _ = roc_curve(labels, probs)
         aucs[source] = auc(fpr, tpr)
         if draw_roc:
-            ax.plot(fpr, tpr, color = colors[source])
+            ax.plot(fpr, tpr, color = colors[source], linewidth = linewidths[source])
             ax.set_xlim([0.0, 1.0])
             ax.set_ylim([0.0, 1.0])
     if draw_roc:
-        ax.plot([0, 1], [0, 1], color = "black")
+        ax.plot([0, 1], [0, 1], color = "gray", linewidth = 0.6)
+        ax.text(0.95, 0.05, abbr, verticalalignment='bottom', horizontalalignment='right', fontsize=9)
+        ax.set_xticks([0, 0.25, 0.5, 0.75, 1])
+        ax.xaxis.set_ticks_position('top')
+        ax.set_yticks([0, 0.25, 0.5, 0.75, 1])
+        ax.xaxis.set_tick_params(labelbottom=False, labeltop=True)
+        if row == 0 or row == 3:
+            ax.set_xticklabels(["0", "", "0.5", "", "1"])
+        else:
+            ax.set_xticks([])
+        if col == 0:
+            ax.set_yticklabels(["0", "", "0.5", "", "1"])
+        else:
+            ax.set_yticks([])
     return aucs
 
 def plot_roc():
@@ -56,30 +72,47 @@ def plot_roc():
     o_abnormities = setting.get_abnormities("OCT Abnormities")
     f_abnormities = setting.get_abnormities("Fundus Abnormities")
     
-    fig = plt.figure(figsize=(8, 12))
-    axs = fig.subplots(6, 4)
+    plt.rcParams['axes.titlesize'] = 9
+    plt.rcParams['axes.labelsize'] = 9
+    plt.rcParams['xtick.labelsize'] = 9
+    plt.rcParams['ytick.labelsize'] = 9
+    plt.rcParams['legend.fontsize'] = 9
+    
+    fig = plt.figure(figsize=(8, 6))
+    grid = gridspec.GridSpec(5, 6, height_ratios=[1, 1, 0.45, 1, 1], hspace=0.125, wspace=0.1)
     
     row = 0
     col = 0
     for abnormity in o_abnormities:
-        plot_single_roc("OCT", abnormity[1], ax = axs[row, col])
-        if col == 3:
+        ax = fig.add_subplot(grid[row, col])
+        plot_single_roc("OCT", abnormity[1], ax = ax, row = row, col = col)
+        if col == 5:
             col = 0
             row += 1
         else:
             col += 1
     
-    for i in range(1, 4):
-        axs[3, i].set_axis_off()
+    row += 1
     for abnormity in f_abnormities:
-        plot_single_roc("Fundus", abnormity[1], ax = axs[row, col])
-        if row == 3:
-            row += 1
-        elif col == 3:
+        ax = fig.add_subplot(grid[row, col])
+        plot_single_roc("Fundus", abnormity[1], ax = ax, row = row, col = col)
+        if row == 4 and col == 3:
+            break
+        elif col == 5:
             col = 0
             row += 1
         else:
             col += 1
     
+    fig.text(0.5, 0.925, "OCT", verticalalignment='bottom', horizontalalignment='center', fontsize=12)
+    fig.text(0.5, 0.485, "Fundus", verticalalignment='bottom', horizontalalignment='center', fontsize=12)
+    colors = {"TR": "#FF0000", "TO": "#00BB00"}
+    legend_lines = [
+        Line2D([0], [0], color=colors["TR"], linewidth = 1.2, linestyle='-', label='ROC for training'),
+        Line2D([0], [0], color=colors["TO"], linewidth = 1.2,linestyle='-', label='ROC for testing'),
+    ]
+    fig.legend(handles=legend_lines, ncols = 2, loc = "lower right", bbox_to_anchor = (0.91,0.1))
+    fig.text(0.898, 0.17, "Horizontal axes: specificity\nVertical axes: sensitivity", fontsize=9, 
+        verticalalignment='bottom', horizontalalignment='right', bbox=dict(facecolor='white', edgecolor='#D1D1D1', boxstyle='round,pad=0.25'))
     plt.savefig(fig_path)
     plt.show()
