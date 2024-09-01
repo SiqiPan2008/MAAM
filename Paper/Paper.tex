@@ -303,22 +303,19 @@
 	
 	In the finetuning phase, we start from the best model in the transfer learning phase, unfreezing all weights in the model. We train the model for 30 epochs. Similarly, we save the weights of the model with the best validation accuracy every 10 epochs, and find the model with the highest overall accuracy. Finally, we compare the overall accuracies of the best model in the transfer learning phase and the finetuning phase to determine the best model of all. 
 	
-	For both OCT and Fundus Models, we trained 4 commonly used CNNs: ResNet152, ResNet50, ResNet18, and VGG16. The accuracies and losses during training and validation phases are shown in Fig.~\ref{fig:AO_train} and Fig.~\ref{fig:AF_train}. 
+	For both OCT and Fundus Models, we trained 4 commonly used CNNs: ResNet152, ResNet50, ResNet18, and VGG16. The accuracies and losses during training and validation phases are shown in Fig.~\ref{fig:A_train}. 
 	
 	\begin{figure}[htbp]
 		\centering
 		\includegraphics[width=\linewidth]{Figs/abnormity_OCT_loss_and_acc.pdf}
-		\caption{AO train}
-		\vspace{0.3cm}
-		\label{fig:AO_train}
 	\end{figure}
-	
 	\begin{figure}[htbp]
 		\centering
+		\vspace{-1cm}
 		\includegraphics[width=\linewidth]{Figs/abnormity_Fundus_loss_and_acc.pdf}
-		\caption{AF train}
+		\caption{Abnormity training}
 		\vspace{0.3cm}
-		\label{fig:AF_train}
+		\label{fig:A_train}
 	\end{figure}
 	
 	\vspace{0.3cm}
