@@ -24,14 +24,14 @@ def plot_tSNE(features, labels, diseases):
     fig_file = "diagnosis2_tSNE.pdf"
     fig_path = os.path.join(fig_folder, fig_file)
     
-    fig = plt.figure(figsize = (4, 3))
+    fig = plt.figure(figsize = (4, 3.01))
     
     tsne = TSNE(n_components=2)
     features_tsne = tsne.fit_transform(np.array(features))
     s = 2
     plt.scatter(features_tsne[:, 0], features_tsne[:, 1], c=labels, cmap='jet', marker='o', s=s)
-    plt.xlabel('t-SNE Component 1')
-    plt.ylabel('t-SNE Component 2')
+    plt.xticks([])
+    plt.yticks([])
     
     handles = []
     for i, disease in enumerate(diseases):

@@ -7,7 +7,7 @@ from sklearn.manifold import TSNE
 import matplotlib.pyplot as plt
 import matplotlib.pyplot as plt
 
-def plot_single_tsne(ax, mr, abnormities, tSNE_point_num, color_bar_on = True):
+def plot_single_tsne(ax, mr, abnormities, tSNE_point_num):
     shape = mr.shape
     features = []
     labels = []
@@ -25,11 +25,14 @@ def plot_single_tsne(ax, mr, abnormities, tSNE_point_num, color_bar_on = True):
     tsne = TSNE(n_components=2)
     features_tsne = tsne.fit_transform(np.array(features))
     
-    scatter = ax.scatter(features_tsne[:, 0], features_tsne[:, 1], c=labels, cmap='jet', alpha=0.5)
-    if color_bar_on:
-        plt.colorbar(scatter)
-    ax.set_xlabel('t-SNE Component 1')
-    ax.set_ylabel('t-SNE Component 2')
+    s=2
+    scatter = ax.scatter(features_tsne[:, 0], features_tsne[:, 1], c=labels, cmap='jet', marker='o', s=s)
+    for i, disease in enumerate(diseases):
+        handle = Line2D([], [], color=plt.get_cmap('jet')(i / len(diseases)), marker='o', linestyle='None', markersize=s, label=disease)
+        handles.append(handle)
+    plt.legend(handles=handles, bbox_to_anchor=(1, 0.5), loc='center left')
+    ax.set_xticks([])
+    ax.set_yticks([])
 
 def plot_tsne():
     setting = utils.get_setting()
