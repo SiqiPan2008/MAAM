@@ -13,21 +13,32 @@ from Diagnosis_Model import diagnosis_model
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 
 def plot_tSNE(features, labels, diseases):
+    plt.rcParams['axes.titlesize'] = 9
+    plt.rcParams['axes.labelsize'] = 9
+    plt.rcParams['xtick.labelsize'] = 9
+    plt.rcParams['ytick.labelsize'] = 9
+    plt.rcParams['legend.fontsize'] = 9
+    
     setting = utils.get_setting()
     fig_folder = setting.fig_folder
     fig_file = "diagnosis2_tSNE.pdf"
     fig_path = os.path.join(fig_folder, fig_file)
     
-    fig = plt.figure(figsize = (9, 8))
+    fig = plt.figure(figsize = (4, 3))
     
     tsne = TSNE(n_components=2)
     features_tsne = tsne.fit_transform(np.array(features))
-    
-    scatter = plt.scatter(features_tsne[:, 0], features_tsne[:, 1], c=labels, cmap='jet', alpha=0.5)
-    plt.colorbar(scatter)
+    s = 2
+    plt.scatter(features_tsne[:, 0], features_tsne[:, 1], c=labels, cmap='jet', marker='o', s=s)
     plt.xlabel('t-SNE Component 1')
     plt.ylabel('t-SNE Component 2')
     
+    handles = []
+    for i, disease in enumerate(diseases):
+        handle = Line2D([], [], color=plt.get_cmap('jet')(i / len(diseases)), marker='o', linestyle='None', markersize=s, label=disease)
+        handles.append(handle)
+    plt.legend(handles=handles, bbox_to_anchor=(1, 0.5), loc='center left')
+    plt.tight_layout()
     plt.savefig(fig_path)
     plt.show()
 
@@ -179,12 +190,12 @@ def plot_tSNE_ROC_conf_mat(plt_tSNE = True, plt_ROC = True, plt_conf_mat = True)
     tSNE_features = np.concatenate(tSNE_features)
     tSNE_labels = np.concatenate(tSNE_labels)
     
-    #if plt_tSNE:
-    #    plot_tSNE(tSNE_features, tSNE_labels, diseases_including_normal)
+    if plt_tSNE:
+        plot_tSNE(tSNE_features, tSNE_labels, abbr_diseases)
     #if plt_ROC:
     #    aucs = plot_all_ROC(roc_labels, roc_probs, diseases_including_normal)
-    if plt_conf_mat:
-        plot_conf_mat(conf_mat, abbr_diseases)
+    #if plt_conf_mat:
+    #    plot_conf_mat(conf_mat, abbr_diseases)
     
     with open(os.path.join(setting.D2_folder, "000D2TORS.csv"), "w", newline="") as file:
         writer = csv.writer(file)
