@@ -192,16 +192,16 @@ def plot_tSNE_ROC_conf_mat(plt_tSNE = True, plt_ROC = True, plt_conf_mat = True)
     
     if plt_tSNE:
         plot_tSNE(tSNE_features, tSNE_labels, abbr_diseases)
-    #if plt_ROC:
-    #    aucs = plot_all_ROC(roc_labels, roc_probs, diseases_including_normal)
-    #if plt_conf_mat:
-    #    plot_conf_mat(conf_mat, abbr_diseases)
+    if plt_ROC:
+        aucs = plot_all_ROC(roc_labels, roc_probs, diseases_including_normal)
+    if plt_conf_mat:
+        plot_conf_mat(conf_mat, abbr_diseases)
     
     with open(os.path.join(setting.D2_folder, "000D2TORS.csv"), "w", newline="") as file:
         writer = csv.writer(file)
         writer.writerow([corrects, corrects_codominant, total, acc, acc_codominant])
     
-    '''with open(os.path.join(setting.table_folder, "diagnosis2.csv"), "w", newline="") as file:
+    with open(os.path.join(setting.table_folder, "diagnosis2.csv"), "w", newline="") as file:
         writer = csv.writer(file)
         writer.writerow([
                 "Abnormity",
@@ -222,10 +222,10 @@ def plot_tSNE_ROC_conf_mat(plt_tSNE = True, plt_ROC = True, plt_conf_mat = True)
             sensitivity = tp / (tp + fn)
             f1 = 2 * precision * sensitivity / (precision + sensitivity)
             writer.writerow([
-                diseases_including_normal[i],
+                abbr_diseases[i],
                 f"{precision:.3f}",
                 f"{sensitivity:.3f}",
                 f"{specificity:.3f}",
                 f"{f1:.3f}", 
                 f"{aucs[i]:.3f}"
-            ])'''
+            ])

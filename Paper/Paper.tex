@@ -50,7 +50,7 @@
 	\section*{Abstract}
 	\hrule
 	\vspace{0.4cm}
-	We devise a novel model, the Multimodal Abnormity-Aware Model (MAAM), for assisting ocular disease diagnosis. The MAAM enables input of 2 kinds of ophthalmological images, namely optical coherence tomography (OCT) and color fundus images, and simulates the decision-making process by deducing the disease from abnormities. The model is composed of 2 submodels, the Abnormity Models and the Diagnosis Model, where the Abnormity Models identify 11 OCT abnormities and 8 fundus abnormities, and the Diagnosis Model identifies 12 diseases by integrating features from the former model. In MAAM, we introduce the fusion mechanics, the concept of codominant abnormities and diseases, and the Abnormity-to-Disease Criteria.  The model breaks the black box of complex neural network and expose more interpretable information for the reference of ophthalmologists. And it gets the overall accuracy of 89\% and thus the feasibility is verified.
+	We devise a novel model, the Multimodal Abnormity-Aware Model (MAAM), for assisting ocular disease diagnosis. The MAAM enables input of 2 kinds of ophthalmological images, namely optical coherence tomography (OCT) and color fundus images, and simulates the decision-making process by deducing the disease from abnormities. The model is composed of 2 submodels, the Abnormity Models and the Diagnosis Model, where the Abnormity Models identify 11 OCT abnormities and 8 fundus abnormities, and the Diagnosis Model identifies 12 diseases by integrating features from the former model. In MAAM, we introduce the fusion mechanism, the concept of codominant abnormities and diseases, and the Abnormity-to-Disease Criteria.  The model breaks the black box of complex neural network and expose more interpretable information for the reference of ophthalmologists. And it gets the overall accuracy of 89\% and thus the feasibility is verified.
 	\vspace{0.4cm}
 	\hrule
 	\vspace{1cm}
@@ -93,7 +93,7 @@
 	\begin{figure}[htbp]
 	\centering
 	\includegraphics[width=\linewidth]{Figs/model_overview.pdf}
-	\caption{Model Overview}
+	\caption{Model overview}
 	\vspace{0.3cm}
 	\label{fig:3_parts}
 	\end{figure}
@@ -103,7 +103,7 @@
 	\begin{figure}[htbp]
 		\centering
 		\includegraphics[width=\linewidth]{Figs/OCT_Abnormities.pdf}
-		\caption{OCT Abnormities \autocite{Duker_Waheed_Goldman_2022}}
+		\caption{OCT abnormities \autocite{Duker_Waheed_Goldman_2022}}
 		\vspace{0.3cm}
 		\label{fig:OCT_abnormities}
 	\end{figure}
@@ -111,7 +111,7 @@
 	\begin{figure}[htbp]
 		\centering
 		\includegraphics[width=\linewidth]{Figs/fundus_Abnormities.pdf}
-		\caption{Fundus Abnormities \autocite{Wolf_Kirchhof_Reim_2006}}
+		\caption{Fundus abnormities \autocite{Wolf_Kirchhof_Reim_2006}}
 		\vspace{0.3cm}
 		\label{fig:fundus_abnormities}
 	\end{figure}
@@ -160,7 +160,7 @@
 	\begin{figure}[htbp]
 	\centering
 	\includegraphics[width=\linewidth]{Figs/fusion.pdf}
-	\caption{Fusion}
+	\caption{Fusion mechanism}
 	\vspace{0.3cm}
 	\label{fig:fusion}
 	\end{figure}
@@ -182,7 +182,7 @@
 			\fontsize{9}{12}\selectfont
 			{
 				\begin{longtable}{cccccc}
-					\caption{OCT abnormities}
+					\caption{Data sources of OCT abnormities}
 					\label{tb:OCT_source}\\
 					\toprule
 					\multirow{2}{*}{Abnormity}&\multicolumn{4}{c}{Source}&\multirow{2}{*}{Total}\\
@@ -227,7 +227,7 @@
 			\fontsize{9}{12}\selectfont
 			{
 				\begin{longtable}{cccccccc}
-					\caption{Fundus abnormities}
+					\caption{Data sources of fundus abnormities}
 					\label{tb:Fundus_source}\\
 					\toprule
 					\multirow{2}{*}{Abnormity}&\multicolumn{6}{c}{Source}&\multirow{2}{*}{Total}\\
@@ -278,7 +278,7 @@
 		\fontsize{9}{12}\selectfont
 		{
 			\begin{longtable}{ccccc}
-				\caption{OCT images CycleGAN adoption rates}
+				\caption{Adoption rates of Cycle-GAN-generated OCT images}
 				\label{tb:cycleGAN_number}\\
 				\toprule
 				Abnormity&Original&Generated&Adopted&Adoption Rate\\
@@ -326,7 +326,7 @@
 		\centering
 		\includegraphics[width=\linewidth]{Figs/abnormity_OCT_loss_and_acc.pdf}
 		\includegraphics[width=\linewidth]{Figs/abnormity_Fundus_loss_and_acc.pdf}
-		\caption{Abnormity training}
+		\caption{Abnormity Models training }
 		\label{fig:A_train}
 	\end{figure}
 	
@@ -335,7 +335,7 @@
 	{
 		\begin{table}
 			\centering
-			\caption{Overall accuracies}
+			\caption{Overall accuracies using different CNNs}
 			\label{tb:A_accuracies}
 			\begin{tabular}{ccccc}
 				\toprule
@@ -352,7 +352,7 @@
 	\begin{table}[htbp]
 		\centering
 		\fontsize{9}{12}\selectfont{
-		\caption{OCT Test}
+		\caption{Test results of the OCT Model}
 		\label{tb:OCT_test}
 		\pgfplotstabletypeset[
 		multicolumn names,
@@ -371,7 +371,7 @@
 	\begin{table}[H]
 		\centering
 		\fontsize{9}{12}\selectfont{
-		\caption{Fundus Test}
+		\caption{Test results of the Fundus Model}
 		\label{tb:Fundus_test}
 		\pgfplotstabletypeset[
 		multicolumn names,
@@ -393,7 +393,7 @@
 	\begin{figure}[htbp]
 		\centering
 		\includegraphics[width=\linewidth]{Figs/abnormity_ROC.pdf}
-		\caption{A ROC}
+		\caption{ROCs of the Abnormity Models}
 		\vspace{0.3cm}
 		\label{fig:A_ROC}
 	\end{figure}
@@ -401,7 +401,7 @@
 	\begin{figure}[htbp]
 		\centering
 		\includegraphics[width=\linewidth]{Figs/abnormity_confusion_matrix.pdf}
-		\caption{A Conf Mat}
+		\caption{Confusion matrices of the Abnormity Models}
 		\vspace{0.3cm}
 		\label{fig:A_conf_mat}
 	\end{figure}
@@ -409,7 +409,7 @@
 	\begin{figure}[htbp]
 		\centering
 		\includegraphics[width=\linewidth]{Figs/abnormity_tSNE.pdf}
-		\caption{A ROC}
+		\caption{t-SNE graph of the Abnormity Models}
 		\vspace{0.3cm}
 		\label{fig:A_tSNE}
 	\end{figure}
@@ -417,7 +417,7 @@
 	\begin{figure}[htbp]
 		\centering
 		\includegraphics[width=\linewidth]{Figs/abnormity_gradCAM.pdf}
-		\caption{GradCAM}
+		\caption{Grad-CAM highlighting of abnormities}
 		\vspace{0.3cm}
 		\label{fig:gradCAM}
 	\end{figure}
@@ -425,7 +425,7 @@
 	\begin{figure}[htbp]
 		\centering
 		\includegraphics[width=0.8\linewidth]{Figs/abnormity_gradCAM_multiple_abnormities.pdf}
-		\caption{GradCAM with multiple abnormities}
+		\caption{GradCAM highlighting of multiple abnormities}
 		\vspace{0.3cm}
 		\label{fig:gradCAM_multi_abnormity}
 	\end{figure}
@@ -478,7 +478,7 @@
 	\begin{figure}[htbp]
 		\centering
 		\includegraphics[width=\linewidth]{Figs/diagnosis1_confusion_matrix.pdf}
-		\caption{D1 Conf Mat}
+		\caption{Confusion matrices of Stage D1}
 		\vspace{0.3cm}
 		\label{fig:D1_conf_mat}
 	\end{figure}
@@ -486,7 +486,7 @@
 	\begin{figure}[htbp]
 		\centering
 		\includegraphics[width=\linewidth]{Figs/diagnosis1_acc_barchart.pdf}
-		\caption{D1 Acc Bar}
+		\caption{Accuracies of the Diagnosis Model (*: accuracy in terms of the disease with highest probability; **: accuracy in terms of codominant diseases)}
 		\vspace{0.3cm}
 		\label{fig:D1_acc_bar}
 	\end{figure}
@@ -494,7 +494,7 @@
 	\begin{figure}[htbp]
 		\centering
 		\includegraphics[width=\linewidth]{Figs/diagnosis2_ROC.pdf}
-		\caption{D2 ROC}
+		\caption{ROCs of Stage D2}
 		\vspace{0.3cm}
 		\label{fig:D2_ROC}
 	\end{figure}
@@ -503,7 +503,7 @@
 		\centering
 		\includegraphics[width=0.7\linewidth]{Figs/diagnosis2_confusion_matrix.pdf}
 		\vspace{-0.8cm}
-		\caption{D2 Conf Mat}
+		\caption{Confusion matrix of Stage D2}
 		\label{fig:D2_conf_mat}
 	\end{figure}
 	
@@ -511,14 +511,14 @@
 		\centering
 		\includegraphics[width=0.65\linewidth]{Figs/diagnosis2_tSNE.pdf}
 		\vspace{-0.3cm}
-		\caption{D2 tSNE}
+		\caption{t-SNE graph of Stage D2}
 		\label{fig:D2_tSNE}
 	\end{figure}
 	
 		\begin{table}[H]
 		\centering
 		\fontsize{9}{12}\selectfont{
-			\caption{Diagnosis Test}
+			\caption{Test results of Stage D2}
 			\label{tb:diagnosis_test}
 			\pgfplotstabletypeset[
 			multicolumn names,
