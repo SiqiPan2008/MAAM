@@ -78,15 +78,18 @@ def plot_loss_and_acc():
         fig_file = "abnormity_Fundus_loss_and_acc.pdf" if type == "AF" else "abnormity_OCT_loss_and_acc.pdf"
         fig_path = os.path.join(fig_folder, fig_file)
         
-        fig = plt.figure(figsize=(8, 5) if type == "AO" else (8, 5.4))
+        fig = plt.figure(figsize=(8, 5) if type == "AO" else (8, 5.6))
         grid = gridspec.GridSpec(2, 2, wspace = 0.05, hspace = 0.25)
-        plt.subplots_adjust(left=0.1, right=0.9, top=0.9 if type == "AO" else 0.95, bottom=0.1 if type == "AO" else 0.2092592592592593)
+        plt.subplots_adjust(left=0.1, right=0.9, top=0.9 if type == "AO" else 0.95, bottom=0.1 if type == "AO" else 0.2357142857142857)
         plt.axis(False)
         plt.title("Fundus" if type == "AF" else "OCT", fontsize = 12)
         
         for net_name, net_name_title, pos in net_list:
             sub_ax = fig.add_subplot(grid[pos])
-            sub_ax.set_title(net_name_title)
+            if pos[0] == 1:
+                sub_ax.set_title(net_name_title, pad = 3.5)
+            else:
+                sub_ax.text(0.5, -0.03, net_name_title,ha='center', va='top', fontsize=9)
             sub_ax.set_axis_off()
             sub_grid = gridspec.GridSpecFromSubplotSpec(2, 1, subplot_spec = grid[pos], wspace = 0, hspace = 0.025)
             
@@ -123,12 +126,20 @@ def plot_loss_and_acc():
             loss_ax.axvline(x=continuation_epoch, linewidth = 0.7, color='gray', linestyle='--')
             loss_ax.axvline(x=best_epoch, linewidth = 0.5, color='gray', linestyle='-')
 
+            
             acc_ax.xaxis.set_ticks([])
             if pos[1] == 1:
                 acc_ax.yaxis.tick_right()
                 acc_ax.yaxis.set_label_position('right')
                 loss_ax.yaxis.tick_right()
                 loss_ax.yaxis.set_label_position('right')
+            else:
+                acc_ax.set_ylabel("Accuracy")
+                loss_ax.set_ylabel("Loss")
+            if pos[0] == 0:
+                loss_ax.xaxis.set_ticks([])
+            else:
+                loss_ax.set_xlabel("Epoch")
         
         if type == "AF" and pos == (1, 1):
             
@@ -146,4 +157,4 @@ def plot_loss_and_acc():
             fig.legend(handles=legend_lines, ncols = 2, loc = "upper center", bbox_to_anchor = (0.5,0.16))
             
         plt.savefig(fig_path)
-        #plt.show()
+        plt.show()
