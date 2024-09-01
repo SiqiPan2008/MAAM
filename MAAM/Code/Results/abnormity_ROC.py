@@ -115,5 +115,5 @@ def plot_roc():
     fig.legend(handles=legend_lines, ncols = 2, loc = "lower right", bbox_to_anchor = (0.91,0.1))
     fig.text(0.898, 0.2, "Horizontal axes: specificity\nVertical axes: sensitivity", fontsize=9, 
         verticalalignment='bottom', horizontalalignment='right', bbox=dict(facecolor='white', edgecolor='#D1D1D1', boxstyle='round,pad=0.25'))
-    plt.savefig(fig_path)
+    plt.savefig(fig_path, bbox_inches = "tight")
     plt.show()
