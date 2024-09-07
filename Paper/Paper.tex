@@ -74,7 +74,6 @@
 	\date{}
 	\maketitle
 	
-	\vspace{-0.7cm}
 	\hrule
 	\vspace{-0.3cm}
 	\section*{Abstract}
@@ -82,12 +81,18 @@
 	\vspace{0.3cm}
 	We devise a novel model, the Multimodal Abnormity-Aware Model (MAAM), for assisting ocular disease diagnosis. The MAAM enables input of 2 kinds of ophthalmological images, namely optical coherence tomography (OCT) and color fundus images, and simulates the decision-making process by deducing the disease from abnormities. The model is composed of 2 submodels, the Abnormity Models and the Diagnosis Model, where the Abnormity Models identify 11 OCT abnormities and 8 fundus abnormities, and the Diagnosis Model identifies 12 diseases by integrating features from the former model. In MAAM, we introduce the fusion mechanism, the concept of codominant abnormities and diseases, and the Abnormity-to-Disease Criteria.  The model breaks the black box of complex neural network and expose more interpretable information for the reference of ophthalmologists. And it gets the overall accuracy of 89\% and thus the feasibility is verified.
 	
-	\vspace{0.2cm}
-	{\fontsize{12pt}{12pt}\selectfont \hspace{-0.8cm}\textbf{Keywords: }Multimodal, Deep Learning, Abnormity-Aware, Ocular Diagnosis}
 	\vspace{0.3cm}
 	\hrule
 	
+	\vspace{0.5cm}
+	{\fontsize{12pt}{12pt}\selectfont \hspace{-0.8cm}\textbf{Keywords: }Multimodal, Deep Learning, Abnormity-Aware, Ocular Diagnosis}
+
+	
+	\pagebreak
+	
 	\tableofcontents
+	
+	\vspace{0.4cm}
 	
 	\begin{multicols}{2}
 	\section{Background}
@@ -587,6 +592,8 @@
 	\section{Conclusion}
 	
 	The main goal of this study is to devise a novel model and verify its feasibility. The MAAM takes both OCT and fundus images as input. We integrate information from different sources by employing the fusion mechanism. Moreover, we deduce disease from abnormities and simulate the decision-making process of ophthalmologists. We also introduced codominant abnormities and diseases, providing more information for reference. As a result, the model breaks the black box of complex neural network and exposes more information. On the other hand, there is some room for improvement, such as gathering more authentic data, introducing the expertise of ophthalmologists, refining the Abnormity-to-Disease Deduction Criteria, and improving the structure of the Diagnosis Model, etc.
+	
+	\pagebreak
 	
 	\phantomsection
 	\addcontentsline{toc}{section}{References}
