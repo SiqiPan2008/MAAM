@@ -20,6 +20,7 @@
 *.synctex(busy)
 *.toc
 Paper/Paper.pdf
+Paper-Translated/Paper.pdf
 __pycache__/
 MAAM/Code/.vscode/
 MAAM/Data
