@@ -14,9 +14,8 @@
 \usepackage{algorithm}
 \usepackage{algpseudocode}
 \usepackage{enumitem}
-\usepackage[style=ieee,sorting=nyt]{biblatex}
-\assignrefcontextentries[]{*}
-\addbibresource{References.bib}
+\bibliographystyle{Frontiers-Harvard.bst}
+\bibliography{References.bib}
 \geometry{left=1in, right=1in, top=1in, bottom=1in}
 \hypersetup{hidelinks}
 \hypersetup{bookmarksnumbered=true,
@@ -33,7 +32,7 @@
 \captionsetup[figure]{name={Fig.},labelsep=space,labelfont=bf}
 \captionsetup[table]{name={Table},labelsep=space,labelfont=bf}
 \CTEXoptions[today=old, contentsname=Contents]
-\newcommand{\authyear}[1]{\citeauthor{#1} (\citeyear{#1})}
+\newcommand{\authyear}[1]{\author{#1} (\year{#1})}
 \setmainfont{Arial}
 
 \newcommand{\toB}[1]{\color{blue}#1\color{black}}
@@ -56,26 +55,26 @@
 	\vspace{1cm}
 	
 	\begin{multicols}{2}
-	\section{Background}
-	Ocular diseases can be diagnosed through various methods, including using optical coherence tomography (OCT) and color fundus images. Ophthalmologists usually identify ocular abnormalities to deduce the disease. Traditionally, the diagnosis primarily depends on the professional experience and knowledge of the ophthalmologists, which may result in high misdiagnosis rate and under-utilization of medical data. With the widespread application of artificial intelligence (AI), deep learning (DL) has made great contributions in providing support to patients in remote areas by sharing expert knowledge \autocite{Ichhpujani_Thakur_2021}. By leveraging DL, researchers have developed auxiliary diagnosis programs to help ophthalmologists in the process. Many studies use convolutional neural networks (CNN) to analyze ocular images. Some commonly used CNNs are VGG, ResNet, and Inception \autocite{daich2023artificial}. And for segmenting images and finding abnormalities, U-net is widely used \autocite{Ronneberger_Fischer_Brox_2015}. With regards to training CNNs, most studies use transferred learning, which consists of three steps: learning, fine-tuning, and validation.
+	\section{Introduction}
+	Ocular diseases can be diagnosed through various methods, including using optical coherence tomography (OCT) and color fundus images. Ophthalmologists usually identify ocular abnormalities to deduce the disease. Traditionally, the diagnosis primarily depends on the professional experience and knowledge of the ophthalmologists, which may result in high misdiagnosis rate and under-utilization of medical data. With the widespread application of artificial intelligence (AI), deep learning (DL) has made great contributions in providing support to patients in remote areas by sharing expert knowledge \cite{Ichhpujani_Thakur_2021}. By leveraging DL, researchers have developed auxiliary diagnosis programs to help ophthalmologists in the process. Many studies use convolutional neural networks (CNN) to analyze ocular images. Some commonly used CNNs are VGG, ResNet, and Inception \cite{daich2023artificial}. And for segmenting images and finding abnormalities, U-net is widely used \cite{Ronneberger_Fischer_Brox_2015}. With regards to training CNNs, most studies use transferred learning, which consists of three steps: learning, fine-tuning, and validation.
 	
 	Some studies directly predict the disease from OCT images.
-	\authyear{li2019deep} used ResNet to analyze OCT images and distinguish between choroidal neovascularization (CNV), diabetic macular edema (DME), drusen, and healthy eyes. In addition, they performed occlusion testing to find out the regions that are the most important in diagnosis \autocite{li2019deep}. 
-	\authyear{yoo2021feasibility} used generative adversarial network (GAN) and Inception-v3 together with a few-shot dataset to investigate the feasibility of improving OCT diagnosis of rare ocular diseases \autocite{yoo2021feasibility}. They handled the issues of training image shortage and data imbalance by creating ocular disease OCT images from healthy OCT images. \authyear{Kermany2018} conducts medical diagnosis and identifies treatable diseases by image-based deep learning. They also provided a widely used database including more than one hundred thousand OCT labeled images for 3 diseases \autocite{Kermany2018}.
+	\authyear{li2019deep} used ResNet to analyze OCT images and distinguish between choroidal neovascularization (CNV), diabetic macular edema (DME), drusen, and healthy eyes. In addition, they performed occlusion testing to find out the regions that are the most important in diagnosis \cite{li2019deep}. 
+	\authyear{yoo2021feasibility} used generative adversarial network (GAN) and Inception-v3 together with a few-shot dataset to investigate the feasibility of improving OCT diagnosis of rare ocular diseases \cite{yoo2021feasibility}. They handled the issues of training image shortage and data imbalance by creating ocular disease OCT images from healthy OCT images. \authyear{Kermany2018} conducts medical diagnosis and identifies treatable diseases by image-based deep learning. They also provided a widely used database including more than one hundred thousand OCT labeled images for 3 diseases \cite{Kermany2018}.
 	
 	Some other studies can identify ocular abnormalities from annotated OCT images.
-	\authyear{camino2018deep} used DL to identify the region of preserved photoreceptors on \textit{en face} OCT in choroideremia and retinitis pigmentosa (RP) \autocite{camino2018deep}. 
-	\authyear{srinivasan2014fully} detected DME and dry age-related macular degeneration (dry AMD) from OCT images by flattening the image and using support vector machine (SVM) to extract the thickness information of the retinal layers \autocite{srinivasan2014fully}. 
-	\authyear{leandro2023oct} implemented VGG to identify up to 8 kinds of key abnormalities and hence detect multiple diseases by using central fovea cross-section OCT \autocite{leandro2023oct}. \authyear{Fang_Wang2019} developed a novel lesion-aware CNN, called LACNN, to simulate the ophthalmologists' diagnosis that focuses on ocular abnormalities. The LACNN is a U-net-like CNN which incorporates VGG16 as the baseline, and the result is impressive \autocite{Fang_Wang2019}.
+	\authyear{camino2018deep} used DL to identify the region of preserved photoreceptors on \textit{en face} OCT in choroideremia and retinitis pigmentosa (RP) \cite{camino2018deep}. 
+	\authyear{srinivasan2014fully} detected DME and dry age-related macular degeneration (dry AMD) from OCT images by flattening the image and using support vector machine (SVM) to extract the thickness information of the retinal layers \cite{srinivasan2014fully}. 
+	\authyear{leandro2023oct} implemented VGG to identify up to 8 kinds of key abnormalities and hence detect multiple diseases by using central fovea cross-section OCT \cite{leandro2023oct}. \authyear{Fang_Wang2019} developed a novel lesion-aware CNN, called LACNN, to simulate the ophthalmologists' diagnosis that focuses on ocular abnormalities. The LACNN is a U-net-like CNN which incorporates VGG16 as the baseline, and the result is impressive \cite{Fang_Wang2019}.
 	
 	Other studies use fundus images to predict ocular diseases.
-	\authyear{masumoto2019accuracy} trained deep CNN with ultrawide-field fundus images to make the CNN capable of diagnosing RP \autocite{masumoto2019accuracy}. 
-	\authyear{chen2021artificial} uses color fundus photographs and multiple types of CNN (Inception V3, Inception Resnet V2, and Xception) to develop a method of early detection of RP \autocite{chen2021artificial}. 
-	\authyear{li2022development} uses CNN to detect up to 12 fundus diseases based on colour fundus photography \autocite{li2022development}. \authyear{Son2023} presented a novel architectural and algorithmic design to comprehensively identify 15 abnormalities and diagnose 8 major ocular diseases from macula-centered fundus images. They defined a notion of counterfactual attribution ratio (CAR) to interpret the system's diagnostic reason and disclose the relationship between abnormalities and diseases \autocite{Son2023}.
+	\authyear{masumoto2019accuracy} trained deep CNN with ultrawide-field fundus images to make the CNN capable of diagnosing RP \cite{masumoto2019accuracy}. 
+	\authyear{chen2021artificial} uses color fundus photographs and multiple types of CNN (Inception V3, Inception Resnet V2, and Xception) to develop a method of early detection of RP \cite{chen2021artificial}. 
+	\authyear{li2022development} uses CNN to detect up to 12 fundus diseases based on colour fundus photography \cite{li2022development}. \authyear{Son2023} presented a novel architectural and algorithmic design to comprehensively identify 15 abnormalities and diagnose 8 major ocular diseases from macula-centered fundus images. They defined a notion of counterfactual attribution ratio (CAR) to interpret the system's diagnostic reason and disclose the relationship between abnormalities and diseases \cite{Son2023}.
 	
-	In recent years, more and more DL systems began to use multi-modal information to predict ocular diseases. For automated detection system, retrieving features from both OCT images and fundus images can effectively keep the diagnosis away from bias and incompleteness. It is not always necessary to yield a better automated diagnosis result, but it does help ophthalmologist to make more accurate and holistic clinical decisions. For instance, \authyear{liu2023prediction} combined OCT and fundus images to evaluate visual impairment in RP in terms of best-corrected visual acuity(BCVA) \autocite{liu2023prediction}. \authyear{Xu2021} leveraged a bi-modal CNN to diagnose AMD and polypoidal choroidal vasculopathy (PCV), where the architecture uses fundus and OCT images as input for transferred learning CNN and concatenates the retrieved features to classify 3 diseases including dry AMD, wet AMD and PCV \autocite{Xu2021}. And \author{Andrearczyk2018} ingeniously combined medical images and biomedical textual information to discriminate different diseases, which is a novel method for the usage of multi-modal application \autocite{Andrearczyk2018}.
+	In recent years, more and more DL systems began to use multi-modal information to predict ocular diseases. For automated detection system, retrieving features from both OCT images and fundus images can effectively keep the diagnosis away from bias and incompleteness. It is not always necessary to yield a better automated diagnosis result, but it does help ophthalmologist to make more accurate and holistic clinical decisions. For instance, \authyear{liu2023prediction} combined OCT and fundus images to evaluate visual impairment in RP in terms of best-corrected visual acuity(BCVA) \cite{liu2023prediction}. \authyear{Xu2021} leveraged a bi-modal CNN to diagnose AMD and polypoidal choroidal vasculopathy (PCV), where the architecture uses fundus and OCT images as input for transferred learning CNN and concatenates the retrieved features to classify 3 diseases including dry AMD, wet AMD and PCV \cite{Xu2021}. And \author{Andrearczyk2018} ingeniously combined medical images and biomedical textual information to discriminate different diseases, which is a novel method for the usage of multi-modal application \cite{Andrearczyk2018}.
 	
-	The key technical problem of multi-modal diagnosis is how to fuse the results from multifarious sources. There are three types of fusion, namely early, late, and hybrid fusion. Deciding on the optimal type of fusion is part of the exploratory process in the application of DL methods \autocite{Ichhpujani_Thakur_2021}.
+	The key technical problem of multi-modal diagnosis is how to fuse the results from multifarious sources. There are three types of fusion, namely early, late, and hybrid fusion. Deciding on the optimal type of fusion is part of the exploratory process in the application of DL methods \cite{Ichhpujani_Thakur_2021}.
 	
 	\section{Overview}
 	\label{sec:overview}
@@ -103,7 +102,7 @@
 	\begin{figure}[htbp]
 		\centering
 		\includegraphics[width=\linewidth]{Figs/OCT_Abnormities.pdf}
-		\caption{OCT abnormities \autocite{Duker_Waheed_Goldman_2022}}
+		\caption{OCT abnormities \cite{Duker_Waheed_Goldman_2022}}
 		\vspace{0.3cm}
 		\label{fig:OCT_abnormities}
 	\end{figure}
@@ -111,14 +110,14 @@
 	\begin{figure}[htbp]
 		\centering
 		\includegraphics[width=\linewidth]{Figs/fundus_Abnormities.pdf}
-		\caption{Fundus abnormities \autocite{Wolf_Kirchhof_Reim_2006}}
+		\caption{Fundus abnormities \cite{Wolf_Kirchhof_Reim_2006}}
 		\vspace{0.3cm}
 		\label{fig:fundus_abnormities}
 	\end{figure}
 	
 	\begin{multicols}{2}
 		
-	The Abnormity Models also contain 2 submodels: the OCT Model and the Fundus Model, which classify OCT and fundus abnormities, respectively. Both of the submodels leverage CNNs with modified final fully-connected (FC) layers. We compare the performances of 4 commonly used CNNs, ResNet152, ResNet50, ResNet18 \autocite{He_Zhang_Ren_Sun_2016} and VGG16 \autocite{Simonyan_Zisserman_2015}, and choose the best one for each submodel. The final FC layer in each CNN is modified so that the size of its output vector is equal to the number of OCT or fundus abnormities. In order to normalize the output vector, we perform the softmax operation. Each submodel outputs a probability vector for all the abnormities.
+	The Abnormity Models also contain 2 submodels: the OCT Model and the Fundus Model, which classify OCT and fundus abnormities, respectively. Both of the submodels leverage CNNs with modified final fully-connected (FC) layers. We compare the performances of 4 commonly used CNNs, ResNet152, ResNet50, ResNet18 \cite{He_Zhang_Ren_Sun_2016} and VGG16 \cite{Simonyan_Zisserman_2015}, and choose the best one for each submodel. The final FC layer in each CNN is modified so that the size of its output vector is equal to the number of OCT or fundus abnormities. In order to normalize the output vector, we perform the softmax operation. Each submodel outputs a probability vector for all the abnormities.
 	
 	\vspace{0.5cm}
 	
@@ -173,7 +172,7 @@
 	
 	The images and labels used for training are mainly downloaded from public databases, but some abnormities are not included in these databases. For those abnormities, we use the search engine as an additional data source to get images. The numbers of images acquired from each data source are shown in Table~\ref{tb:OCT_source} and Table~\ref{tb:Fundus_source}. As to the links of the images from the search engine, refer to ``Appendix''. 
 
-	For OCT abnormities with less than 1000 images, we use Cycle-GAN \autocite{Zhu_Park_Isola_Efros_2020} to generate new images. We train a Cycle-GAN network to interconvert healthy and abnormity images, take out the generator that converts healthy to abnormity images, and use it to generate new abnormity images. We go through all generated images and adopt those that clearly display only the abnormity of interest. The adoption rates are shown in Table~\ref{tb:cycleGAN_number}. Fundus images are not generated using Cycle-GAN because generated fundus images are too blurry; in addition, fundus abnormities are usually less salient than OCT ones and cannot be properly learned by Cycle-GAN, given that we only have a small number of fundus images.
+	For OCT abnormities with less than 1000 images, we use Cycle-GAN \cite{Zhu_Park_Isola_Efros_2020} to generate new images. We train a Cycle-GAN network to interconvert healthy and abnormity images, take out the generator that converts healthy to abnormity images, and use it to generate new abnormity images. We go through all generated images and adopt those that clearly display only the abnormity of interest. The adoption rates are shown in Table~\ref{tb:cycleGAN_number}. Fundus images are not generated using Cycle-GAN because generated fundus images are too blurry; in addition, fundus abnormities are usually less salient than OCT ones and cannot be properly learned by Cycle-GAN, given that we only have a small number of fundus images.
 	\end{multicols}
 	
 	\vspace{-0.5cm}
@@ -205,13 +204,13 @@
 				
 				\vspace{0.5cm}
 				\begin{enumerate}
-					\item Normal Disease Database \autocite{Kermany_database}
+					\item Normal Disease Database \cite{Kermany_database}
 					\vspace{-0.2cm}
 					
-					\item OCTID \autocite{Gholami_Roy_Parthasarathy_Lakshminarayanan_2020}
+					\item OCTID \cite{Gholami_Roy_Parthasarathy_Lakshminarayanan_2020}
 					\vspace{-0.2cm}
 					
-					\item Few-shot \autocite{Yoo_2020}
+					\item Few-shot \cite{Yoo_2020}
 					\vspace{-0.2cm}
 					
 					\item Search engine
@@ -249,19 +248,19 @@
 				\vspace{1cm}
 				\begin{enumerate}[left=1.5cm]
 					
-					\item E-ophtha \autocite{E_ophtha}.
+					\item E-ophtha \cite{E_ophtha}.
 					\vspace{-0.2cm}
 					
-					\item Kaggle1000 \autocite{1000Fundus_Pytorch_TransferLearning}
+					\item Kaggle1000 \cite{1000Fundus_Pytorch_TransferLearning}
 					\vspace{-0.2cm}
 					
-					\item HRF \autocite{HRF_2013}
+					\item HRF \cite{HRF_2013}
 					\vspace{-0.2cm}
 					
-					\item STARE \autocite{STARE}
+					\item STARE \cite{STARE}
 					\vspace{-0.2cm}
 					
-					\item EyePACS \autocite{DR_dataset}
+					\item EyePACS \cite{DR_dataset}
 					\vspace{-0.2cm}
 					
 					\item Search engine
@@ -306,7 +305,7 @@
 	
 	For the Abnormity Models, we employ a strategy of transfer learning to finetuning. 
 	
-	In the transfer learning phase, pretrained weights from ImageNet \autocite{Krizhevsky_Sutskever_Hinton_2017} are used. We freeze the weights in all the convolutional layers and only vary the weights in the final FC layer. The training lasts for 100 epochs. Every 10 epochs, weights of the model with the best validation accuracy are saved. In order to prevent overfitting on the train dataset, we introduce a measure called overall accuracy, which is the weighted average of validation and test accuracy. For all the saved models, we calculate the overall accuracy to select the model with the best overall performance on the validation and test datasets, and start finetuning based on this model. 
+	In the transfer learning phase, pretrained weights from ImageNet \cite{Krizhevsky_Sutskever_Hinton_2017} are used. We freeze the weights in all the convolutional layers and only vary the weights in the final FC layer. The training lasts for 100 epochs. Every 10 epochs, weights of the model with the best validation accuracy are saved. In order to prevent overfitting on the train dataset, we introduce a measure called overall accuracy, which is the weighted average of validation and test accuracy. For all the saved models, we calculate the overall accuracy to select the model with the best overall performance on the validation and test datasets, and start finetuning based on this model. 
 	
 	In the finetuning phase, we start from the best model in the transfer learning phase, unfreezing all weights in the model. We train the model for 30 epochs. Similarly, we save the weights of the model with the best validation accuracy every 10 epochs, and find the model with the highest overall accuracy. Finally, we compare the overall accuracies of the best model in the transfer learning phase and the finetuning phase to determine the best model of all. 
 	
@@ -446,7 +445,7 @@
 		
 		\vspace{0.3cm}
 		
-		We can use Grad-CAM \autocite{Selvaraju_Cogswell_Das_Vedantam_Parikh_Batra} to highlight areas on the image that make a large contribution to the final classification. If the model had been trained correctly, this would be equivalent to highlighting the abnormity. In Fig.~\ref{fig:gradCAM}, the left image in each pair of images is the original OCT or Fundus image, and the right one is the image with the abnormity correctly highlighted with Grad-CAM. 
+		We can use Grad-CAM \cite{Selvaraju_Cogswell_Das_Vedantam_Parikh_Batra} to highlight areas on the image that make a large contribution to the final classification. If the model had been trained correctly, this would be equivalent to highlighting the abnormity. In Fig.~\ref{fig:gradCAM}, the left image in each pair of images is the original OCT or Fundus image, and the right one is the image with the abnormity correctly highlighted with Grad-CAM. 
 		
 		Furthermore, Grad-CAM can highlight any designated abnormity, so it can be used to highlight codominant abnormities. In Fig.~\ref{fig:gradCAM_multi_abnormity}, the middle images are the original OCT and fundus images. In the images on the left and right, we use Grad-CAM to highlight the codominant abnormities.
 	
@@ -540,13 +539,13 @@
 	\begin{multicols}{2}
 	\section{Discussion}
 	
-	There are some studies working on classifying OCT abnormities.  For examples, \citeauthor{leandro2023oct}'s model is trained on 10770 images (most images belong to multiple classes), classifies 8 abnormities, and has overall accuracy between 93\% and 99\% \autocite{leandro2023oct}. \citeauthor{li2019deep}'s model is trained on 21357 images, classifies 4 abnormities, and has overall accuracy 97.3\% \autocite{li2019deep}.  And there are some studies working on classifying fundus abnormities.  For example,  	\citeauthor{Son2023}'s model is trained on 103262 images, classifies 15 abnormities, and has a mean AUC of 0.980 \autocite{Son2023}. In comparison, our OCT Model is trained on 15632 images, classifies 11 abnormities, and has overall accuracy less than 80\%.  And our Fundus Model is trained on 1734 images, classifies 8 abnormities, and has a mean AUC of 0.909. As a matter of fact, our Abnormity Models are not satisfying in terms of performance.
+	There are some studies working on classifying OCT abnormities.  For examples, \citeauthor{leandro2023oct}'s model is trained on 10770 images (most images belong to multiple classes), classifies 8 abnormities, and has overall accuracy between 93\% and 99\% \cite{leandro2023oct}. \citeauthor{li2019deep}'s model is trained on 21357 images, classifies 4 abnormities, and has overall accuracy 97.3\% \cite{li2019deep}.  And there are some studies working on classifying fundus abnormities.  For example,  	\citeauthor{Son2023}'s model is trained on 103262 images, classifies 15 abnormities, and has a mean AUC of 0.980 \cite{Son2023}. In comparison, our OCT Model is trained on 15632 images, classifies 11 abnormities, and has overall accuracy less than 80\%.  And our Fundus Model is trained on 1734 images, classifies 8 abnormities, and has a mean AUC of 0.909. As a matter of fact, our Abnormity Models are not satisfying in terms of performance.
 	
 	Our data are collected from various online sources and therefore lack a uniform standard. Furthermore, some of the data are labeled by ourselves, while we do not have the expertise of ophthalmologists. Moreover, our data is not sufficient. There is also an imbalance between the number of images of different abnormities. In the OCT Model, the imbalance is partly neutralized by using Cycle-GAN. However, in the Fundus Model, we could only perform transformations to generate more images, which may increase the model's tendency of being overfitting and make it hard for the model to extract the correct features. Also as mentioned before, in our model, there are often multiple abnormities on one image, which increase the difficulty to identify one specific abnormity correctly. 
 	
 	\vspace{0.3cm}
 	
-	In MAAM, the Diagnosis Model improves the overall performance successfully. There are also some studies using similar framework. For example, \citeauthor{Son2023}'s diagnosis model classifies 8 diseases and has mean AUC 0.992\autocite{Son2023}. In comparison, our Diagnosis Model classifies 12 diseases and has mean AUC of 0.984 which is close to other studies.
+	In MAAM, the Diagnosis Model improves the overall performance successfully. There are also some studies using similar framework. For example, \citeauthor{Son2023}'s diagnosis model classifies 8 diseases and has mean AUC 0.992\cite{Son2023}. In comparison, our Diagnosis Model classifies 12 diseases and has mean AUC of 0.984 which is close to other studies.
 	
 	It is noted that the goal of MAAM is not to identify one specific disease.  It is developed for identifying all the potential diseases, which is different from other studies mentioned in this paper.  Therefore, we introduced codominant abnormities and codominant diseases, which buff up the performances. Moreover, the Diagnosis Model performs two additional feature extractions. While the Abnormity Models only have accuracies between 70\% and 80\%, after we extracted the features of severity levels of diseases in Stage D1, the average accuracy increases. And after we extracted the features of disease in Stage D2, the accuracy keep on increasing up to a satisfying level. These two stages enhance the performance of the Abnormity Models and make the features of the diseases more distinct.	Also, in training the Diagnosis Model, we use the Abnormity-to-Disease Deduction Criteria to generate ground truth, which is reliable even without involving ophthalmologists.
 	
